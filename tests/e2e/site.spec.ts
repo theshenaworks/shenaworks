@@ -67,7 +67,9 @@ test.describe('WCAG 2.2 AA Accessibility (axe-core)', () => {
 
   for (const route of A11Y_ROUTES) {
     test(`Route ${route} passes axe-core WCAG 2.2 AA checks`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' })
       await page.goto(route)
+      await page.waitForLoadState('domcontentloaded')
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
         .analyze()

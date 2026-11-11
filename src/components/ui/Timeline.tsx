@@ -58,7 +58,7 @@ export function Timeline({ entries, variant = 'side-by-side', className = '' }: 
                 }
               >
                 <p className="t-overline !text-[var(--accent-600)] mb-1">{entry.overline}</p>
-                <h4 className="t-h4 mb-1">{entry.title}</h4>
+                <h4 className="t-h4 text-[var(--ink-900)] mb-1">{entry.title}</h4>
                 {entry.subtitle && (
                   <p className="t-body-xs font-bold text-[var(--ink-900)] mb-2">{entry.subtitle}</p>
                 )}
