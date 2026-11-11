@@ -98,7 +98,7 @@ export function Carousel({
                 aria-label={`${idx + 1} of ${total}`}
                 aria-hidden={!isActive}
                 data-slide={isActive ? 'active' : idx > activeIndex ? 'next' : 'prev'}
-                className={`${isActive ? 'relative z-10 block' : 'hidden'} transition-opacity duration-500`}
+                className={`${isActive ? 'relative z-10 block' : 'hidden'} transition-opacity duration-200`}
               >
                 {slide.content}
               </div>

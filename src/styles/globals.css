@@ -353,6 +353,32 @@ html[data-lock="page"]:not([data-lock-below="lg"]) body {
   }
 }
 
+/* Header hide-on-scroll choreography (DESIGN.md 3.3 B & 6.1) */
+@media (min-width: 1024px) {
+  [data-site-header] {
+    transition: transform 400ms cubic-bezier(0.215, 0.61, 0.355, 1),
+                background-color 200ms ease,
+                color 200ms ease,
+                border-color 200ms ease;
+  }
+
+  html[data-scrolled][data-scroll-dir="down"]:not([data-scroll-locked]) [data-site-header]:not(:hover):not(:focus-within) {
+    transform: translate3d(0, -100%, 0);
+  }
+
+  html[data-scroll-dir="up"] [data-site-header],
+  html:not([data-scrolled]) [data-site-header] {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-site-header] {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* Typography roles (DESIGN.md 2.2) */
 .t-display {
   font: 400 var(--display) var(--font-header);

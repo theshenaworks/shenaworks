@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          backgroundColor: '#252627',
+          backgroundColor: '#2e2a25',
           color: '#ffffff',
           padding: '64px 80px',
-          borderTop: '12px solid #c14a12',
+          borderLeft: '8px solid #c14a12',
           fontFamily: 'sans-serif',
         }}
       >
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
           >
             SHENA WORKS LIMITED
           </span>
-          <span style={{ fontSize: '20px', color: '#cccccc' }}>{subtitle}</span>
+          <span style={{ fontSize: '20px', color: '#d7d6d6' }}>{subtitle}</span>
         </div>
 
         <div
@@ -70,10 +70,10 @@ export async function GET(req: NextRequest) {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            borderTop: '2px solid #676868',
+            borderTop: '2px solid #65615d',
             paddingTop: '24px',
             fontSize: '20px',
-            color: '#cccccc',
+            color: '#d7d6d6',
           }}
         >
           <span>shenaworksltd.com</span>

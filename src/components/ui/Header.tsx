@@ -136,7 +136,7 @@ export function Header({
         ref={headerRef}
         data-site-header
         data-header={isTransparent ? 'transparent' : 'solid'}
-        className={`fixed inset-x-0 top-0 z-[50] transition-[transform,background-color,color,border-color] duration-300 ${
+        className={`fixed inset-x-0 top-0 z-[50] transition-[transform,background-color,color,border-color] duration-200 ${
           isTransparent
             ? 'bg-transparent text-[var(--white)] border-b border-white/20'
             : 'bg-[var(--white)] text-[var(--ink-900)] border-b border-[var(--grey-300)] shadow-[var(--shadow-1)]'

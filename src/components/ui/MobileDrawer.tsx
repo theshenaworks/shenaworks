@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Icon } from './Icon'
 import { Button } from './Button'
 import { trackEvent } from '@/lib/analytics'
+import { lockScroll } from '@/behaviors/scrollLock'
 import type { EquipmentCategoryRecord, ServiceRecord } from '@/types/content'
 
 export interface MobileDrawerProps {
@@ -45,22 +46,21 @@ export function MobileDrawer({
 
     if (open) {
       html.setAttribute('data-drawer-open', 'true')
-      document.body.style.overflow = 'hidden'
+      const unlock = lockScroll()
       main?.setAttribute('inert', '')
       footer?.setAttribute('inert', '')
+
+      return () => {
+        html.removeAttribute('data-drawer-open')
+        unlock()
+        main?.removeAttribute('inert')
+        footer?.removeAttribute('inert')
+      }
     } else {
       html.removeAttribute('data-drawer-open')
-      document.body.style.overflow = ''
       main?.removeAttribute('inert')
       footer?.removeAttribute('inert')
       setSubMenu(null)
-    }
-
-    return () => {
-      html.removeAttribute('data-drawer-open')
-      document.body.style.overflow = ''
-      main?.removeAttribute('inert')
-      footer?.removeAttribute('inert')
     }
   }, [open])
 

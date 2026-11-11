@@ -879,7 +879,7 @@ export function EnquiryForm({
                   }}
                   aria-invalid={Boolean(errors.consent)}
                   aria-describedby={errors.consent ? 'error-consent' : undefined}
-                  className="mt-[0.3rem] h-[2.0rem] w-[2.0rem] accent-[var(--ink-900)] shrink-0"
+                  className="mt-[0.3rem] h-[2.0rem] w-[2.0rem] accent-[var(--ink-900)] rounded-none shrink-0"
                 />
                 <span className="text-body-sm text-[var(--ink-900)]">
                   I agree that Shena Works may use these details to respond to my enquiry, as

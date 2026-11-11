@@ -78,7 +78,7 @@ export function Dialog({ open, onClose, title, id, children, actions }: DialogPr
         aria-modal="true"
         aria-labelledby={`${id}-title`}
         tabIndex={-1}
-        className="relative z-10 bg-white text-[var(--ink-900)] w-full h-dvh md:h-auto md:max-w-[min(72rem,calc(100vw-4.8rem))] md:max-h-[calc(100dvh-9.6rem)] p-6 md:p-14 overflow-y-auto [filter:var(--shadow-2)] transition-all duration-400"
+        className="relative z-10 bg-white text-[var(--ink-900)] w-full h-dvh md:h-auto md:max-w-[min(72rem,calc(100vw-4.8rem))] md:max-h-[calc(100dvh-9.6rem)] p-6 md:p-14 overflow-y-auto [filter:var(--shadow-2)] transition-[transform,opacity] duration-200 ease-[var(--ease-out-cubic)]"
       >
         <div className="absolute top-2 right-2">
           <IconButton icon="close" ariaLabel="Close dialog" dense onClick={onClose} />
