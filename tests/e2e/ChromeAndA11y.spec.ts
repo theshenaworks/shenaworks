@@ -55,10 +55,19 @@ test.describe('Global Chrome & Accessibility', () => {
     const mainContent = page.locator('#main-content')
     await expect(mainContent).toHaveAttribute('inert', '')
 
-    // Tab within drawer - focus must stay inside dialog
+    // Verify focus trap wraps on both boundaries
+    const focusables = drawer.locator('a[href], button:not([disabled])')
+    const firstControl = focusables.first()
+    const lastControl = focusables.last()
+
+    // 1. Focus first control and press Shift+Tab -> focus moves to last control
+    await firstControl.focus()
+    await page.keyboard.press('Shift+Tab')
+    await expect(lastControl).toBeFocused()
+
+    // 2. From last control, press Tab -> focus wraps back to first control
     await page.keyboard.press('Tab')
-    const focusedInsideDrawer = await drawer.evaluate((el) => el.contains(document.activeElement))
-    expect(focusedInsideDrawer).toBe(true)
+    await expect(firstControl).toBeFocused()
 
     // Press Escape to close
     await page.keyboard.press('Escape')

@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import { siteSettingsSeed } from '../src/seed/data'
+import { getSiteSettings } from '../src/lib/content'
 
 async function generateProfile() {
   const pdfDoc = await PDFDocument.create()
+  const settings = getSiteSettings()
 
   // Murram accent (#c14a12) = rgb(193/255, 74/255, 18/255)
   const murramColor = rgb(193 / 255, 74 / 255, 18 / 255)
@@ -111,8 +112,8 @@ async function generateProfile() {
     ['Head Office:', 'Ground Floor, Al-Haqq Building, Makutano, Meru County (P.O. Box 2872-60200)'],
     ['Nairobi Office:', 'Park Suites, Parklands, Nairobi'],
     ['Managing Director:', 'Newton M. Muthee'],
-    ['Contact Phone:', siteSettingsSeed.contact.phoneDisplay],
-    ['Email & Web:', `${siteSettingsSeed.contact.email} | https://shenaworksltd.com`],
+    ['Contact Phone:', settings.contact.phoneDisplay],
+    ['Email & Web:', `${settings.contact.email} | https://shenaworksltd.com`],
   ]
 
   let factY = y - 42
@@ -304,7 +305,7 @@ async function generateProfile() {
   })
 
   page2.drawText(
-    `Telephone: ${siteSettingsSeed.contact.phoneDisplay} | WhatsApp: +${siteSettingsSeed.contact.whatsappNumber} | Email: ${siteSettingsSeed.contact.email}`,
+    `Telephone: ${settings.contact.phoneDisplay} | WhatsApp: +${settings.contact.whatsappNumber} | Email: ${settings.contact.email}`,
     {
       x: 64,
       y: y - 60,

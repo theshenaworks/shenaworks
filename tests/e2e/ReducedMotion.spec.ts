@@ -15,7 +15,7 @@ test.describe('Reduced Motion Compliance', () => {
     const count = await revealElements.count()
 
     if (count > 0) {
-      for (let i = 0; i < Math.min(count, 3); i++) {
+      for (let i = 0; i < count; i++) {
         const reveal = revealElements.nth(i)
         await expect(reveal).toBeVisible()
         const styles = await reveal.evaluate((el) => {
