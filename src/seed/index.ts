@@ -36,16 +36,29 @@ async function upsertBySlug(
   data: Record<string, any>,
 ): Promise<number | string> {
   process.stdout.write(`[seed] ${collection} > ${slug}... `)
-  const existing = await payload.find({
-    collection,
-    where: { slug: { equals: slug } },
-    draft: true,
-    limit: 1,
-  })
-  if (existing.docs[0]) {
+  let existingDoc = (
+    await payload.find({
+      collection,
+      where: { slug: { equals: slug } },
+      draft: true,
+      limit: 1,
+    })
+  ).docs[0]
+
+  if (!existingDoc) {
+    existingDoc = (
+      await payload.find({
+        collection,
+        where: { slug: { equals: slug } },
+        limit: 1,
+      })
+    ).docs[0]
+  }
+
+  if (existingDoc) {
     const updated = await payload.update({
       collection,
-      id: existing.docs[0].id,
+      id: existingDoc.id,
       data,
       draft: data._status === 'draft',
     })
@@ -116,11 +129,13 @@ async function runSeed() {
     slug: 'equipment-index',
     data: {
       hireTerms: {
-        operator: defaultHireTerms.operator,
-        fuel: defaultHireTerms.fuel,
-        transport: defaultHireTerms.transport,
-        serviceArea: defaultHireTerms.serviceArea,
-        minimumHire: defaultHireTerms.minimumHire,
+        operator: 'Included — machine is hired only with a Shena-trained operator',
+        fuel: 'Dry rate (client supplies diesel on site) or wet rate option stated on quote',
+        transport:
+          'Low-loader mobilisation and demobilisation quoted from Meru or Nairobi yard to your site',
+        minimumHire: '1 full day (8 machine working hours)',
+        serviceArea:
+          'Meru, Isiolo, Laikipia, Tharaka-Nithi, Nyeri, Embu, Kirinyaga, Nairobi and nationwide for longer hires',
       },
     },
   })
