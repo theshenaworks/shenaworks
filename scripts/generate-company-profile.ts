@@ -5,7 +5,30 @@ import { getSiteSettings } from '../src/lib/content'
 
 async function generateProfile() {
   const pdfDoc = await PDFDocument.create()
-  const settings = getSiteSettings()
+  let settings = getSiteSettings()
+
+  if (process.env.DATABASE_URI) {
+    try {
+      const { getPayload } = await import('payload')
+      const config = (await import('@payload-config')).default
+      const payload = await getPayload({ config })
+      const liveSettings = await payload.findGlobal({ slug: 'site-settings' })
+      if (liveSettings?.contact) {
+        settings = {
+          ...settings,
+          contact: {
+            ...settings.contact,
+            phoneE164: liveSettings.contact.phoneE164 || settings.contact.phoneE164,
+            phoneDisplay: liveSettings.contact.phoneDisplay || settings.contact.phoneDisplay,
+            whatsappNumber: liveSettings.contact.whatsappNumber || settings.contact.whatsappNumber,
+            email: liveSettings.contact.email || settings.contact.email,
+          },
+        }
+      }
+    } catch {
+      // Fall back to local seed settings if offline or DB not reachable
+    }
+  }
 
   // Murram accent (#c14a12) = rgb(193/255, 74/255, 18/255)
   const murramColor = rgb(193 / 255, 74 / 255, 18 / 255)
