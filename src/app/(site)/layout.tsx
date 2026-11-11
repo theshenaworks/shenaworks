@@ -1,8 +1,11 @@
 import React from 'react'
+import type { Metadata } from 'next'
+import '@/styles/globals.css'
 import { Header } from '@/components/ui/Header'
 import { Footer } from '@/components/ui/Footer'
 import { MobileActionBar } from '@/components/ui/MobileActionBar'
 import { CookieBanner } from '@/components/ui/CookieBanner'
+import { AnalyticsLoader } from '@/components/ui/AnalyticsLoader'
 import { BehaviorProvider } from '@/behaviors'
 import {
   getPublishedCredentials,
@@ -13,6 +16,23 @@ import {
   getSiteSettings,
 } from '@/lib/content'
 
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://shenaworksltd.com'),
+  title: {
+    default: 'Road & Building Contractors in Meru and Nairobi | Shena Works',
+    template: '%s',
+  },
+  description:
+    'Shena Works builds roads, cabro paving, drainage and buildings across Meru, Nairobi and Kenya, with its own excavators, graders and rollers. Request a quote.',
+  icons: {
+    icon: '/brand/favicon.svg',
+  },
+}
+
+/**
+ * Root layout for the public site. The `(payload)` route group has its own
+ * root layout for `/admin`, so the `<html>` shell lives here, not in app/.
+ */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = getSiteSettings()
   const services = getPublishedServices()
@@ -23,7 +43,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   const hasCompanyProfile = Boolean(settings.files.companyProfile?.url)
 
   return (
-    <>
+    <html lang="en-KE">
+      <body>
+      <AnalyticsLoader />
       <BehaviorProvider />
       <Header
         services={services}
@@ -65,6 +87,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       />
 
       <CookieBanner />
-    </>
+      </body>
+    </html>
   )
 }

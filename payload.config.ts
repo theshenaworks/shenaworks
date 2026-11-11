@@ -1,9 +1,17 @@
+import dns from 'dns'
+import net from 'net'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { s3Storage } from '@payloadcms/storage-s3'
+import sharp from 'sharp'
+
+dns.setDefaultResultOrder('ipv4first')
+if (typeof net.setDefaultAutoSelectFamily === 'function') {
+  net.setDefaultAutoSelectFamily(false)
+}
 
 import { Users } from './src/collections/Users'
 import { Media, EnquiryAttachments } from './src/collections/Media'
@@ -34,6 +42,16 @@ const dirname = path.dirname(filename)
 const plugins = []
 
 if (process.env.R2_ACCOUNT_ID && process.env.R2_ACCESS_KEY_ID && process.env.R2_SECRET_ACCESS_KEY) {
+  const r2Config = {
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    region: 'auto',
+    credentials: {
+      accessKeyId: process.env.R2_ACCESS_KEY_ID,
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+    },
+  }
+
+  // Public media -> public bucket served from media.shenaworksltd.com (BUILD-GUIDE.md 6).
   plugins.push(
     s3Storage({
       collections: {
@@ -42,19 +60,22 @@ if (process.env.R2_ACCOUNT_ID && process.env.R2_ACCESS_KEY_ID && process.env.R2_
           generateFileURL: ({ filename: file }) =>
             `${process.env.NEXT_PUBLIC_MEDIA_URL || 'https://media.shenaworksltd.com'}/media/${file}`,
         },
-        'enquiry-attachments': {
-          prefix: 'private/enquiries',
-        },
       },
       bucket: process.env.R2_PUBLIC_BUCKET || 'shena-media-public',
-      config: {
-        endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-        region: 'auto',
-        credentials: {
-          accessKeyId: process.env.R2_ACCESS_KEY_ID,
-          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+      config: r2Config,
+    }),
+  )
+
+  // Enquiry attachments -> private bucket. Never public; read only via Payload access control.
+  plugins.push(
+    s3Storage({
+      collections: {
+        'enquiry-attachments': {
+          prefix: 'enquiries',
         },
       },
+      bucket: process.env.R2_PRIVATE_BUCKET || 'shena-enquiries-private',
+      config: r2Config,
     }),
   )
 }
@@ -93,7 +114,14 @@ export default buildConfig({
     EquipmentIndex,
   ],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'shena-works-dev-secret-change-in-production',
+  secret: (() => {
+    if (process.env.PAYLOAD_SECRET) return process.env.PAYLOAD_SECRET
+    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
+      throw new Error('PAYLOAD_SECRET must be set in production.')
+    }
+    return 'shena-works-dev-secret-change-in-production'
+  })(),
+  sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'src/payload-types.ts'),
   },
@@ -107,6 +135,7 @@ export default buildConfig({
       idleTimeoutMillis: 30000,
     },
     push: false,
+    migrationDir: path.resolve(dirname, 'src/migrations'),
   }),
   plugins,
 })

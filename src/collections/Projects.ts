@@ -42,6 +42,7 @@ export const Projects: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
+      enumName: 'enum_projects_delivery_status',
       required: true,
       defaultValue: 'Completed',
       options: ['Completed', 'In progress'],

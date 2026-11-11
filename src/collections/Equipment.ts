@@ -24,7 +24,7 @@ export const EquipmentCategories: CollectionConfig = {
     {
       name: 'uses',
       type: 'array',
-      minRows: 3,
+      minRows: 2,
       fields: [
         { name: 'title', type: 'text', required: true },
         { name: 'description', type: 'textarea', required: true },
@@ -71,7 +71,7 @@ export const Equipment: CollectionConfig = {
     {
       name: 'uses',
       type: 'array',
-      minRows: 3,
+      minRows: 2,
       fields: [
         { name: 'title', type: 'text', required: true },
         { name: 'description', type: 'textarea', required: true },

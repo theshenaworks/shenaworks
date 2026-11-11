@@ -23,6 +23,10 @@ export function CookieBanner() {
     const maxAge = 60 * 60 * 24 * 365 // 12 months
     document.cookie = `sw_consent=${choice}; path=/; max-age=${maxAge}; SameSite=Lax`
 
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('shena:consent-changed', { detail: { choice } }))
+    }
+
     if (choice === 'essential') {
       // Remove any existing _ga cookies if switching to essential only (CONTENT.md 11.2)
       document.cookie.split(';').forEach((cookie) => {

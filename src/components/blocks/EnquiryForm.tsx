@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { MessageBanner } from '@/components/ui/MessageBanner'
 import { Icon } from '@/components/ui/Icon'
@@ -92,9 +92,49 @@ export function EnquiryForm({
   const [serverError, setServerError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [started, setStarted] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string>('')
 
   const summaryRef = useRef<HTMLDivElement>(null)
   const startedAtRef = useRef<number>(Date.now())
+  const turnstileContainerRef = useRef<HTMLDivElement>(null)
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+  useEffect(() => {
+    if (!siteKey || typeof window === 'undefined') return
+
+    const renderWidget = () => {
+      // @ts-expect-error Cloudflare Turnstile global
+      if (window.turnstile && turnstileContainerRef.current) {
+        try {
+          // @ts-expect-error Cloudflare Turnstile global
+          window.turnstile.render(turnstileContainerRef.current, {
+            sitekey: siteKey,
+            callback: (token: string) => {
+              setTurnstileToken(token)
+            },
+            'expired-callback': () => {
+              setTurnstileToken('')
+            },
+            theme: 'light',
+          })
+        } catch {
+          // ignore if already rendered
+        }
+      }
+    }
+
+    // @ts-expect-error Cloudflare Turnstile global
+    if (window.turnstile) {
+      renderWidget()
+    } else {
+      const script = document.createElement('script')
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+      script.async = true
+      script.defer = true
+      script.onload = renderWidget
+      document.head.appendChild(script)
+    }
+  }, [siteKey])
 
   const publishedServices = useMemo(
     () => servicesSeed.filter((s) => s._status === 'published'),
@@ -160,15 +200,39 @@ export function EnquiryForm({
     e.preventDefault()
     setServerError(null)
 
-    const parsed = enquirySchema.safeParse(getFormPayload())
+    const payload = getFormPayload()
+    const parsed = enquirySchema.safeParse(payload)
+    const nextErrors: Record<string, string> = {}
+
     if (!parsed.success) {
-      const nextErrors: Record<string, string> = {}
       for (const issue of parsed.error.issues) {
         const fieldKey = String(issue.path[0] ?? 'form')
         if (!nextErrors[fieldKey]) {
           nextErrors[fieldKey] = issue.message
         }
       }
+    }
+
+    if ((type === 'project' || type === 'consultation') && !payload.service) {
+      nextErrors.service = 'Choose a service'
+    }
+    if (type === 'hire' && !payload.equipment) {
+      nextErrors.equipment = 'Choose a machine'
+    }
+    if (type === 'hire' && !payload.hireStart) {
+      nextErrors.hireStart = 'Select a start date'
+    }
+    if (type === 'hire' && !payload.hireDuration) {
+      nextErrors.hireDuration = 'Select hire duration'
+    }
+    if ((type === 'project' || type === 'hire') && !payload.location) {
+      nextErrors.location = 'Enter site location'
+    }
+    if (type !== 'hire' && !payload.message) {
+      nextErrors.message = 'Enter your message'
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors)
       trackEvent('form_error', {
         error_count: Object.keys(nextErrors).length,
@@ -208,6 +272,13 @@ export function EnquiryForm({
         setSubmitting(false)
         return
       }
+
+      trackEvent(type === 'hire' ? 'hire_submit' : 'quote_submit', {
+        enquiry_type: type,
+        reference: data?.reference,
+        service: service || undefined,
+        equipment: equipment || undefined,
+      })
 
       window.location.assign(data?.redirectUrl || `/thank-you?type=${type}`)
     } catch {
@@ -782,8 +853,26 @@ export function EnquiryForm({
               />
             </div>
 
-            {/* Turnstile token (managed) */}
-            <input type="hidden" name="cf-turnstile-response" value="managed-pass" />
+            {/* Cloudflare Turnstile token */}
+            {siteKey ? (
+              <div className="my-[1.6rem]">
+                <div ref={turnstileContainerRef} id="turnstile-widget" />
+                <input
+                  type="hidden"
+                  name="cf-turnstile-response"
+                  value={
+                    turnstileToken ||
+                    (typeof window !== 'undefined' &&
+                    (window.location.hostname === 'localhost' ||
+                      window.location.hostname === '127.0.0.1')
+                      ? 'managed-pass'
+                      : '')
+                  }
+                />
+              </div>
+            ) : (
+              <input type="hidden" name="cf-turnstile-response" value="managed-pass" />
+            )}
 
             <div>
               <Button type="submit" variant="primary" loading={submitting}>

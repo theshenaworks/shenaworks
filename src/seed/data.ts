@@ -255,7 +255,10 @@ export const siteSettingsSeed = {
     facebookUrl: null as string | null,
   },
   files: {
-    companyProfile: null as { url: string; sizeMb: string } | null,
+    companyProfile: {
+      url: '/downloads/company-profile',
+      sizeMb: '1.2 MB',
+    },
   },
   ctaImage: {
     url: '/media/cta-site-work.svg',
@@ -1596,7 +1599,7 @@ export const equipmentCategoriesSeed: EquipmentCategoryRecord[] = [
   },
 ]
 
-const defaultHireTerms = {
+export const defaultHireTerms = {
   operator: 'Included — machine is hired only with a Shena-trained operator',
   fuel: 'Dry rate (client supplies diesel on site) or wet rate option stated on quote',
   transport: 'Low-loader mobilisation and demobilisation quoted from Meru or Nairobi yard to your site',
@@ -1722,6 +1725,10 @@ export const machinesSeed: MachineRecord[] = [
         title: 'Commercial compound and parking sub-bases',
         description: 'Compacting hardcore and crusher-run bases before cabro paving or concrete.',
       },
+      {
+        title: 'Road embankment and trench backfill compaction',
+        description: 'Compacting fill lifts and trench reinstatements to prevent post-construction settlement.',
+      },
     ],
     hireTerms: defaultHireTerms,
   },
@@ -1758,6 +1765,10 @@ export const machinesSeed: MachineRecord[] = [
       {
         title: 'Bulk cut-and-fill and ripping',
         description: 'Ripping weathered rock and pushing bulk soil to level sloping sites.',
+      },
+      {
+        title: 'Dam embankment pushing and site leveling',
+        description: 'Excavating and compacting farm dam walls, water pans and terracing sloping terrain.',
       },
     ],
     hireTerms: defaultHireTerms,

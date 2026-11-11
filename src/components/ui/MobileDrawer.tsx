@@ -84,6 +84,7 @@ export function MobileDrawer({
   return (
     <div
       ref={drawerRef}
+      id="mobile-drawer"
       role="dialog"
       aria-modal="true"
       aria-label="Site navigation"

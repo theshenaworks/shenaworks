@@ -5,6 +5,13 @@ import { usePathname } from 'next/navigation'
 import { initScrollState } from './scrollState'
 import { initReveal } from './reveal'
 import { initDragScroll } from './dragScroll'
+import { initDisclosure } from './disclosure'
+
+export { lockScroll } from './scrollLock'
+export { initDisclosure } from './disclosure'
+export { initScrollState } from './scrollState'
+export { initReveal } from './reveal'
+export { initDragScroll } from './dragScroll'
 
 export function BehaviorProvider() {
   const pathname = usePathname()
@@ -17,6 +24,7 @@ export function BehaviorProvider() {
       ['scrollState', () => initScrollState()],
       ['reveal', () => initReveal(document)],
       ['dragScroll', () => initDragScroll(document)],
+      ['disclosure', () => initDisclosure(document)],
     ]
 
     for (const [name, run] of modules) {
