@@ -1,0 +1,33 @@
+name: Nightly Database Backup
+
+on:
+  schedule:
+    # 23:00 UTC = 02:00 EAT (daily)
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    name: NeonDB logical dump to Cloudflare R2
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client & AWS CLI
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends postgresql-client awscli
+
+      - name: Run backup script
+        env:
+          DIRECT_DATABASE_URI: ${{ secrets.DIRECT_DATABASE_URI }}
+          R2_BACKUP_BUCKET: ${{ secrets.R2_BACKUP_BUCKET }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          chmod +x ./scripts/backup-db.sh
+          ./scripts/backup-db.sh
