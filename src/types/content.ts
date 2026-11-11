@@ -219,6 +219,7 @@ export interface LegalPageRecord {
   lastUpdated: string
   metaTitle: string
   metaDescription: string
+  _status?: 'published' | 'draft'
   sections: {
     heading: string
     paragraphs: string[]
@@ -249,6 +250,7 @@ export interface SiteSettingsRecord {
     officeHours: string
     responseTimeStatement?: string | null
   }
+  responseTimeStatement?: string | null
   social: {
     linkedinUrl?: string | null
     facebookUrl?: string | null

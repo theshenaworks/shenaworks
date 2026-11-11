@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { getSiteSettings } from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { ThankYouTracker } from '@/components/analytics/ThankYouTracker'
 
 export const metadata = buildPageMetadata({
   title: 'Thank You | Shena Works',
@@ -42,15 +43,36 @@ export default async function ThankYouPage({
 }) {
   const params = await searchParams
   const cookieStore = await cookies()
-  const reference = cookieStore.get('sw_enquiry_ref')?.value
+  const lastEnquiryRaw = cookieStore.get('sw_last_enquiry')?.value
+  let lastEnquiry: {
+    ref?: string
+    type?: string
+    service?: string
+    equipment?: string
+    sourcePage?: string
+  } | null = null
+
+  if (lastEnquiryRaw) {
+    try {
+      lastEnquiry = JSON.parse(lastEnquiryRaw)
+    } catch {}
+  }
+
+  const reference = lastEnquiry?.ref || cookieStore.get('sw_enquiry_ref')?.value
 
   const settings = await getSiteSettings()
-  const typeKey = params.type && COPY_BY_TYPE[params.type] ? params.type : 'project'
+  const typeKey =
+    params.type && COPY_BY_TYPE[params.type]
+      ? params.type
+      : lastEnquiry?.type && COPY_BY_TYPE[lastEnquiry.type]
+        ? lastEnquiry.type
+        : 'project'
   const copy = COPY_BY_TYPE[typeKey]!
   const whatsappUrl = buildWhatsAppUrl({ type: 'default' }, settings.contact.whatsappNumber)
 
   return (
     <div className="bg-[var(--white)]">
+      <ThankYouTracker enquiry={lastEnquiry} />
       <PageHeader
         overline="Enquiry received"
         headline={copy.headline}

@@ -69,7 +69,7 @@ describe('Seed Integrity & Fleet Verification (AUD-20, D-08)', () => {
     ]
 
     const publishedConfirmViolations = allRecords.filter((rec) => {
-      if (rec._status === 'published') {
+      if ((rec as { _status?: string })._status === 'published') {
         return JSON.stringify(rec).includes('[CONFIRM')
       }
       return false

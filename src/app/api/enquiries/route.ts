@@ -3,42 +3,18 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { Resend } from 'resend'
 import { enquirySchema } from '@/lib/validation/enquiry'
+import {
+  getClientIp,
+  checkRateLimit,
+  generateSequentialReference,
+  buildCustomerAckEmail,
+  buildStaffNotificationEmail,
+  formatLastEnquiryCookie,
+} from '@/lib/enquiry'
+import { getSiteSettings } from '@/lib/payload'
 
 const DEFAULT_PHONE_DISPLAY = '+254 718 971 896'
 const DEFAULT_ENQUIRY_RECIPIENT = 'shenaworksltd@gmail.com'
-
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
-const RATE_LIMIT_MAX = 5
-const ipHits = new Map<string, number[]>()
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now()
-  const recent = (ipHits.get(ip) || []).filter((ts) => now - ts < RATE_LIMIT_WINDOW_MS)
-  if (recent.length >= RATE_LIMIT_MAX) {
-    ipHits.set(ip, recent)
-    return true
-  }
-  recent.push(now)
-  ipHits.set(ip, recent)
-  return false
-}
-
-function generateReference(): string {
-  const now = new Date()
-  const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '')
-  const randomPart = Math.floor(1000 + Math.random() * 9000)
-  const timeSuffix = now.getTime().toString().slice(-3)
-  return `SW-${dateStr}-${randomPart}${timeSuffix}`
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-}
 
 function isValidFileSignature(buffer: Buffer, mimetype: string): boolean {
   if (buffer.length < 4) return false
@@ -132,16 +108,32 @@ async function verifyTurnstile(
   }
 }
 
-export async function POST(req: NextRequest) {
-  const ip =
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('x-real-ip') ||
-    '127.0.0.1'
+/**
+ * Executes a promise with an enforced timeout.
+ */
+function withTimeout<T>(promise: Promise<T>, ms = 5000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms),
+    ),
+  ])
+}
 
-  if (isRateLimited(ip)) {
+export async function POST(req: NextRequest) {
+  const payload = await getPayload({ config })
+  const settings = await getSiteSettings()
+  const phoneDisplay = settings?.contact?.phoneDisplay || DEFAULT_PHONE_DISPLAY
+
+  // Secure client IP extraction (D-10)
+  const ip = getClientIp(req.headers, false)
+
+  // Rate limiting against PostgreSQL rate_limits table (AUD-11, D-10)
+  const rateLimit = await checkRateLimit(payload, ip)
+  if (!rateLimit.allowed) {
     return NextResponse.json(
       {
-        error: `You've sent several enquiries in a short time. Please wait a few minutes or call us on ${DEFAULT_PHONE_DISPLAY}.`,
+        error: `You've sent several enquiries in a short time. Please wait a few minutes or call us on ${phoneDisplay}.`,
       },
       { status: 429 },
     )
@@ -231,155 +223,194 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: firstIssue, issues: parsed.error.issues }, { status: 400 })
   }
 
-  const reference = generateReference()
+  // Generate sequential reference from PostgreSQL sequence (AUD-06, D-10)
+  const reference = await generateSequentialReference(payload)
 
   // 1. Persist to Payload CMS & Cloudflare R2 (NeonDB)
   const attachmentIds: (number | string)[] = []
-  if (process.env.DATABASE_URI) {
-    try {
-      const payload = await getPayload({ config })
-
-      // Upload file attachments to enquiry-attachments collection
-      for (const item of fileBuffers) {
-        try {
-          const attachment = await payload.create({
-            collection: 'enquiry-attachments',
-            overrideAccess: true,
-            file: {
-              data: item.buffer,
-              name: item.file.name,
-              mimetype: item.file.type,
-              size: item.file.size,
-            },
-            data: {
-              enquiryReference: reference,
-            },
-          })
-          attachmentIds.push(attachment.id)
-        } catch (uploadErr) {
-          console.error('[enquiries] Failed to store file attachment in R2/Payload:', uploadErr)
-        }
+  try {
+    // Upload file attachments to enquiry-attachments collection
+    for (const item of fileBuffers) {
+      try {
+        const attachment = await payload.create({
+          collection: 'enquiry-attachments',
+          overrideAccess: true,
+          file: {
+            data: item.buffer,
+            name: item.file.name,
+            mimetype: item.file.type,
+            size: item.file.size,
+          },
+          data: {
+            enquiryReference: reference,
+          },
+        })
+        attachmentIds.push(attachment.id)
+      } catch (uploadErr) {
+        console.error('[enquiries] Failed to store file attachment in R2/Payload:', uploadErr)
       }
+    }
 
-      // Create enquiry document
-      await payload.create({
-        collection: 'enquiries',
-        overrideAccess: true,
-        data: {
-          reference,
-          type: parsed.data.type,
-          name: parsed.data.name,
-          phone: parsed.data.phone,
-          email: parsed.data.email || undefined,
-          organisation: parsed.data.organisation || undefined,
-          service: parsed.data.service || undefined,
-          equipment: parsed.data.equipment || undefined,
-          hireStart: parsed.data.hireStart ? new Date(parsed.data.hireStart).toISOString() : undefined,
-          hireDuration: parsed.data.hireDuration || undefined,
-          location: parsed.data.location || undefined,
-          budgetBand: parsed.data.budgetBand || undefined,
-          timeline: parsed.data.timeline || undefined,
-          message: parsed.data.message || undefined,
-          attachments: attachmentIds.length > 0 ? (attachmentIds as any) : undefined,
-          consentAcceptedAt: new Date().toISOString(),
-          sourcePage: parsed.data.sourcePage || '/contact',
-          status: 'new',
-        },
+    // Create enquiry document
+    await payload.create({
+      collection: 'enquiries',
+      overrideAccess: true,
+      data: {
+        reference,
+        type: parsed.data.type,
+        name: parsed.data.name,
+        phone: parsed.data.phone,
+        email: parsed.data.email || undefined,
+        organisation: parsed.data.organisation || undefined,
+        service: parsed.data.service || undefined,
+        equipment: parsed.data.equipment || undefined,
+        hireStart: parsed.data.hireStart ? new Date(parsed.data.hireStart).toISOString() : undefined,
+        hireDuration: parsed.data.hireDuration || undefined,
+        location: parsed.data.location || undefined,
+        budgetBand: parsed.data.budgetBand || undefined,
+        timeline: parsed.data.timeline || undefined,
+        message: parsed.data.message || undefined,
+        attachments: attachmentIds.length > 0 ? (attachmentIds as any) : undefined,
+        consentAcceptedAt: new Date().toISOString(),
+        sourcePage: parsed.data.sourcePage || '/contact',
+        status: 'new',
+      },
+    })
+  } catch (dbErr) {
+    console.error('[enquiries] Database save error:', dbErr)
+    return NextResponse.json(
+      {
+        error: `We could not record your enquiry due to a server error. Please call us directly on ${phoneDisplay}.`,
+      },
+      { status: 500 },
+    )
+  }
+
+  // 2. Notifications: Parallel, non-blocking to DB, 5s timeouts (AUD-07, AUD-08, AUD-09, D-10)
+  const notificationPromises: Promise<unknown>[] = []
+
+  // Staff notification via Resend
+  if (process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    const staffParams = buildStaffNotificationEmail({
+      reference,
+      type: parsed.data.type,
+      name: parsed.data.name,
+      phone: parsed.data.phone,
+      email: parsed.data.email || undefined,
+      organisation: parsed.data.organisation || undefined,
+      service: parsed.data.service || undefined,
+      equipment: parsed.data.equipment || undefined,
+      hireStart: parsed.data.hireStart || undefined,
+      hireDuration: parsed.data.hireDuration || undefined,
+      location: parsed.data.location || undefined,
+      budgetBand: parsed.data.budgetBand || undefined,
+      timeline: parsed.data.timeline || undefined,
+      message: parsed.data.message || undefined,
+      filesCount: files.length,
+      sourcePage: parsed.data.sourcePage || '/contact',
+      recipientEmail:
+        process.env.ENQUIRY_NOTIFICATION_EMAIL ||
+        settings?.contact?.email ||
+        DEFAULT_ENQUIRY_RECIPIENT,
+      fromEmail: process.env.ENQUIRY_FROM_EMAIL || 'Shena Works <onboarding@resend.dev>',
+    })
+
+    notificationPromises.push(
+      withTimeout(
+        resend.emails.send({
+          from: staffParams.from,
+          to: staffParams.to,
+          replyTo: staffParams.replyTo,
+          subject: staffParams.subject,
+          text: staffParams.text,
+          html: staffParams.html,
+        }),
+        5000,
+      ).catch((err) => console.error('[enquiries] Staff email notification error:', err)),
+    )
+
+    // Customer acknowledgement email via Resend (AUD-07, D-10)
+    if (parsed.data.email) {
+      const meruAddress = 'Makutano, Meru County, Kenya'
+      const website = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.shenaworksltd.com'
+
+      const customerAck = buildCustomerAckEmail({
+        name: parsed.data.name,
+        type: parsed.data.type,
+        reference,
+        phoneDisplay,
+        meruAddress,
+        website,
+        responseTimeStatement:
+          settings?.contact?.responseTimeStatement || settings?.responseTimeStatement,
       })
-    } catch (dbErr) {
-      console.error('[enquiries] Database save error:', dbErr)
-      return NextResponse.json(
-        {
-          error: `We could not record your enquiry due to a server error. Please call us directly on ${DEFAULT_PHONE_DISPLAY}.`,
-        },
-        { status: 500 },
+
+      notificationPromises.push(
+        withTimeout(
+          resend.emails.send({
+            from: staffParams.from,
+            to: parsed.data.email,
+            subject: customerAck.subject,
+            text: customerAck.text,
+            html: customerAck.html,
+          }),
+          5000,
+        ).catch((err) => console.error('[enquiries] Customer ack email error:', err)),
       )
     }
   }
 
-  // 2. Email Notification via Resend
-  if (process.env.RESEND_API_KEY) {
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY)
-      const recipient =
-        process.env.ENQUIRY_NOTIFICATION_EMAIL ||
-        DEFAULT_ENQUIRY_RECIPIENT
-      const from = process.env.ENQUIRY_FROM_EMAIL || 'Shena Works <onboarding@resend.dev>'
-      await resend.emails.send({
-        from,
-        to: recipient,
-        subject: `[${reference}] New ${parsed.data.type.toUpperCase()} enquiry: ${escapeHtml(parsed.data.name)}`,
-        html: `
-          <h2>New Shena Works Enquiry: ${escapeHtml(reference)}</h2>
-          <p><strong>Type:</strong> ${escapeHtml(parsed.data.type)}</p>
-          <p><strong>Name:</strong> ${escapeHtml(parsed.data.name)}</p>
-          <p><strong>Phone:</strong> ${escapeHtml(parsed.data.phone)}</p>
-          ${parsed.data.email ? `<p><strong>Email:</strong> ${escapeHtml(parsed.data.email)}</p>` : ''}
-          ${parsed.data.organisation ? `<p><strong>Organisation:</strong> ${escapeHtml(parsed.data.organisation)}</p>` : ''}
-          ${parsed.data.service ? `<p><strong>Service:</strong> ${escapeHtml(parsed.data.service)}</p>` : ''}
-          ${parsed.data.equipment ? `<p><strong>Equipment:</strong> ${escapeHtml(parsed.data.equipment)}</p>` : ''}
-          ${parsed.data.hireStart ? `<p><strong>Start Date:</strong> ${escapeHtml(parsed.data.hireStart)}</p>` : ''}
-          ${parsed.data.hireDuration ? `<p><strong>Duration:</strong> ${escapeHtml(parsed.data.hireDuration)}</p>` : ''}
-          ${parsed.data.location ? `<p><strong>Location:</strong> ${escapeHtml(parsed.data.location)}</p>` : ''}
-          ${parsed.data.budgetBand ? `<p><strong>Budget:</strong> ${escapeHtml(parsed.data.budgetBand)}</p>` : ''}
-          ${parsed.data.timeline ? `<p><strong>Timeline:</strong> ${escapeHtml(parsed.data.timeline)}</p>` : ''}
-          ${parsed.data.message ? `<p><strong>Message:</strong><br/>${escapeHtml(parsed.data.message).replace(/\n/g, '<br/>')}</p>` : ''}
-          <p><strong>Files:</strong> ${files.length} attached</p>
-          <p><strong>Source Page:</strong> ${escapeHtml(parsed.data.sourcePage || '/contact')}</p>
-        `,
-      })
-    } catch (emailErr) {
-      console.error('[enquiries] Resend email notification error:', emailErr)
-    }
-  }
-
-  // 3. Telegram Notification
+  // Telegram Notification (AUD-09)
   if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
-    try {
-      const messageLines = [
-        `New Shena Works Enquiry`,
-        `Ref: ${reference}`,
-        `Type: ${parsed.data.type}`,
-        `Name: ${parsed.data.name}`,
-        `Phone: ${parsed.data.phone}`,
-        parsed.data.email ? `Email: ${parsed.data.email}` : null,
-        parsed.data.service ? `Service: ${parsed.data.service}` : null,
-        parsed.data.equipment ? `Machine: ${parsed.data.equipment}` : null,
-        parsed.data.location ? `Location: ${parsed.data.location}` : null,
-        parsed.data.message ? `Message: ${parsed.data.message}` : null,
-        files.length > 0 ? `Attachments: ${files.length} file(s)` : null,
-      ]
-        .filter(Boolean)
-        .join('\n')
+    const messageLines = [
+      `New Shena Works Enquiry`,
+      `Ref: ${reference}`,
+      `Type: ${parsed.data.type}`,
+      `Name: ${parsed.data.name}`,
+      `Phone: ${parsed.data.phone}`,
+      parsed.data.email ? `Email: ${parsed.data.email}` : null,
+      parsed.data.service ? `Service: ${parsed.data.service}` : null,
+      parsed.data.equipment ? `Machine: ${parsed.data.equipment}` : null,
+      parsed.data.location ? `Location: ${parsed.data.location}` : null,
+      parsed.data.message ? `Message: ${parsed.data.message}` : null,
+      files.length > 0 ? `Attachments: ${files.length} file(s)` : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
 
-      const tgRes = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    notificationPromises.push(
+      fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: process.env.TELEGRAM_CHAT_ID,
           text: messageLines,
         }),
-      })
-      if (!tgRes.ok) {
-        console.error('[enquiries] Telegram notification failed HTTP status:', tgRes.status)
-      }
-    } catch (tgErr) {
-      console.error('[enquiries] Telegram notification error:', tgErr)
-    }
+        signal: AbortSignal.timeout(5000),
+      }).catch((err) => console.error('[enquiries] Telegram notification error:', err)),
+    )
   }
 
+  // Await all notification attempts before responding (with 5s max timeout)
+  await Promise.allSettled(notificationPromises)
+
+  // Response with sw_last_enquiry cookie (AUD-10, D-10)
   const redirectUrl = `/thank-you?type=${encodeURIComponent(parsed.data.type)}`
   const acceptsJson = req.headers.get('accept')?.includes('application/json')
   const response = acceptsJson
     ? NextResponse.json({ ok: true, reference, redirectUrl }, { status: 200 })
     : NextResponse.redirect(new URL(redirectUrl, req.url), 303)
 
-  response.cookies.set('sw_enquiry_ref', reference, {
-    httpOnly: true,
-    sameSite: 'lax',
-    path: '/thank-you',
-    maxAge: 600, // 10 minutes
+  const cookieData = formatLastEnquiryCookie({
+    ref: reference,
+    type: parsed.data.type,
+    service: parsed.data.service,
+    equipment: parsed.data.equipment,
+    sourcePage: parsed.data.sourcePage,
   })
+
+  response.cookies.set(cookieData.name, cookieData.value, cookieData.options)
 
   return response
 }
