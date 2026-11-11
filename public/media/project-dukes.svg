@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <rect width="1600" height="900" fill="#312e2a"/>
+  <g stroke="#3e3935" stroke-width="2" opacity="0.45">
+    <line x1="0" y1="297" x2="1600" y2="297"/>
+    <line x1="0" y1="594" x2="1600" y2="594"/>
+    <line x1="400" y1="0" x2="400" y2="900"/>
+    <line x1="800" y1="0" x2="800" y2="900"/>
+    <line x1="1200" y1="0" x2="1200" y2="900"/>
+  </g>
+  <rect x="0" y="884" width="1600" height="16" fill="#c14a12"/>
+  <rect x="48" y="48" width="64" height="8" fill="#c14a12"/>
+  <text x="48" y="96" font-family="'Roboto Condensed', Arial, sans-serif" font-weight="700" font-size="22" fill="#9ea1a2" letter-spacing="2">SHENA WORKS SITE PHOTOGRAPH</text>
+  <text x="48" y="138" font-family="'Roboto Condensed', Arial, sans-serif" font-weight="700" font-size="32" fill="#ffffff" letter-spacing="1">DUKES COTTAGES, RESTAURANT & GARDEN</text>
+</svg>

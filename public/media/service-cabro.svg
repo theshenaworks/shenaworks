@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" width="960" height="720">
+  <rect width="960" height="720" fill="#2e2a25"/>
+  <g stroke="#3e3935" stroke-width="2" opacity="0.45">
+    <line x1="0" y1="237" x2="960" y2="237"/>
+    <line x1="0" y1="475" x2="960" y2="475"/>
+    <line x1="240" y1="0" x2="240" y2="720"/>
+    <line x1="480" y1="0" x2="480" y2="720"/>
+    <line x1="720" y1="0" x2="720" y2="720"/>
+  </g>
+  <rect x="0" y="704" width="960" height="16" fill="#c14a12"/>
+  <rect x="48" y="48" width="64" height="8" fill="#c14a12"/>
+  <text x="48" y="96" font-family="'Roboto Condensed', Arial, sans-serif" font-weight="700" font-size="22" fill="#9ea1a2" letter-spacing="2">SHENA WORKS SITE PHOTOGRAPH</text>
+  <text x="48" y="138" font-family="'Roboto Condensed', Arial, sans-serif" font-weight="700" font-size="32" fill="#ffffff" letter-spacing="1">CABRO & INTERLOCKING BLOCK PAVING</text>
+</svg>

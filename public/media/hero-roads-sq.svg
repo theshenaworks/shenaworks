@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <rect width="800" height="800" fill="#2e2a25"/>
+  <g stroke="#3e3935" stroke-width="2" opacity="0.45">
+    <line x1="0" y1="264" x2="800" y2="264"/>
+    <line x1="0" y1="528" x2="800" y2="528"/>
+    <line x1="200" y1="0" x2="200" y2="800"/>
+    <line x1="400" y1="0" x2="400" y2="800"/>
+    <line x1="600" y1="0" x2="600" y2="800"/>
+  </g>
+  <rect x="0" y="784" width="800" height="16" fill="#c14a12"/>
+  <rect x="48" y="48" width="64" height="8" fill="#c14a12"/>
+  <text x="48" y="96" font-family="'Roboto Condensed', Arial, sans-serif" font-weight="700" font-size="22" fill="#9ea1a2" letter-spacing="2">SHENA WORKS SITE PHOTOGRAPH</text>
+  <text x="48" y="138" font-family="'Roboto Condensed', Arial, sans-serif" font-weight="700" font-size="32" fill="#ffffff" letter-spacing="1">ROAD GRADING & COMPACTION · MERU</text>
+</svg>
