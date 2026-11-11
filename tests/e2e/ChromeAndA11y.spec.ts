@@ -51,12 +51,14 @@ test.describe('Global Chrome & Accessibility', () => {
     const drawer = page.getByRole('dialog', { name: 'Site navigation' })
     await expect(drawer).toBeVisible()
 
-    // Check main content is inert or hidden when drawer is open
+    // Check main content is inert when drawer is open
     const mainContent = page.locator('#main-content')
-    const isInert = await mainContent.evaluate(
-      (el) => el.hasAttribute('inert') || el.getAttribute('aria-hidden') === 'true',
-    )
-    expect(isInert).toBe(true)
+    await expect(mainContent).toHaveAttribute('inert', '')
+
+    // Tab within drawer - focus must stay inside dialog
+    await page.keyboard.press('Tab')
+    const focusedInsideDrawer = await drawer.evaluate((el) => el.contains(document.activeElement))
+    expect(focusedInsideDrawer).toBe(true)
 
     // Press Escape to close
     await page.keyboard.press('Escape')

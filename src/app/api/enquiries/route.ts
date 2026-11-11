@@ -177,6 +177,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'You can attach up to 3 files' }, { status: 400 })
   }
 
+  const fileBuffers: { file: File; buffer: Buffer }[] = []
   for (const file of files) {
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
@@ -190,6 +191,14 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       )
     }
+    const buffer = Buffer.from(await file.arrayBuffer())
+    if (!isValidFileSignature(buffer, file.type)) {
+      return NextResponse.json(
+        { error: `${file.name} is not a valid PDF or image file` },
+        { status: 400 },
+      )
+    }
+    fileBuffers.push({ file, buffer })
   }
 
   const rawPayload = {
@@ -229,21 +238,16 @@ export async function POST(req: NextRequest) {
       const payload = await getPayload({ config })
 
       // Upload file attachments to enquiry-attachments collection
-      for (const file of files) {
+      for (const item of fileBuffers) {
         try {
-          const buffer = Buffer.from(await file.arrayBuffer())
-          if (!isValidFileSignature(buffer, file.type)) {
-            console.warn(`[enquiries] File ${file.name} failed signature verification, skipping upload`)
-            continue
-          }
           const attachment = await payload.create({
             collection: 'enquiry-attachments',
             overrideAccess: true,
             file: {
-              data: buffer,
-              name: file.name,
-              mimetype: file.type,
-              size: file.size,
+              data: item.buffer,
+              name: item.file.name,
+              mimetype: item.file.type,
+              size: item.file.size,
             },
             data: {
               enquiryReference: reference,

@@ -303,13 +303,16 @@ async function generateProfile() {
     color: inkDark,
   })
 
-  page2.drawText('Telephone: +254 742 376 052 | WhatsApp: +254 742 376 052 | Email: info@shenaworksltd.com', {
-    x: 64,
-    y: y - 60,
-    size: 9,
-    font: boldFont,
-    color: inkDark,
-  })
+  page2.drawText(
+    `Telephone: ${siteSettingsSeed.contact.phoneDisplay} | WhatsApp: +${siteSettingsSeed.contact.whatsappNumber} | Email: ${siteSettingsSeed.contact.email}`,
+    {
+      x: 64,
+      y: y - 60,
+      size: 9,
+      font: boldFont,
+      color: inkDark,
+    },
+  )
 
   // Footer page 2
   page2.drawText('Shena Works Limited — Company Profile | Page 2 of 2', {

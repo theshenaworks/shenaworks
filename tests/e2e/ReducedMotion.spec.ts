@@ -15,10 +15,19 @@ test.describe('Reduced Motion Compliance', () => {
     const count = await revealElements.count()
 
     if (count > 0) {
-      const firstReveal = revealElements.first()
-      await expect(firstReveal).toBeVisible()
-      const opacity = await firstReveal.evaluate((el) => window.getComputedStyle(el).opacity)
-      expect(Number(opacity)).toBeGreaterThan(0)
+      for (let i = 0; i < Math.min(count, 3); i++) {
+        const reveal = revealElements.nth(i)
+        await expect(reveal).toBeVisible()
+        const styles = await reveal.evaluate((el) => {
+          const comp = window.getComputedStyle(el)
+          return {
+            opacity: comp.opacity,
+            transitionDuration: comp.transitionDuration,
+          }
+        })
+        expect(Number(styles.opacity)).toBe(1)
+        expect(styles.transitionDuration === '0s' || styles.transitionDuration === '0.001s').toBe(true)
+      }
     }
   })
 
