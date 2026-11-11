@@ -418,6 +418,26 @@ export function EnquiryForm({
             onSubmit={handleSubmit}
             className="space-y-[2.4rem]"
           >
+            <noscript>
+              <div className="p-[1.6rem] bg-[var(--grey-100)] border border-[var(--grey-300)] text-body mb-[2.4rem]">
+                <p className="text-[var(--ink-900)]">
+                  This form needs JavaScript to check you are not a robot. Please call{' '}
+                  <a href={`tel:${phoneE164}`} className="font-bold underline text-[var(--accent-500)]">
+                    {phoneDisplay}
+                  </a>
+                  ,{' '}
+                  <a href={whatsappUrl} className="font-bold underline text-[var(--accent-500)]">
+                    WhatsApp us
+                  </a>{' '}
+                  or email{' '}
+                  <a href={`mailto:${contactEmail}`} className="font-bold underline text-[var(--accent-500)]">
+                    {contactEmail}
+                  </a>{' '}
+                  instead.
+                </p>
+              </div>
+            </noscript>
+
             <p className="text-body-xs text-[var(--ink-600)]">* required</p>
 
             {/* 1. Enquiry type radio group */}
