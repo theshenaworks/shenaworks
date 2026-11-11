@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { siteSettingsSeed } from '../src/seed/data'
 
 async function generateProfile() {
   const pdfDoc = await PDFDocument.create()
@@ -110,8 +111,8 @@ async function generateProfile() {
     ['Head Office:', 'Ground Floor, Al-Haqq Building, Makutano, Meru County (P.O. Box 2872-60200)'],
     ['Nairobi Office:', 'Park Suites, Parklands, Nairobi'],
     ['Managing Director:', 'Newton M. Muthee'],
-    ['Contact Phone:', '+254 742 376 052 / +254 745 613 252'],
-    ['Email & Web:', 'info@shenaworksltd.com | https://shenaworksltd.com'],
+    ['Contact Phone:', siteSettingsSeed.contact.phoneDisplay],
+    ['Email & Web:', `${siteSettingsSeed.contact.email} | https://shenaworksltd.com`],
   ]
 
   let factY = y - 42

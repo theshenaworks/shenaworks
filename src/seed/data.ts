@@ -257,7 +257,7 @@ export const siteSettingsSeed = {
   files: {
     companyProfile: {
       url: '/downloads/company-profile',
-      sizeMb: '1.2 MB',
+      sizeMb: '5 KB',
     },
   },
   ctaImage: {

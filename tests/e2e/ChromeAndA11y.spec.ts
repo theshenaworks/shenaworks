@@ -17,15 +17,26 @@ test.describe('Global Chrome & Accessibility', () => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/')
 
-    const servicesBtn = page.locator('nav[aria-label="Primary"] button:has-text("Services")')
-    if (await servicesBtn.isVisible()) {
-      await servicesBtn.click()
-      const megaPanel = page.locator('#mega-panel-services')
-      await expect(megaPanel).toBeVisible()
+    const servicesTrigger = page.locator('nav[aria-label="Primary"] a[href="/services"]').locator('..')
+    const toggleBtn = page.locator('button[aria-label="Toggle Services menu"]')
+    await expect(toggleBtn).toBeVisible()
 
-      await page.keyboard.press('Escape')
-      await expect(megaPanel).toBeHidden()
-    }
+    // Test hover intent (200ms)
+    await servicesTrigger.hover()
+    await page.waitForTimeout(300)
+    const megaPanel = page.locator('#mega-panel-services')
+    await expect(megaPanel).toBeVisible()
+
+    // Test Escape key closes panel
+    await page.keyboard.press('Escape')
+    await expect(megaPanel).toBeHidden()
+
+    // Test ArrowDown key opens panel
+    await toggleBtn.focus()
+    await page.keyboard.press('ArrowDown')
+    await expect(megaPanel).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(megaPanel).toBeHidden()
   })
 
   test('Mobile drawer opens, traps focus, and closes on toggle or Escape', async ({ page }) => {
@@ -39,6 +50,13 @@ test.describe('Global Chrome & Accessibility', () => {
 
     const drawer = page.getByRole('dialog', { name: 'Site navigation' })
     await expect(drawer).toBeVisible()
+
+    // Check main content is inert or hidden when drawer is open
+    const mainContent = page.locator('#main-content')
+    const isInert = await mainContent.evaluate(
+      (el) => el.hasAttribute('inert') || el.getAttribute('aria-hidden') === 'true',
+    )
+    expect(isInert).toBe(true)
 
     // Press Escape to close
     await page.keyboard.press('Escape')

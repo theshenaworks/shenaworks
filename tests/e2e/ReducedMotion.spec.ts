@@ -15,9 +15,10 @@ test.describe('Reduced Motion Compliance', () => {
     const count = await revealElements.count()
 
     if (count > 0) {
-      // Check that elements have opacity > 0 or data-reveal="visible"
       const firstReveal = revealElements.first()
       await expect(firstReveal).toBeVisible()
+      const opacity = await firstReveal.evaluate((el) => window.getComputedStyle(el).opacity)
+      expect(Number(opacity)).toBeGreaterThan(0)
     }
   })
 

@@ -19,8 +19,16 @@ test.describe('Enquiry Flows', () => {
   test('Submitting a project quote (F1) completes and redirects to thank-you', async ({ page }) => {
     await page.goto('/contact')
 
+    // Blur validation check on phone field
+    await page.fill('#field-phone', '123')
+    await page.locator('#field-name').focus()
+    await expect(page.locator('#error-phone')).toBeVisible()
+
     await page.fill('#field-name', 'John Mwangi')
     await page.fill('#field-phone', '0712 345 678')
+    await page.locator('#field-name').focus()
+    await expect(page.locator('#error-phone')).not.toBeVisible()
+
     await page.fill('#field-email', 'john@example.com')
     await page.fill('#field-organisation', 'Meru Highlands Farm')
     await page.selectOption('#field-service', 'road-construction-and-earthworks')

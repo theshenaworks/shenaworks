@@ -134,7 +134,16 @@ export function EnquiryForm({
       script.onload = renderWidget
       document.head.appendChild(script)
     }
-  }, [siteKey])
+    if (
+      !turnstileToken &&
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === '')
+    ) {
+      setTurnstileToken('managed-pass')
+    }
+  }, [siteKey, turnstileToken])
 
   const publishedServices = useMemo(
     () => servicesSeed.filter((s) => s._status === 'published'),
@@ -220,16 +229,16 @@ export function EnquiryForm({
       nextErrors.equipment = 'Choose a machine'
     }
     if (type === 'hire' && !payload.hireStart) {
-      nextErrors.hireStart = 'Select a start date'
+      nextErrors.hireStart = 'Choose a start date'
     }
     if (type === 'hire' && !payload.hireDuration) {
-      nextErrors.hireDuration = 'Select hire duration'
+      nextErrors.hireDuration = 'Choose how long you need the machine'
     }
     if ((type === 'project' || type === 'hire') && !payload.location) {
-      nextErrors.location = 'Enter site location'
+      nextErrors.location = 'Enter the site location'
     }
     if (type !== 'hire' && !payload.message) {
-      nextErrors.message = 'Enter your message'
+      nextErrors.message = 'Tell us a little about the project'
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -860,15 +869,24 @@ export function EnquiryForm({
                 <input
                   type="hidden"
                   name="cf-turnstile-response"
-                  value={
-                    turnstileToken ||
-                    (typeof window !== 'undefined' &&
-                    (window.location.hostname === 'localhost' ||
-                      window.location.hostname === '127.0.0.1')
-                      ? 'managed-pass'
-                      : '')
-                  }
+                  value={turnstileToken}
                 />
+                <noscript>
+                  <div className="p-[1.6rem] bg-[var(--surface-warm)] border border-[var(--grey-300)] text-body">
+                    <p className="font-bold text-[var(--ink-900)] mb-[0.8rem]">Security challenge requires JavaScript</p>
+                    <p className="text-[var(--ink-700)] mb-[1.2rem]">
+                      To send an enquiry online, please enable JavaScript, or reach our team directly:
+                    </p>
+                    <div className="flex flex-wrap gap-[1.2rem]">
+                      <a href={`tel:${phoneE164}`} className="font-bold text-[var(--accent-500)] underline">
+                        Call {phoneDisplay}
+                      </a>
+                      <a href={`https://wa.me/${whatsappNumber}`} className="font-bold text-[var(--accent-500)] underline">
+                        Message on WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                </noscript>
               </div>
             ) : (
               <input type="hidden" name="cf-turnstile-response" value="managed-pass" />

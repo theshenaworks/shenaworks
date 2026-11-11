@@ -242,6 +242,12 @@ export function Header({
                     aria-controls="mega-panel-services"
                     aria-label="Toggle Services menu"
                     onClick={() => toggleDropdown('services')}
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault()
+                        setOpenDropdown('services')
+                      }
+                    }}
                     className={`ml-[0.4rem] inline-flex h-[3.2rem] w-[2.8rem] items-center justify-center transition-transform duration-200 ${
                       openDropdown === 'services' ? 'rotate-180' : ''
                     }`}

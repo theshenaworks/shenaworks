@@ -17,8 +17,10 @@ export function AnalyticsLoader() {
       if (document.getElementById('ga4-script')) return
 
       window.dataLayer = window.dataLayer || []
-      function gtag(...args: unknown[]) {
-        window.dataLayer?.push(args)
+      // Standard Google gtag pattern requires pushing the Arguments object, not a rest array
+      function gtag(..._args: unknown[]) {
+        // eslint-disable-next-line prefer-rest-params
+        window.dataLayer?.push(arguments)
       }
       window.gtag = gtag
       gtag('js', new Date())

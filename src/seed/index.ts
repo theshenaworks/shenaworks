@@ -299,7 +299,10 @@ async function runSeed() {
       person: test.person,
       title: test.title,
       organisation: test.organisation,
-      project: test.projectSlug ? Number(projectIdBySlug.get(test.projectSlug)) : undefined,
+      project:
+        test.projectSlug && projectIdBySlug.has(test.projectSlug)
+          ? Number(projectIdBySlug.get(test.projectSlug))
+          : undefined,
       services: test.serviceSlugs
         .map((s) => Number(serviceIdBySlug.get(s)))
         .filter((v) => !isNaN(v)),

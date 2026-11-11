@@ -1,7 +1,7 @@
 import React from 'react'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'neutral' | 'accent' | 'dark' | 'success' | 'warning' | 'error'
+  variant?: 'neutral' | 'accent' | 'dark' | 'error'
   children: React.ReactNode
   size?: 'sm' | 'md'
 }
@@ -17,8 +17,6 @@ export function Badge({
     neutral: 'bg-[var(--grey-100)] text-[var(--ink-900)] border-[var(--grey-300)]',
     accent: 'bg-[var(--accent-500)] text-[var(--white)] border-[var(--accent-500)]',
     dark: 'bg-[var(--ink-900)] text-[var(--white)] border-[var(--ink-900)]',
-    success: 'bg-[#0f766e] text-[var(--white)] border-[#0f766e]',
-    warning: 'bg-[#b45309] text-[var(--white)] border-[#b45309]',
     error: 'bg-[var(--error)] text-[var(--white)] border-[var(--error)]',
   }[variant]
 

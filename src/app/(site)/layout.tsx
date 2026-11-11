@@ -44,6 +44,13 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en-KE">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: 'document.documentElement.setAttribute("data-js", "");',
+          }}
+        />
+      </head>
       <body>
       <AnalyticsLoader />
       <BehaviorProvider />
