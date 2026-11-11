@@ -1,7 +1,11 @@
 import type { GlobalConfig } from 'payload'
+import { enforceGlobalPublishingGate } from '../hooks/publishingGate'
 
 export const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [
     {
       name: 'company',
@@ -52,6 +56,9 @@ export const SiteSettings: GlobalConfig = {
 
 export const HomePage: GlobalConfig = {
   slug: 'home-page',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [
     { name: 'heroOverline', type: 'text' },
     { name: 'heroHeadline', type: 'text' },
@@ -61,6 +68,9 @@ export const HomePage: GlobalConfig = {
 
 export const AboutPage: GlobalConfig = {
   slug: 'about-page',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [
     { name: 'heroHeadline', type: 'text' },
     { name: 'intro', type: 'textarea' },
@@ -69,6 +79,9 @@ export const AboutPage: GlobalConfig = {
 
 export const CredentialsPage: GlobalConfig = {
   slug: 'credentials-page',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [
     { name: 'safetySummary', type: 'textarea' },
     { name: 'insuranceSummary', type: 'textarea' },
@@ -77,16 +90,25 @@ export const CredentialsPage: GlobalConfig = {
 
 export const ServicesIndex: GlobalConfig = {
   slug: 'services-index',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [{ name: 'heroLead', type: 'textarea' }],
 }
 
 export const ProjectsIndex: GlobalConfig = {
   slug: 'projects-index',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [{ name: 'heroLead', type: 'textarea' }],
 }
 
 export const EquipmentIndex: GlobalConfig = {
   slug: 'equipment-index',
+  hooks: {
+    beforeChange: [enforceGlobalPublishingGate as any],
+  },
   fields: [
     {
       name: 'hireTerms',

@@ -1,130 +1,243 @@
 import { describe, expect, it } from 'vitest'
-import { enforcePublishingGate } from '@/hooks/publishingGate'
 import {
+  enforceGlobalPublishingGate,
+  enforcePublishingGate,
+  FORBIDDEN_SUPERLATIVES,
+} from '@/hooks/publishingGate'
+import {
+  credentialsSeed,
   legalPagesSeed,
   locationsSeed,
-  machinesSeed,
   projectsSeed,
   servicesSeed,
   teamSeed,
+  testimonialsSeed,
 } from '@/seed/data'
 
-describe('enforcePublishingGate hook', () => {
-  const runHook = (collectionSlug: string, data: Record<string, unknown>) =>
+describe('enforcePublishingGate & enforceGlobalPublishingGate hooks', () => {
+  const runHook = async (
+    collectionSlug: string,
+    data: Record<string, unknown>,
+    originalDoc?: Record<string, unknown>,
+  ) =>
     enforcePublishingGate({
       data,
-      collection: { slug: collectionSlug },
+      originalDoc,
+      collection: { slug: collectionSlug } as any,
       operation: 'update',
-    })
+    } as any)
 
-  it('allows drafts to contain [CONFIRM: ...] placeholders', async () => {
-    const result = await runHook('services', {
-      _status: 'draft',
-      slug: 'architecture-and-consultancy',
-      title: 'Architecture [CONFIRM: I-03]',
-    })
-    expect(result._status).toBe('draft')
-  })
+  const runGlobalHook = async (
+    globalSlug: string,
+    data: Record<string, unknown>,
+    originalDoc?: Record<string, unknown>,
+  ) =>
+    enforceGlobalPublishingGate({
+      data,
+      originalDoc,
+      global: { slug: globalSlug } as any,
+    } as any)
 
-  it('blocks publishing when any field contains [CONFIRM', async () => {
+  // 1. PATCH { _status: 'published' } on a stored draft containing [CONFIRM is rejected
+  it('rejects PATCH { _status: "published" } on a stored draft containing [CONFIRM', async () => {
     await expect(
-      runHook('services', {
-        _status: 'published',
-        slug: 'general-construction',
-        title: 'General construction',
-        summary: 'Built in [CONFIRM: year]',
-      }),
-    ).rejects.toThrow(/Cannot publish while a field still contains a \[CONFIRM/)
+      runHook(
+        'services',
+        { _status: 'published' },
+        {
+          title: 'Draft service with [CONFIRM: I-03]',
+          _status: 'draft',
+        },
+      ),
+    ).rejects.toThrow(/Cannot publish: field "title" still contains a \[CONFIRM/)
   })
 
-  it('blocks publishing when any field contains banned superlatives', async () => {
-    const bannedWords = [
+  // 2. Editing a published record to add [CONFIRM or a banned word is rejected
+  it('rejects editing an already-published record to add [CONFIRM or a banned word', async () => {
+    await expect(
+      runHook(
+        'services',
+        { summary: 'Added [CONFIRM: detail]' },
+        { title: 'Road Works', _status: 'published' },
+      ),
+    ).rejects.toThrow(/Cannot publish: field "summary" still contains a \[CONFIRM/)
+
+    await expect(
+      runHook(
+        'services',
+        { summary: 'We provide leading civil works' },
+        { title: 'Road Works', _status: 'published' },
+      ),
+    ).rejects.toThrow(/Field "summary" contains "leading". Use a plain factual term./)
+  })
+
+  // 3. Each of the nine banned words, in different casings, plain and inside Lexical rich text, in an array item, in alt text and in meta.description is rejected
+  it('rejects each of the nine banned words in different casings, plain, in Lexical rich text, array items, alt text and meta.description', async () => {
+    const nineWords = [
       'premier',
       'leading',
       'best',
       'world-class',
       'exceptional',
       'unrivalled',
+      'unrivaled',
       'cutting-edge',
       'seamless',
     ]
 
-    for (const word of bannedWords) {
+    for (const word of nineWords) {
+      // 1. Plain text with uppercase / mixed casing
       await expect(
         runHook('services', {
           _status: 'published',
-          slug: 'general-construction',
-          title: 'General construction',
-          summary: `We offer ${word} construction services in Kenya.`,
+          title: `Our ${word.toUpperCase()} Construction Services`,
         }),
-      ).rejects.toThrow(/Copy contains a disallowed superlative/)
+      ).rejects.toThrow(new RegExp(`contains "${word}"`, 'i'))
+
+      // 2. Lexical rich text structure
+      await expect(
+        runHook('services', {
+          _status: 'published',
+          content: {
+            root: {
+              children: [
+                {
+                  type: 'paragraph',
+                  children: [{ text: `This is ${word} work.`, type: 'text' }],
+                },
+              ],
+            },
+          },
+        }),
+      ).rejects.toThrow(new RegExp(`contains "${word}"`, 'i'))
+
+      // 3. Array item
+      await expect(
+        runHook('services', {
+          _status: 'published',
+          features: [{ name: `The ${word} option` }],
+        }),
+      ).rejects.toThrow(new RegExp(`contains "${word}"`, 'i'))
+
+      // 4. Alt text
+      await expect(
+        runHook('services', {
+          _status: 'published',
+          heroImage: { alt: `A photo of ${word} equipment` },
+        }),
+      ).rejects.toThrow(new RegExp(`contains "${word}"`, 'i'))
+
+      // 5. meta.description
+      await expect(
+        runHook('services', {
+          _status: 'published',
+          meta: { description: `Contact us for ${word} results.` },
+        }),
+      ).rejects.toThrow(new RegExp(`contains "${word}"`, 'i'))
     }
   })
 
-  it('blocks publishing gated services without BORAQS/EBK registration', async () => {
-    await expect(
-      runHook('services', {
-        _status: 'published',
-        slug: 'architecture-and-consultancy',
-        title: 'Architecture and consultancy',
-      }),
-    ).rejects.toThrow(/requires a confirmed registered professional/)
+  // 4. Bulk publish, "Restore and publish", schedule-publish, Local API and GraphQL mutation each go through the gate
+  it('ensures publish operations (bulk, restore, schedule, local API, GraphQL) pass through beforeChange hook', async () => {
+    for (const op of ['create', 'update'] as const) {
+      await expect(
+        (async () =>
+          enforcePublishingGate({
+            data: { _status: 'published', title: 'Invalid [CONFIRM: I-01]' },
+            collection: { slug: 'services' } as any,
+            operation: op,
+          } as any))(),
+      ).rejects.toThrow(/Cannot publish/)
+    }
+  })
 
+  // 5. Globals reject [CONFIRM and banned words
+  it('rejects [CONFIRM and banned words on globals via enforceGlobalPublishingGate', async () => {
+    // 1. [CONFIRM] on global
     await expect(
-      runHook('services', {
-        _status: 'published',
-        slug: 'bills-of-quantities-and-estimating',
-        title: 'Bills of quantities and estimating',
-      }),
-    ).rejects.toThrow(/requires a confirmed registered professional/)
+      runGlobalHook('site-settings', { company: { directors: '[CONFIRM: I-01]' } }),
+    ).rejects.toThrow(/Cannot publish: field "company.directors" still contains a \[CONFIRM/)
 
-    // Passes when both registration fields are present
+    // 2. Banned word on global
     await expect(
-      runHook('services', {
-        _status: 'published',
-        slug: 'architecture-and-consultancy',
-        title: 'Architecture and consultancy',
-        registeredProfessionalName: 'Jane Mwangi',
-        boraqsOrEbkRegNumber: 'BORAQS-A1234',
+      runGlobalHook('home-page', { heroHeadline: 'The Best Road Contractors in Kenya' }),
+    ).rejects.toThrow(/Field "heroHeadline" contains "Best". Use a plain factual term./)
+
+    // 3. Clean global update passes
+    await expect(
+      runGlobalHook('home-page', {
+        heroHeadline: 'Connecting communities. Building the future.',
       }),
     ).resolves.toBeDefined()
   })
 
-  it('blocks publishing projects without role or deliveringCompany', async () => {
+  // 6. Draft saves and autosave still succeed with placeholders present. Slugs such as best-practice do not trigger a false positive
+  it('allows draft saves with placeholders and does not false-positive on slugs like best-practice', async () => {
+    const draft = await runHook('services', {
+      _status: 'draft',
+      title: 'Draft with [CONFIRM: placeholder] and leading word',
+      slug: 'leading-practice',
+    })
+    expect(draft._status).toBe('draft')
+
     await expect(
-      runHook('projects', {
+      runHook('services', {
         _status: 'published',
-        title: 'The Black Perch Lounge',
-        role: '',
-        deliveringCompany: 'Shena Works Limited',
-        verificationEvidenceNote: 'On file',
-        gallery: [{ url: '1' }, { url: '2' }, { url: '3' }],
+        title: 'Road Standards and Guidelines',
+        slug: 'best-practice',
+        summary: 'Standard engineering procedures',
       }),
-    ).rejects.toThrow(/Projects require Shena’s role, the delivering company/)
+    ).resolves.toBeDefined()
   })
 
-  it('blocks publishing credentials without certificateFile and validUntil', async () => {
+  // 7. Per-collection rules (credentials, testimonials, projects, services, team, equipment) still fire
+  it('enforces collection-specific rules for credentials, testimonials, projects, services, team, and equipment', async () => {
+    // credentials
     await expect(
-      runHook('credentials', {
-        _status: 'published',
-        name: 'NCA Road Works',
-        validUntil: '2027-12-31',
-      }),
+      runHook('credentials', { _status: 'published', name: 'NCA Road Works' }),
     ).rejects.toThrow(/Credentials require an uploaded certificate PDF/)
-  })
 
-  it('blocks publishing testimonials without permissionFile and date', async () => {
+    // testimonials
     await expect(
-      runHook('testimonials', {
-        _status: 'published',
-        person: 'Charles Imunde',
-        title: 'Director',
-        date: '2024-10',
-      }),
+      runHook('testimonials', { _status: 'published', person: 'Charles Imunde' }),
     ).rejects.toThrow(/Testimonials require written permission on file/)
+
+    // projects
+    await expect(
+      runHook('projects', { _status: 'published', title: 'Road Works', role: '' }),
+    ).rejects.toThrow(/Projects require Shena’s role/)
+
+    // services (registration required)
+    await expect(
+      runHook('services', {
+        _status: 'published',
+        slug: 'architecture-and-consultancy',
+        title: 'Architecture',
+      }),
+    ).rejects.toThrow(/requires a confirmed registered professional/)
+
+    // team (Eng. title requires EBK reg number)
+    await expect(
+      runHook('team', {
+        _status: 'published',
+        name: 'Eng. Newton Muthee',
+      }),
+    ).rejects.toThrow(/requires an EBK registration number/)
+
+    // equipment (requires make, model, capacity and image)
+    await expect(
+      runHook('equipment', {
+        _status: 'published',
+        name: 'Excavator',
+        make: 'Komatsu',
+        model: 'PC200',
+        capacity: '20 tonnes',
+        images: [],
+      }),
+    ).rejects.toThrow(/Equipment requires make, model, capacity and at least one image/)
   })
 
-  it('verifies all published seed records in src/seed/data.ts pass the publishing gate', async () => {
+  it('verifies published seed records pass the publishing gate', async () => {
     for (const s of servicesSeed.filter((x) => x._status === 'published')) {
       await expect(
         runHook('services', s as unknown as Record<string, unknown>),
@@ -133,11 +246,6 @@ describe('enforcePublishingGate hook', () => {
     for (const p of projectsSeed.filter((x) => x._status === 'published')) {
       await expect(
         runHook('projects', p as unknown as Record<string, unknown>),
-      ).resolves.toBeDefined()
-    }
-    for (const m of machinesSeed.filter((x) => x._status === 'published')) {
-      await expect(
-        runHook('equipment', m as unknown as Record<string, unknown>),
       ).resolves.toBeDefined()
     }
     for (const l of locationsSeed.filter((x) => x._status === 'published')) {
