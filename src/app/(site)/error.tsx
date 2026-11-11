@@ -3,10 +3,10 @@
 import React from 'react'
 import { PageHeader } from '@/components/blocks/PageHeader'
 import { Button } from '@/components/ui/Button'
-import { siteSettingsSeed } from '@/seed/data'
 
 export default function ErrorPage({ reset }: { error: Error; reset: () => void }) {
-  const { phoneE164, phoneDisplay } = siteSettingsSeed.contact
+  const phoneE164 = '+254718971896'
+  const phoneDisplay = '+254 718 971 896'
 
   return (
     <div className="bg-[var(--white)] min-h-[70vh]">

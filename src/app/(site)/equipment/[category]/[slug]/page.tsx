@@ -14,14 +14,15 @@ import {
   getPublishedEquipmentCategories,
   getPublishedMachine,
   getPublishedMachines,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildMachineProductJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import type { KeyFactItem } from '@/seed/data'
+import type { KeyFactItem } from '@/types/content'
 
-export function generateStaticParams() {
-  return getPublishedMachines().map((m) => ({
+export async function generateStaticParams() {
+  const machines = await getPublishedMachines()
+  return machines.map((m) => ({
     category: m.categorySlug,
     slug: m.slug,
   }))
@@ -33,7 +34,7 @@ export async function generateMetadata({
   params: Promise<{ category: string; slug: string }>
 }): Promise<Metadata> {
   const { category, slug } = await params
-  const found = getPublishedMachine(category, slug)
+  const found = await getPublishedMachine(category, slug)
   if (!found) return {}
   const { category: cat, machine } = found
   return buildPageMetadata({
@@ -54,7 +55,7 @@ export default async function MachineDetailPage({
   params: Promise<{ category: string; slug: string }>
 }) {
   const { category, slug } = await params
-  const found = getPublishedMachine(category, slug)
+  const found = await getPublishedMachine(category, slug)
   if (!found) notFound()
 
   const { category: cat, machine } = found
@@ -100,11 +101,14 @@ export default async function MachineDetailPage({
     { term: 'Service area', value: machine.hireTerms.serviceArea },
   ]
 
-  const allCategories = getPublishedEquipmentCategories()
+  const [allCategories, allMachines] = await Promise.all([
+    getPublishedEquipmentCategories(),
+    getPublishedMachines(),
+  ])
   const catMap = new Map<string, string>()
   allCategories.forEach((c) => catMap.set(c.slug, c.singular))
 
-  const otherMachines = getPublishedMachines()
+  const otherMachines = allMachines
     .filter((m) => m.slug !== machine.slug)
     .sort(
       (a, b) =>

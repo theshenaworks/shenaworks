@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/blocks/PageHeader'
 import { CtaBand } from '@/components/blocks/CtaBand'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { getPublishedPostCategories, getPublishedPosts } from '@/lib/content'
+import { getPublishedPostCategories, getPublishedPosts } from '@/lib/payload'
 import { buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -15,14 +15,15 @@ export const metadata = buildPageMetadata({
   path: '/insights',
 })
 
-export default function InsightsIndexPage() {
-  const posts = getPublishedPosts()
+export default async function InsightsIndexPage() {
+  const [posts, categories] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedPostCategories(),
+  ])
   // SITE-PLAN.md 8: Insights index renders only when >= 1 published post; otherwise 404
   if (posts.length === 0) {
     notFound()
   }
-
-  const categories = getPublishedPostCategories()
   const catMap = new Map<string, string>()
   categories.forEach((c) => catMap.set(c.slug, c.name))
 

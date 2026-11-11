@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/blocks/PageHeader'
 import { CtaBand } from '@/components/blocks/CtaBand'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { getPublishedPostCategories, getPublishedPosts } from '@/lib/content'
+import { getPublishedPostCategories, getPublishedPosts } from '@/lib/payload'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export const metadata = buildPageMetadata({
@@ -20,11 +20,14 @@ export default async function InsightsCategoryPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const categories = getPublishedPostCategories()
+  const [categories, allPosts] = await Promise.all([
+    getPublishedPostCategories(),
+    getPublishedPosts(),
+  ])
   const activeCat = categories.find((c) => c.slug === slug)
   if (!activeCat) notFound()
 
-  const posts = getPublishedPosts().filter((p) => p.categorySlug === slug)
+  const posts = allPosts.filter((p) => p.categorySlug === slug)
   if (posts.length === 0) notFound()
 
   const breadcrumbs = [

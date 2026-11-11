@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { SectionIntro } from './SectionIntro'
-import type { LocationRecord } from '@/seed/data'
+import type { LocationRecord } from '@/types/content'
 
 export interface LocationsBandProps {
   heading?: string

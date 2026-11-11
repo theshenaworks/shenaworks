@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Icon } from './Icon'
 import { Button } from './Button'
 import { trackEvent } from '@/lib/analytics'
-import type { EquipmentCategoryRecord, ServiceRecord } from '@/seed/data'
+import type { EquipmentCategoryRecord, ServiceRecord } from '@/types/content'
 
 export interface MobileDrawerProps {
   open: boolean

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card } from '@/components/ui/Card'
 import { SectionIntro } from './SectionIntro'
-import type { ServiceRecord } from '@/seed/data'
+import type { ServiceRecord } from '@/types/content'
 
 export interface ServiceGridProps {
   id?: string

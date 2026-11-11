@@ -14,7 +14,7 @@ import {
   getPublishedPosts,
   getPublishedServices,
   getSiteSettings,
-} from '@/lib/content'
+} from '@/lib/payload'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://shenaworksltd.com'),
@@ -33,13 +33,15 @@ export const metadata: Metadata = {
  * Root layout for the public site. The `(payload)` route group has its own
  * root layout for `/admin`, so the `<html>` shell lives here, not in app/.
  */
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
-  const settings = getSiteSettings()
-  const services = getPublishedServices()
-  const equipmentCategories = getPublishedEquipmentCategories()
-  const locations = getPublishedLocations()
-  const hasCredentials = getPublishedCredentials().length > 0
-  const hasInsights = getPublishedPosts().length > 0
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getSiteSettings()
+  const services = await getPublishedServices()
+  const equipmentCategories = await getPublishedEquipmentCategories()
+  const locations = await getPublishedLocations()
+  const credentials = await getPublishedCredentials()
+  const hasCredentials = credentials.length > 0
+  const posts = await getPublishedPosts()
+  const hasInsights = posts.length > 0
   const hasCompanyProfile = Boolean(settings.files.companyProfile?.url)
 
   return (

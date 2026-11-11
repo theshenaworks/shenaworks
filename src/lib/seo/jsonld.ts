@@ -1,22 +1,27 @@
-import { siteSettingsSeed, type FaqItem } from '@/seed/data'
+import type { FaqItem, SiteSettingsRecord } from '@/types/content'
 import type { BreadcrumbItem } from '@/components/ui/Breadcrumb'
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://shenaworksltd.com'
 export const ORG_ID = `${SITE_URL}/#organization`
 
-export function buildOrganizationJsonLd() {
+export function buildOrganizationJsonLd(settings?: SiteSettingsRecord) {
+  const legalName = settings?.company?.legalName || 'Shena Works Limited'
+  const tradingName = settings?.company?.tradingName || 'Shena Works'
+  const phone = settings?.contact?.phoneE164 || '+254718971896'
+  const email = settings?.contact?.email || 'shenaworksltd@gmail.com'
+
   return {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': ['Organization', 'GeneralContractor'],
         '@id': ORG_ID,
-        name: siteSettingsSeed.company.legalName,
-        alternateName: siteSettingsSeed.company.tradingName,
+        name: legalName,
+        alternateName: tradingName,
         url: SITE_URL,
         logo: `${SITE_URL}/brand/logo-color.svg`,
-        telephone: siteSettingsSeed.contact.phoneE164,
-        email: siteSettingsSeed.contact.email,
+        telephone: phone,
+        email: email,
         areaServed: [
           { '@type': 'AdministrativeArea', name: 'Meru County' },
           { '@type': 'AdministrativeArea', name: 'Nairobi County' },
@@ -33,7 +38,7 @@ export function buildOrganizationJsonLd() {
         '@type': 'WebSite',
         '@id': `${SITE_URL}/#website`,
         url: SITE_URL,
-        name: siteSettingsSeed.company.legalName,
+        name: legalName,
         publisher: { '@id': ORG_ID },
       },
     ],

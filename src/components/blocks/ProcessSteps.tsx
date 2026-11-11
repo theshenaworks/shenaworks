@@ -1,6 +1,6 @@
 import React from 'react'
 import { Timeline } from '@/components/ui/Timeline'
-import type { ProcessStepItem } from '@/seed/data'
+import type { ProcessStepItem } from '@/types/content'
 
 export interface ProcessStepsProps {
   id?: string

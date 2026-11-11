@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card } from '@/components/ui/Card'
 import { SectionIntro } from './SectionIntro'
-import type { EquipmentCategoryRecord, MachineRecord } from '@/seed/data'
+import type { EquipmentCategoryRecord, MachineRecord } from '@/types/content'
 
 export interface EquipmentTeaserProps {
   overline?: string

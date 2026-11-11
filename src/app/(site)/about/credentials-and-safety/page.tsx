@@ -6,9 +6,9 @@ import { CredentialTable } from '@/components/blocks/CredentialTable'
 import { FeatureSplit } from '@/components/blocks/FeatureSplit'
 import { DownloadCard } from '@/components/blocks/DownloadCard'
 import { EnquiryForm } from '@/components/blocks/EnquiryForm'
-import { getPublishedCredentials, getSiteSettings } from '@/lib/content'
+import { getPublishedCredentials, getSiteSettings } from '@/lib/payload'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import type { KeyFactItem } from '@/seed/data'
+import type { KeyFactItem } from '@/types/content'
 
 export const metadata = buildPageMetadata({
   title: 'Credentials and Safety | Shena Works Limited',
@@ -17,14 +17,14 @@ export const metadata = buildPageMetadata({
   path: '/about/credentials-and-safety',
 })
 
-export default function CredentialsAndSafetyPage() {
-  const credentials = getPublishedCredentials()
+export default async function CredentialsAndSafetyPage() {
+  const credentials = await getPublishedCredentials()
   // SITE-PLAN.md 6.4 & 8: If no credential has passed the gate, this route returns 404
   if (credentials.length === 0) {
     notFound()
   }
 
-  const settings = getSiteSettings()
+  const settings = await getSiteSettings()
   const breadcrumbs = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
@@ -103,7 +103,7 @@ export default function CredentialsAndSafetyPage() {
             <div className="col-span-4 lg:col-start-2 lg:col-span-7">
               <DownloadCard
                 title="Company profile"
-                sizeMb={settings.files.companyProfile.sizeMb}
+                sizeMb={settings.files.companyProfile.sizeMb || '1.2 MB'}
                 href="/downloads/company-profile"
               />
             </div>

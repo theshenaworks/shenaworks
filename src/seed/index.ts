@@ -1,5 +1,14 @@
+if (!process.env.DATABASE_URI) {
+  try {
+    process.loadEnvFile?.('.env.local')
+  } catch {
+    try {
+      process.loadEnvFile?.('.env')
+    } catch {}
+  }
+}
+
 import { getPayload } from 'payload'
-import config from '../../payload.config'
 import {
   credentialsSeed,
   defaultHireTerms,
@@ -54,12 +63,20 @@ async function upsertBySlug(
 
 async function runSeed() {
   if (!process.env.DATABASE_URI) {
-    console.log(
-      '[seed] DATABASE_URI is not set. Static seed dataset in src/seed/data.ts is verified and ready for SSR/Payload.',
-    )
-    return
+    try {
+      process.loadEnvFile?.('.env.local')
+    } catch {
+      try {
+        process.loadEnvFile?.('.env')
+      } catch {}
+    }
   }
 
+  if (!process.env.DATABASE_URI) {
+    throw new Error('[seed] DATABASE_URI is not set. Cannot seed database.')
+  }
+
+  const config = (await import('../../payload.config')).default
   const payload = await getPayload({ config })
   console.log('[seed] Connected to Payload + NeonDB. Seeding globals and collections idempotently...')
 

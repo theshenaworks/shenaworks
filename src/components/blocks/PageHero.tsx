@@ -1,6 +1,6 @@
 import React from 'react'
 import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/Breadcrumb'
-import type { MediaItem } from '@/seed/data'
+import type { MediaItem } from '@/types/content'
 
 export interface PageHeroProps {
   breadcrumbs?: BreadcrumbItem[]

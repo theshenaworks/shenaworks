@@ -4,7 +4,7 @@ import React from 'react'
 import { DataTable, type TableColumn } from '@/components/ui/Table'
 import { Icon } from '@/components/ui/Icon'
 import { trackEvent } from '@/lib/analytics'
-import type { CredentialRecord } from '@/seed/data'
+import type { CredentialRecord } from '@/types/content'
 
 export interface CredentialTableProps {
   heading?: string

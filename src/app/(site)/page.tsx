@@ -21,7 +21,7 @@ import {
   getPublishedServices,
   getPublishedTestimonials,
   getSiteSettings,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildOrganizationJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -32,20 +32,33 @@ export const metadata = buildPageMetadata({
   path: '/',
 })
 
-export default function HomePage() {
-  const home = getHomePage()
-  const settings = getSiteSettings()
-  const services = getPublishedServices()
-  const projects = getFeaturedProjects()
-  const machines = getFeaturedMachines()
-  const equipmentCategories = getPublishedEquipmentCategories()
-  const testimonials = getPublishedTestimonials({ excludePublicOfficials: true })
-  const posts = getPublishedPosts()
-  const postCategories = getPublishedPostCategories()
-  const locations = getPublishedLocations()
+export default async function HomePage() {
+  const [
+    home,
+    settings,
+    services,
+    projects,
+    machines,
+    equipmentCategories,
+    testimonials,
+    posts,
+    postCategories,
+    locations,
+  ] = await Promise.all([
+    getHomePage(),
+    getSiteSettings(),
+    getPublishedServices(),
+    getFeaturedProjects(),
+    getFeaturedMachines(),
+    getPublishedEquipmentCategories(),
+    getPublishedTestimonials({ excludePublicOfficials: true }),
+    getPublishedPosts(),
+    getPublishedPostCategories(),
+    getPublishedLocations(),
+  ])
 
   const architecturePublished = services.some((s) => s.slug === 'architecture-and-consultancy')
-  const jsonLd = buildOrganizationJsonLd()
+  const jsonLd = buildOrganizationJsonLd(settings)
 
   return (
     <>

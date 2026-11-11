@@ -8,13 +8,38 @@ import { SectionIntro } from './SectionIntro'
 import { enquirySchema, type EnquiryType } from '@/lib/validation/enquiry'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { trackEvent } from '@/lib/analytics'
-import {
-  equipmentCategoriesSeed,
-  locationsSeed,
-  machinesSeed,
-  servicesSeed,
-  siteSettingsSeed,
-} from '@/seed/data'
+
+const DEFAULT_SERVICES = [
+  { slug: 'road-construction-and-earthworks', title: 'Road construction and earthworks' },
+  { slug: 'cabro-paving', title: 'Cabro paving' },
+  { slug: 'general-construction', title: 'General construction' },
+  { slug: 'interior-design', title: 'Interior design' },
+  { slug: 'project-management', title: 'Project management' },
+]
+
+const DEFAULT_CATEGORIES = [
+  { slug: 'excavators', singular: 'excavator' },
+  { slug: 'graders', singular: 'motor grader' },
+  { slug: 'rollers', singular: 'roller' },
+  { slug: 'bulldozers', singular: 'bulldozer' },
+]
+
+const DEFAULT_LOCATIONS = [
+  {
+    slug: 'meru',
+    town: 'Meru',
+    address: 'Meru Town Yard, Meru County',
+    directionsUrl: 'https://maps.google.com/?q=0.0463,37.6559',
+  },
+]
+
+const DEFAULT_CONTACT = {
+  phoneE164: '+254718971896',
+  phoneDisplay: '+254 718 971 896',
+  whatsappNumber: '254718971896',
+  officeHours: 'Monday – Friday 8:00 am – 5:00 pm, Saturday 8:00 am – 1:00 pm',
+  responseTimeStatement: 'We respond to all verified enquiries within one business day.',
+}
 
 export interface EnquiryFormProps {
   id?: string
@@ -27,6 +52,17 @@ export interface EnquiryFormProps {
   showSectionIntro?: boolean
   surface?: 'subtle' | 'white'
   showOfficesInAside?: boolean
+  services?: { slug: string; title: string }[]
+  categories?: { slug: string; singular: string }[]
+  machines?: { slug: string; name: string; make: string; model: string }[]
+  locations?: { slug: string; town: string; address: string; directionsUrl: string }[]
+  contact?: {
+    phoneE164: string
+    phoneDisplay: string
+    whatsappNumber: string
+    officeHours?: string
+    responseTimeStatement?: string | null
+  }
 }
 
 const TYPE_OPTIONS: { value: EnquiryType; label: string }[] = [
@@ -73,6 +109,11 @@ export function EnquiryForm({
   showSectionIntro = true,
   surface = 'subtle',
   showOfficesInAside = false,
+  services,
+  categories,
+  machines,
+  locations,
+  contact,
 }: EnquiryFormProps) {
   const [type, setType] = useState<EnquiryType>(defaultType)
   const [name, setName] = useState('')
@@ -93,6 +134,11 @@ export function EnquiryForm({
   const [submitting, setSubmitting] = useState(false)
   const [started, setStarted] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string>('')
+
+  const activeContact = contact || DEFAULT_CONTACT
+  const { phoneE164, phoneDisplay, whatsappNumber, officeHours, responseTimeStatement } =
+    activeContact
+  const contactEmail = 'shenaworksltd@gmail.com'
 
   const summaryRef = useRef<HTMLDivElement>(null)
   const startedAtRef = useRef<number>(Date.now())
@@ -146,16 +192,20 @@ export function EnquiryForm({
   }, [siteKey, turnstileToken])
 
   const publishedServices = useMemo(
-    () => servicesSeed.filter((s) => s._status === 'published'),
-    [],
+    () => services || DEFAULT_SERVICES,
+    [services],
+  )
+  const equipmentCategories = useMemo(
+    () => categories || DEFAULT_CATEGORIES,
+    [categories],
   )
   const publishedMachines = useMemo(
-    () => machinesSeed.filter((m) => m._status === 'published'),
-    [],
+    () => machines || [],
+    [machines],
   )
   const publishedLocations = useMemo(
-    () => locationsSeed.filter((l) => l._status === 'published'),
-    [],
+    () => locations || DEFAULT_LOCATIONS,
+    [locations],
   )
 
   const handleFirstInteraction = () => {
@@ -276,7 +326,7 @@ export function EnquiryForm({
       if (!res.ok) {
         setServerError(
           data?.error ||
-            `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${siteSettingsSeed.contact.phoneDisplay}.`,
+            `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${phoneDisplay}.`,
         )
         setSubmitting(false)
         return
@@ -292,15 +342,13 @@ export function EnquiryForm({
       window.location.assign(data?.redirectUrl || `/thank-you?type=${type}`)
     } catch {
       setServerError(
-        `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${siteSettingsSeed.contact.phoneDisplay}.`,
+        `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${phoneDisplay}.`,
       )
       setSubmitting(false)
     }
   }
 
   const errorEntries = Object.entries(errors)
-  const { phoneE164, phoneDisplay, whatsappNumber, email: contactEmail, officeHours, responseTimeStatement } =
-    siteSettingsSeed.contact
   const whatsappUrl = buildWhatsAppUrl({ type: 'contact' }, whatsappNumber)
 
   const messageLabel =
@@ -572,7 +620,7 @@ export function EnquiryForm({
                       className="field-input"
                     >
                       <option value="">Choose a machine or type</option>
-                      {equipmentCategoriesSeed.map((cat) => (
+                      {equipmentCategories.map((cat) => (
                         <option key={`any-${cat.slug}`} value={`any-${cat.slug}`}>
                           Any {cat.singular}
                         </option>

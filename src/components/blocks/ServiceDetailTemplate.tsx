@@ -18,10 +18,10 @@ import {
   getPublishedEquipmentCategories,
   getPublishedServices,
   getPublishedTestimonials,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, buildServiceJsonLd } from '@/lib/seo/jsonld'
-import type { ServiceRecord } from '@/seed/data'
+import type { ServiceRecord } from '@/types/content'
 import type { BreadcrumbItem } from '@/components/ui/Breadcrumb'
 
 export interface ServiceDetailTemplateProps {
@@ -30,17 +30,28 @@ export interface ServiceDetailTemplateProps {
   path: string
 }
 
-export function ServiceDetailTemplate({
+export async function ServiceDetailTemplate({
   service,
   breadcrumbs,
   path,
 }: ServiceDetailTemplateProps) {
-  const childServices = getChildServices(service.slug)
-  const relatedProjects = getProjectsByService(service.slug).slice(0, 3)
-  const allServices = getPublishedServices()
-  const equipmentUsed = getMachinesBySlugs(service.equipmentSlugs || []).slice(0, 3)
-  const equipmentCategories = getPublishedEquipmentCategories()
-  const testimonials = getPublishedTestimonials({ serviceSlug: service.slug })
+  const [
+    childServices,
+    allProjects,
+    allServices,
+    equipmentUsedAll,
+    equipmentCategories,
+    testimonials,
+  ] = await Promise.all([
+    getChildServices(service.slug),
+    getProjectsByService(service.slug),
+    getPublishedServices(),
+    getMachinesBySlugs(service.equipmentSlugs || []),
+    getPublishedEquipmentCategories(),
+    getPublishedTestimonials({ serviceSlug: service.slug }),
+  ])
+  const relatedProjects = allProjects.slice(0, 3)
+  const equipmentUsed = equipmentUsedAll.slice(0, 3)
   const whatsappUrl = buildWhatsAppUrl({ type: 'service', serviceTitle: service.title })
 
   const jsonLd = {

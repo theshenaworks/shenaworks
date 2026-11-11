@@ -9,7 +9,7 @@ import {
   getPublishedPostCategories,
   getPublishedServiceBySlug,
   getTeamMember,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -19,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const post = getPublishedPostBySlug(slug)
+  const post = await getPublishedPostBySlug(slug)
   if (!post) return {}
   return buildPageMetadata({
     title: `${post.title} | Shena Works`,
@@ -34,13 +34,15 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const post = getPublishedPostBySlug(slug)
+  const post = await getPublishedPostBySlug(slug)
   if (!post) notFound()
 
-  const categories = getPublishedPostCategories()
+  const [categories, author, relatedService] = await Promise.all([
+    getPublishedPostCategories(),
+    getTeamMember(),
+    getPublishedServiceBySlug(post.relatedServiceSlug),
+  ])
   const category = categories.find((c) => c.slug === post.categorySlug)
-  const author = getTeamMember()
-  const relatedService = getPublishedServiceBySlug(post.relatedServiceSlug)
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },

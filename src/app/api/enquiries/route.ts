@@ -3,7 +3,9 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { Resend } from 'resend'
 import { enquirySchema } from '@/lib/validation/enquiry'
-import { siteSettingsSeed } from '@/seed/data'
+
+const DEFAULT_PHONE_DISPLAY = '+254 718 971 896'
+const DEFAULT_ENQUIRY_RECIPIENT = 'shenaworksltd@gmail.com'
 
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
 const RATE_LIMIT_MAX = 5
@@ -139,7 +141,7 @@ export async function POST(req: NextRequest) {
   if (isRateLimited(ip)) {
     return NextResponse.json(
       {
-        error: `You've sent several enquiries in a short time. Please wait a few minutes or call us on ${siteSettingsSeed.contact.phoneDisplay}.`,
+        error: `You've sent several enquiries in a short time. Please wait a few minutes or call us on ${DEFAULT_PHONE_DISPLAY}.`,
       },
       { status: 429 },
     )
@@ -288,7 +290,7 @@ export async function POST(req: NextRequest) {
       console.error('[enquiries] Database save error:', dbErr)
       return NextResponse.json(
         {
-          error: `We could not record your enquiry due to a server error. Please call us directly on ${siteSettingsSeed.contact.phoneDisplay}.`,
+          error: `We could not record your enquiry due to a server error. Please call us directly on ${DEFAULT_PHONE_DISPLAY}.`,
         },
         { status: 500 },
       )
@@ -301,8 +303,7 @@ export async function POST(req: NextRequest) {
       const resend = new Resend(process.env.RESEND_API_KEY)
       const recipient =
         process.env.ENQUIRY_NOTIFICATION_EMAIL ||
-        siteSettingsSeed.contact.enquiryRecipients[0] ||
-        'shenaworksltd@gmail.com'
+        DEFAULT_ENQUIRY_RECIPIENT
       const from = process.env.ENQUIRY_FROM_EMAIL || 'Shena Works <onboarding@resend.dev>'
       await resend.emails.send({
         from,

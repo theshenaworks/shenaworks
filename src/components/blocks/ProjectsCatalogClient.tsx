@@ -6,7 +6,7 @@ import { Dialog } from '@/components/ui/Dialog'
 import { ProjectGrid } from './ProjectGrid'
 import { EmptyState } from './EmptyState'
 import { trackEvent } from '@/lib/analytics'
-import type { ProjectRecord, ServiceRecord } from '@/seed/data'
+import type { ProjectRecord, ServiceRecord } from '@/types/content'
 
 export interface ProjectsCatalogClientProps {
   projects: ProjectRecord[]

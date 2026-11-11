@@ -18,13 +18,14 @@ import {
   getPublishedEquipmentCategories,
   getPublishedProjects,
   getPublishedServices,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
-export function generateStaticParams() {
-  return getPublishedEquipmentCategories().map((c) => ({ category: c.slug }))
+export async function generateStaticParams() {
+  const categories = await getPublishedEquipmentCategories()
+  return categories.map((c) => ({ category: c.slug }))
 }
 
 export async function generateMetadata({
@@ -33,7 +34,7 @@ export async function generateMetadata({
   params: Promise<{ category: string }>
 }): Promise<Metadata> {
   const { category } = await params
-  const cat = getEquipmentCategoryBySlug(category)
+  const cat = await getEquipmentCategoryBySlug(category)
   if (!cat) return {}
   return buildPageMetadata({
     title: cat.metaTitle,
@@ -48,18 +49,21 @@ export default async function EquipmentCategoryPage({
   params: Promise<{ category: string }>
 }) {
   const { category } = await params
-  const cat = getEquipmentCategoryBySlug(category)
+  const cat = await getEquipmentCategoryBySlug(category)
   if (!cat) notFound()
 
-  const machines = getMachinesByCategory(cat.slug)
+  const [machines, indexData, allProjects, allServices] = await Promise.all([
+    getMachinesByCategory(cat.slug),
+    getEquipmentIndex(),
+    getPublishedProjects(),
+    getPublishedServices(),
+  ])
   if (machines.length === 0) notFound()
 
-  const indexData = getEquipmentIndex()
   const machineSlugs = new Set(machines.map((m) => m.slug))
-  const relatedProjects = getPublishedProjects()
+  const relatedProjects = allProjects
     .filter((p) => p.equipmentSlugs.some((slug) => machineSlugs.has(slug)))
     .slice(0, 3)
-  const allServices = getPublishedServices()
 
   const whatsappUrl = buildWhatsAppUrl({ type: 'equipment', categoryName: cat.name })
   const breadcrumbs = [

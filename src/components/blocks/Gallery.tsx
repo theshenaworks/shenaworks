@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Carousel } from '@/components/ui/Carousel'
-import type { MediaItem } from '@/seed/data'
+import type { MediaItem } from '@/types/content'
 
 export interface GalleryProps {
   id?: string

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from '@/components/ui/Button'
-import type { MediaItem } from '@/seed/data'
+import type { MediaItem } from '@/types/content'
 
 export interface WhyShenaPoint {
   number: string

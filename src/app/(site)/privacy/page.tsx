@@ -1,7 +1,7 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/blocks/PageHeader'
-import { getLegalPageBySlug } from '@/lib/content'
+import { getLegalPageBySlug } from '@/lib/payload'
 import { buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -12,8 +12,8 @@ export const metadata = buildPageMetadata({
   path: '/privacy',
 })
 
-export default function PrivacyPage() {
-  const page = getLegalPageBySlug('privacy')
+export default async function PrivacyPage() {
+  const page = await getLegalPageBySlug('privacy')
   if (!page) notFound()
 
   const breadcrumbs = [{ label: 'Home', href: '/' }, { label: page.title }]

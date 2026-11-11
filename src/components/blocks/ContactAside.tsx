@@ -4,14 +4,44 @@ import React from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { buildWhatsAppUrl, type WhatsAppMessageContext } from '@/lib/whatsapp'
 import { trackEvent } from '@/lib/analytics'
-import { siteSettingsSeed, teamSeed } from '@/seed/data'
+import type { MediaItem } from '@/types/content'
+
+const DEFAULT_PORTRAIT: MediaItem = {
+  url: '/media/founder-newton-muthee.svg',
+  alt: 'Newton M. Muthee, Founder and Managing Director of Shena Works Limited',
+  caption: 'Newton Muthee, Founder and Managing Director',
+}
 
 export interface ContactAsideProps {
   waContext?: WhatsAppMessageContext
+  contact?: {
+    phoneE164: string
+    phoneDisplay: string
+    whatsappNumber: string
+    email: string
+  }
+  person?: {
+    name: string
+    role: string
+    portrait: MediaItem
+  }
 }
 
-export function ContactAside({ waContext = { type: 'default' } }: ContactAsideProps) {
-  const { phoneE164, phoneDisplay, whatsappNumber, email } = siteSettingsSeed.contact
+export function ContactAside({
+  waContext = { type: 'default' },
+  contact = {
+    phoneE164: '+254718971896',
+    phoneDisplay: '+254 718 971 896',
+    whatsappNumber: '254718971896',
+    email: 'shenaworksltd@gmail.com',
+  },
+  person = {
+    name: 'Newton M. Muthee',
+    role: 'Founder and Managing Director',
+    portrait: DEFAULT_PORTRAIT,
+  },
+}: ContactAsideProps) {
+  const { phoneE164, phoneDisplay, whatsappNumber, email } = contact
   const whatsappUrl = buildWhatsAppUrl(waContext, whatsappNumber)
 
   return (
@@ -21,14 +51,14 @@ export function ContactAside({ waContext = { type: 'default' } }: ContactAsidePr
     >
       <div className="mb-[2.0rem] aspect-square w-[9.6rem] overflow-hidden bg-[var(--ink-800)]">
         <img
-          src={teamSeed.portrait.url}
-          alt={teamSeed.portrait.alt}
+          src={person.portrait.url}
+          alt={person.portrait.alt}
           loading="lazy"
           className="h-full w-full object-cover"
         />
       </div>
-      <p className="text-label text-[var(--white)] mb-[0.4rem]">{teamSeed.name}</p>
-      <p className="text-body-xs text-[var(--grey-500)] mb-[2.4rem]">{teamSeed.role}</p>
+      <p className="text-label text-[var(--white)] mb-[0.4rem]">{person.name}</p>
+      <p className="text-body-xs text-[var(--grey-500)] mb-[2.4rem]">{person.role}</p>
 
       <ul className="space-y-[1.2rem] border-t border-[var(--ink-600)] pt-[2.0rem] text-body-sm">
         <li>

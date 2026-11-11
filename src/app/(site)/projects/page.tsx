@@ -2,7 +2,7 @@ import React from 'react'
 import { PageHero } from '@/components/blocks/PageHero'
 import { ProjectsCatalogClient } from '@/components/blocks/ProjectsCatalogClient'
 import { CtaBand } from '@/components/blocks/CtaBand'
-import { getPublishedProjects, getPublishedServices } from '@/lib/content'
+import { getPublishedProjects, getPublishedServices } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -19,8 +19,10 @@ export default async function ProjectsIndexPage({
   searchParams: Promise<{ service?: string; location?: string; year?: string }>
 }) {
   const params = await searchParams
-  const projects = getPublishedProjects()
-  const services = getPublishedServices()
+  const [projects, services] = await Promise.all([
+    getPublishedProjects(),
+    getPublishedServices(),
+  ])
 
   const breadcrumbs = [{ label: 'Home', href: '/' }, { label: 'Projects' }]
   const jsonLd = {

@@ -1,21 +1,22 @@
-'use client'
-
 import React from 'react'
+import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/blocks/PageHeader'
-import { Button } from '@/components/ui/Button'
-import { getLegalPageBySlug } from '@/lib/content'
+import { CookieSettingsButton } from '@/components/ui/CookieSettingsButton'
+import { getLegalPageBySlug } from '@/lib/payload'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 
-export default function CookiesPage() {
-  const page = getLegalPageBySlug('cookies')
-  if (!page) return null
+export const metadata = buildPageMetadata({
+  title: 'Cookie Notice | Shena Works',
+  description:
+    'Information about cookies used on the Shena Works website, including consent choices for optional analytics.',
+  path: '/cookies',
+})
+
+export default async function CookiesPage() {
+  const page = await getLegalPageBySlug('cookies')
+  if (!page) notFound()
 
   const breadcrumbs = [{ label: 'Home', href: '/' }, { label: page.title }]
-
-  const openCookieSettings = () => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('shena:open-cookie-banner'))
-    }
-  }
 
   return (
     <>
@@ -83,9 +84,7 @@ export default function CookiesPage() {
             ))}
 
             <div className="pt-[1.6rem]">
-              <Button variant="secondary" onClick={openCookieSettings}>
-                Change cookie settings
-              </Button>
+              <CookieSettingsButton />
             </div>
           </div>
         </div>

@@ -19,13 +19,14 @@ import {
   getPublishedLocations,
   getPublishedServices,
   getSiteSettings,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
-export function generateStaticParams() {
-  return getPublishedLocations().map((l) => ({ slug: l.slug }))
+export async function generateStaticParams() {
+  const locs = await getPublishedLocations()
+  return locs.map((l) => ({ slug: l.slug }))
 }
 
 export async function generateMetadata({
@@ -34,7 +35,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const loc = getPublishedLocationBySlug(slug)
+  const loc = await getPublishedLocationBySlug(slug)
   if (!loc) return {}
   return buildPageMetadata({
     title: loc.metaTitle,
@@ -49,15 +50,18 @@ export default async function LocationPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const location = getPublishedLocationBySlug(slug)
+  const location = await getPublishedLocationBySlug(slug)
   // SITE-PLAN.md 8: Unpublished locations (e.g. Nairobi while in draft) return 404
   if (!location) notFound()
 
-  const settings = getSiteSettings()
-  const services = getPublishedServices()
-  const localProjects = getProjectsByCounty(location.county).slice(0, 6)
-  const machines = getFeaturedMachines()
-  const equipmentCategories = getPublishedEquipmentCategories()
+  const [settings, services, allCountyProjects, machines, equipmentCategories] = await Promise.all([
+    getSiteSettings(),
+    getPublishedServices(),
+    getProjectsByCounty(location.county),
+    getFeaturedMachines(),
+    getPublishedEquipmentCategories(),
+  ])
+  const localProjects = allCountyProjects.slice(0, 6)
 
   const whatsappUrl = buildWhatsAppUrl({ type: 'location', town: location.town })
   const breadcrumbs = [

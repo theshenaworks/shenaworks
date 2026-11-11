@@ -10,9 +10,9 @@ import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import {
   getEquipmentIndex,
-  getMachinesByCategory,
   getPublishedEquipmentCategories,
-} from '@/lib/content'
+  getPublishedMachines,
+} from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
@@ -24,9 +24,12 @@ export const metadata = buildPageMetadata({
   path: '/equipment',
 })
 
-export default function EquipmentIndexPage() {
-  const indexData = getEquipmentIndex()
-  const categories = getPublishedEquipmentCategories()
+export default async function EquipmentIndexPage() {
+  const [indexData, categories, allMachines] = await Promise.all([
+    getEquipmentIndex(),
+    getPublishedEquipmentCategories(),
+    getPublishedMachines(),
+  ])
   const whatsappUrl = buildWhatsAppUrl({ type: 'equipment' })
 
   const breadcrumbs = [{ label: 'Home', href: '/' }, { label: 'Equipment hire' }]
@@ -91,7 +94,7 @@ export default function EquipmentIndexPage() {
 
       {/* 4. Category sections */}
       {categories.map((cat, idx) => {
-        const machines = getMachinesByCategory(cat.slug)
+        const machines = allMachines.filter((m) => m.categorySlug === cat.slug)
         const subtle = idx % 2 === 1
 
         return (

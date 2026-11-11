@@ -1,11 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import { getSiteSettings } from '../src/lib/content'
+import { getSiteSettings } from '../src/lib/payload'
 
 async function generateProfile() {
   const pdfDoc = await PDFDocument.create()
-  let settings = getSiteSettings()
+  let settings = await getSiteSettings()
 
   if (process.env.DATABASE_URI) {
     try {

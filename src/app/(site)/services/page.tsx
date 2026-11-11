@@ -4,10 +4,10 @@ import { StatementBlock } from '@/components/blocks/StatementBlock'
 import { CtaBand } from '@/components/blocks/CtaBand'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { getPublishedServices } from '@/lib/content'
+import { getPublishedServices } from '@/lib/payload'
 import { buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import type { ServiceRecord } from '@/seed/data'
+import type { ServiceRecord } from '@/types/content'
 
 export const metadata = buildPageMetadata({
   title: 'Construction Services in Meru and Nairobi | Shena Works',
@@ -42,8 +42,8 @@ const GROUPS: {
   },
 ]
 
-export default function ServicesIndexPage() {
-  const allServices = getPublishedServices()
+export default async function ServicesIndexPage() {
+  const allServices = await getPublishedServices()
   const topLevelServices = allServices.filter((s) => !s.parentSlug)
   const cabroService = allServices.find((s) => s.slug === 'cabro-paving')
 

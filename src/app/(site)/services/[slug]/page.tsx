@@ -2,11 +2,12 @@ import React from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { ServiceDetailTemplate } from '@/components/blocks/ServiceDetailTemplate'
-import { getPublishedServiceBySlug, getPublishedServices } from '@/lib/content'
+import { getPublishedServiceBySlug, getPublishedServices } from '@/lib/payload'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
-export function generateStaticParams() {
-  return getPublishedServices()
+export async function generateStaticParams() {
+  const services = await getPublishedServices()
+  return services
     .filter((s) => !s.parentSlug)
     .map((s) => ({ slug: s.slug }))
 }
@@ -17,7 +18,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const service = getPublishedServiceBySlug(slug)
+  const service = await getPublishedServiceBySlug(slug)
   if (!service || service.parentSlug) {
     return {}
   }
@@ -34,7 +35,7 @@ export default async function ServicePage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const service = getPublishedServiceBySlug(slug)
+  const service = await getPublishedServiceBySlug(slug)
   // Gated or child services accessed directly at /services/[slug] return 404
   if (!service || service.parentSlug) {
     notFound()

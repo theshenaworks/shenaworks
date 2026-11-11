@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Icon } from './Icon'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { trackEvent } from '@/lib/analytics'
-import type { EquipmentCategoryRecord, LocationRecord, ServiceRecord } from '@/seed/data'
+import type { EquipmentCategoryRecord, LocationRecord, ServiceRecord } from '@/types/content'
 
 export interface FooterProps {
   services: ServiceRecord[]

@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ScopeItem } from '@/seed/data'
+import type { ScopeItem } from '@/types/content'
 
 export interface ScopeListProps {
   heading?: string

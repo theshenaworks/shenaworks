@@ -1,5 +1,5 @@
 import React from 'react'
-import type { KeyFactItem } from '@/seed/data'
+import type { KeyFactItem } from '@/types/content'
 
 export interface KeyFactsProps {
   heading?: string

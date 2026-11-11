@@ -4,7 +4,13 @@ import React from 'react'
 import { Button } from '@/components/ui/Button'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { trackEvent } from '@/lib/analytics'
-import { siteSettingsSeed, type MediaItem } from '@/seed/data'
+import type { MediaItem } from '@/types/content'
+
+const DEFAULT_IMAGE: MediaItem = {
+  url: '/media/hero-aerial-road.svg',
+  alt: 'Aerial perspective of a civil road construction project by Shena Works',
+  caption: 'Civil road construction and earthworks across Kenya.',
+}
 
 export interface CtaBandProps {
   headlineLine1?: string
@@ -12,6 +18,10 @@ export interface CtaBandProps {
   buttonLabel?: string
   buttonHref?: string
   image?: MediaItem
+  phoneE164?: string
+  phoneDisplay?: string
+  whatsappNumber?: string
+  officeHours?: string
 }
 
 export function CtaBand({
@@ -19,9 +29,12 @@ export function CtaBand({
   headlineLine2 = 'your site',
   buttonLabel = 'Request a quote',
   buttonHref = '/contact?type=project',
-  image = siteSettingsSeed.ctaImage,
+  image = DEFAULT_IMAGE,
+  phoneE164 = '+254718971896',
+  phoneDisplay = '+254 718 971 896',
+  whatsappNumber = '254718971896',
+  officeHours = 'Monday – Friday 8:00 am – 5:00 pm, Saturday 8:00 am – 1:00 pm',
 }: CtaBandProps) {
-  const { phoneE164, phoneDisplay, whatsappNumber, officeHours } = siteSettingsSeed.contact
   const whatsappUrl = buildWhatsAppUrl({ type: 'default' }, whatsappNumber)
 
   return (

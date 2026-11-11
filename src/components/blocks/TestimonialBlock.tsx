@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { IconButton } from '@/components/ui/IconButton'
-import type { TestimonialRecord } from '@/seed/data'
+import type { TestimonialRecord } from '@/types/content'
 
 export interface TestimonialBlockProps {
   testimonials: TestimonialRecord[]

@@ -3,7 +3,7 @@
 import React from 'react'
 import { Button } from '@/components/ui/Button'
 import { trackEvent } from '@/lib/analytics'
-import type { MediaItem } from '@/seed/data'
+import type { MediaItem } from '@/types/content'
 
 export interface HomeHeroProps {
   overline: string

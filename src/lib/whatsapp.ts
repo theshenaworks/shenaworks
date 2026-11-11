@@ -1,5 +1,3 @@
-import { siteSettingsSeed } from '@/seed/data'
-
 export type WhatsAppMessageContext =
   | { type: 'default' }
   | { type: 'service'; serviceTitle: string }
@@ -31,7 +29,7 @@ export function buildWhatsAppMessage(ctx: WhatsAppMessageContext = { type: 'defa
 
 export function buildWhatsAppUrl(
   ctx: WhatsAppMessageContext = { type: 'default' },
-  whatsappNumber: string = siteSettingsSeed.contact.whatsappNumber,
+  whatsappNumber = '254718971896',
 ): string {
   const digits = whatsappNumber.replace(/[^0-9]/g, '')
   const message = buildWhatsAppMessage(ctx)

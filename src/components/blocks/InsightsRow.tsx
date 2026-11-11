@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card } from '@/components/ui/Card'
 import { SectionIntro } from './SectionIntro'
-import type { PostCategoryRecord, PostRecord } from '@/seed/data'
+import type { PostCategoryRecord, PostRecord } from '@/types/content'
 
 export interface InsightsRowProps {
   posts: PostRecord[]

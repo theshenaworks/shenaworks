@@ -2,7 +2,7 @@ import React from 'react'
 import { PageHeader } from '@/components/blocks/PageHeader'
 import { EnquiryForm } from '@/components/blocks/EnquiryForm'
 import { MapBlock } from '@/components/blocks/MapBlock'
-import { getPublishedLocations, getSiteSettings } from '@/lib/content'
+import { getPublishedLocations, getSiteSettings } from '@/lib/payload'
 import { ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import type { EnquiryType } from '@/lib/validation/enquiry'
@@ -33,8 +33,10 @@ export default async function ContactPage({
   searchParams: Promise<{ type?: string; service?: string; equipment?: string }>
 }) {
   const params = await searchParams
-  const settings = getSiteSettings()
-  const locations = getPublishedLocations()
+  const [settings, locations] = await Promise.all([
+    getSiteSettings(),
+    getPublishedLocations(),
+  ])
 
   const defaultType = resolvePresetType(params.type, params.equipment)
   const defaultService = params.service || ''

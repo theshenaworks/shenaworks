@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { SectionIntro } from './SectionIntro'
-import type { ProjectRecord, ServiceRecord } from '@/seed/data'
+import type { ProjectRecord, ServiceRecord } from '@/types/content'
 
 export interface ProjectGridProps {
   variant?: 'home' | 'index' | 'related'

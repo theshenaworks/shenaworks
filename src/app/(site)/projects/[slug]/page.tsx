@@ -14,13 +14,14 @@ import {
   getPublishedProjects,
   getPublishedServices,
   getPublishedTestimonials,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import type { KeyFactItem } from '@/seed/data'
+import type { KeyFactItem } from '@/types/content'
 
-export function generateStaticParams() {
-  return getPublishedProjects().map((p) => ({ slug: p.slug }))
+export async function generateStaticParams() {
+  const projects = await getPublishedProjects()
+  return projects.map((p) => ({ slug: p.slug }))
 }
 
 export async function generateMetadata({
@@ -29,7 +30,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const project = getPublishedProjectBySlug(slug)
+  const project = await getPublishedProjectBySlug(slug)
   if (!project) return {}
   return buildPageMetadata({
     title: project.metaTitle,
@@ -45,15 +46,18 @@ export default async function ProjectCaseStudyPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const project = getPublishedProjectBySlug(slug)
+  const project = await getPublishedProjectBySlug(slug)
   if (!project) notFound()
 
-  const allServices = getPublishedServices()
+  const [allServices, linkedMachines, testimonials, allProjects] = await Promise.all([
+    getPublishedServices(),
+    getMachinesBySlugs(project.equipmentSlugs),
+    getPublishedTestimonials({ projectSlug: project.slug }),
+    getPublishedProjects(),
+  ])
   const linkedServices = allServices.filter((s) => project.serviceSlugs.includes(s.slug))
-  const linkedMachines = getMachinesBySlugs(project.equipmentSlugs)
-  const testimonials = getPublishedTestimonials({ projectSlug: project.slug })
 
-  const relatedProjects = getPublishedProjects()
+  const relatedProjects = allProjects
     .filter(
       (p) =>
         p.slug !== project.slug &&

@@ -6,7 +6,7 @@ import { KeyFacts } from '@/components/blocks/KeyFacts'
 import { CredentialTable } from '@/components/blocks/CredentialTable'
 import { CtaBand } from '@/components/blocks/CtaBand'
 import { Button } from '@/components/ui/Button'
-import { getPublishedCredentials, getTeamMember } from '@/lib/content'
+import { getPublishedCredentials, getTeamMember } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -17,9 +17,12 @@ export const metadata = buildPageMetadata({
   path: '/about/leadership',
 })
 
-export default function LeadershipPage() {
-  const team = getTeamMember()
-  const personalCredentials = getPublishedCredentials().filter(
+export default async function LeadershipPage() {
+  const [team, credentials] = await Promise.all([
+    getTeamMember(),
+    getPublishedCredentials(),
+  ])
+  const personalCredentials = credentials.filter(
     (c) => c.holderSlug === 'newton-muthee',
   )
 

@@ -13,7 +13,7 @@ import {
   getPublishedMachines,
   getSiteSettings,
   getTeamMember,
-} from '@/lib/content'
+} from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -24,13 +24,16 @@ export const metadata = buildPageMetadata({
   path: '/about',
 })
 
-export default function AboutPage() {
-  const settings = getSiteSettings()
-  const machines = getPublishedMachines()
-  const categories = getPublishedEquipmentCategories()
-  const locations = getPublishedLocations()
-  const team = getTeamMember()
-  const hasCredentials = getPublishedCredentials().length > 0
+export default async function AboutPage() {
+  const [settings, machines, categories, locations, team, credentials] = await Promise.all([
+    getSiteSettings(),
+    getPublishedMachines(),
+    getPublishedEquipmentCategories(),
+    getPublishedLocations(),
+    getTeamMember(),
+    getPublishedCredentials(),
+  ])
+  const hasCredentials = credentials.length > 0
   const hasCompanyProfile = Boolean(settings.files.companyProfile?.url)
 
   const breadcrumbs = [{ label: 'Home', href: '/' }, { label: 'About' }]

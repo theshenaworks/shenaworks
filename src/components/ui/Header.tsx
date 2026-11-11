@@ -9,7 +9,7 @@ import { Scrim } from './Scrim'
 import { MobileDrawer } from './MobileDrawer'
 import { buildWhatsAppUrl, type WhatsAppMessageContext } from '@/lib/whatsapp'
 import { trackEvent } from '@/lib/analytics'
-import type { EquipmentCategoryRecord, LocationRecord, ServiceRecord } from '@/seed/data'
+import type { EquipmentCategoryRecord, LocationRecord, ServiceRecord } from '@/types/content'
 
 export interface HeaderProps {
   services: ServiceRecord[]

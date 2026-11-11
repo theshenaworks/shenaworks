@@ -1,6 +1,6 @@
 import React from 'react'
 import { Accordion } from '@/components/ui/Accordion'
-import type { FaqItem } from '@/seed/data'
+import type { FaqItem } from '@/types/content'
 
 export interface FaqAccordionProps {
   heading?: string

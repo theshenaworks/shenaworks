@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { PageHeader } from '@/components/blocks/PageHeader'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { getSiteSettings } from '@/lib/content'
+import { getSiteSettings } from '@/lib/payload'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -44,7 +44,7 @@ export default async function ThankYouPage({
   const cookieStore = await cookies()
   const reference = cookieStore.get('sw_enquiry_ref')?.value
 
-  const settings = getSiteSettings()
+  const settings = await getSiteSettings()
   const typeKey = params.type && COPY_BY_TYPE[params.type] ? params.type : 'project'
   const copy = COPY_BY_TYPE[typeKey]!
   const whatsappUrl = buildWhatsAppUrl({ type: 'default' }, settings.contact.whatsappNumber)

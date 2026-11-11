@@ -13,6 +13,16 @@ if (typeof net.setDefaultAutoSelectFamily === 'function') {
   net.setDefaultAutoSelectFamily(false)
 }
 
+if (!process.env.DATABASE_URI) {
+  try {
+    process.loadEnvFile?.('.env.local')
+  } catch {
+    try {
+      process.loadEnvFile?.('.env')
+    } catch {}
+  }
+}
+
 import { Users } from './src/collections/Users'
 import { Media, EnquiryAttachments } from './src/collections/Media'
 import { Services } from './src/collections/Services'
