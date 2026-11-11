@@ -636,18 +636,12 @@ export interface Enquiry {
   timeline?: string | null;
   message?: string | null;
   attachments?: (number | EnquiryAttachment)[] | null;
-  consentAcceptedAt: string;
   sourcePage?: string | null;
-  utm?: {
-    source?: string | null;
-    medium?: string | null;
-    campaign?: string | null;
-    term?: string | null;
-    content?: string | null;
-    gclid?: string | null;
-  };
-  status?: ('new' | 'contacted' | 'quoted' | 'won' | 'closed_lost' | 'spam') | null;
-  assignedTo?: (number | null) | User;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+  consentAcceptedAt: string;
+  status?: ('new' | 'in_review' | 'contacted' | 'quoted' | 'closed_won' | 'closed_lost') | null;
   internalNotes?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1248,20 +1242,12 @@ export interface EnquiriesSelect<T extends boolean = true> {
   timeline?: T;
   message?: T;
   attachments?: T;
-  consentAcceptedAt?: T;
   sourcePage?: T;
-  utm?:
-    | T
-    | {
-        source?: T;
-        medium?: T;
-        campaign?: T;
-        term?: T;
-        content?: T;
-        gclid?: T;
-      };
+  utmSource?: T;
+  utmMedium?: T;
+  utmCampaign?: T;
+  consentAcceptedAt?: T;
   status?: T;
-  assignedTo?: T;
   internalNotes?: T;
   updatedAt?: T;
   createdAt?: T;

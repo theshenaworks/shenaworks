@@ -24,27 +24,27 @@ if (!process.env.DATABASE_URI) {
 }
 
 import { Users } from './src/collections/Users'
-import { Media, EnquiryAttachments } from './src/collections/Media'
+import { Media } from './src/collections/Media'
+import { EnquiryAttachments } from './src/collections/EnquiryAttachments'
 import { Services } from './src/collections/Services'
 import { Projects } from './src/collections/Projects'
-import { EquipmentCategories, Equipment } from './src/collections/Equipment'
-import { Credentials, Team, Testimonials } from './src/collections/CredentialsTeamTestimonials'
-import {
-  PostCategories,
-  Posts,
-  Locations,
-  LegalPages,
-  Enquiries,
-} from './src/collections/PostsLocationsLegalEnquiries'
-import {
-  SiteSettings,
-  HomePage,
-  AboutPage,
-  CredentialsPage,
-  ServicesIndex,
-  ProjectsIndex,
-  EquipmentIndex,
-} from './src/globals'
+import { EquipmentCategories } from './src/collections/EquipmentCategories'
+import { Equipment } from './src/collections/Equipment'
+import { Credentials } from './src/collections/Credentials'
+import { Team } from './src/collections/Team'
+import { Testimonials } from './src/collections/Testimonials'
+import { PostCategories } from './src/collections/PostCategories'
+import { Posts } from './src/collections/Posts'
+import { Locations } from './src/collections/Locations'
+import { LegalPages } from './src/collections/LegalPages'
+import { Enquiries } from './src/collections/Enquiries'
+import { SiteSettings } from './src/globals/SiteSettings'
+import { HomePage } from './src/globals/HomePage'
+import { AboutPage } from './src/globals/AboutPage'
+import { CredentialsPage } from './src/globals/CredentialsPage'
+import { ServicesIndex } from './src/globals/ServicesIndex'
+import { ProjectsIndex } from './src/globals/ProjectsIndex'
+import { EquipmentIndex } from './src/globals/EquipmentIndex'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
