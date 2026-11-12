@@ -24,6 +24,13 @@ const DEFAULT_CATEGORIES = [
   { slug: 'bulldozers', singular: 'bulldozer' },
 ]
 
+const DEFAULT_MACHINES: Array<{ slug: string; name: string; make?: string; model?: string }> = [
+  { slug: 'crawler-excavator', name: 'Crawler Excavator' },
+  { slug: 'motor-grader', name: 'Motor Grader' },
+  { slug: 'vibratory-roller', name: 'Vibratory Roller' },
+  { slug: 'crawler-bulldozer', name: 'Crawler Bulldozer' },
+]
+
 const DEFAULT_LOCATIONS = [
   {
     slug: 'meru',
@@ -200,7 +207,7 @@ export function EnquiryForm({
     [categories],
   )
   const publishedMachines = useMemo(
-    () => machines || [],
+    () => (machines && machines.length > 0 ? machines : DEFAULT_MACHINES),
     [machines],
   )
   const publishedLocations = useMemo(
@@ -647,9 +654,17 @@ export function EnquiryForm({
                       ))}
                       {publishedMachines.map((m) => (
                         <option key={m.slug} value={m.slug}>
-                          {m.name} ({m.make} {m.model})
+                          {m.name}
+                          {'make' in m && 'model' in m && m.make && m.model ? ` (${m.make} ${m.model})` : ''}
                         </option>
                       ))}
+                      {defaultEquipment &&
+                        !publishedMachines.some((m) => m.slug === defaultEquipment) &&
+                        !equipmentCategories.some((c) => `any-${c.slug}` === defaultEquipment) && (
+                          <option value={defaultEquipment}>
+                            {defaultEquipment.replace(/-/g, ' ')}
+                          </option>
+                        )}
                     </select>
                     {errors.equipment && (
                       <p
