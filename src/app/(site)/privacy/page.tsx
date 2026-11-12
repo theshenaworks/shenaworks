@@ -1,6 +1,6 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { PageHeader } from '@/components/blocks/PageHeader'
+import Link from 'next/link'
 import { getLegalPageBySlug } from '@/lib/payload'
 import { buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
@@ -26,36 +26,38 @@ export default async function PrivacyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <PageHeader
-        breadcrumbs={breadcrumbs}
-        overline="Legal"
-        headline={page.title}
-        meta={`Last updated ${page.lastUpdated}`}
-      />
-
-      <section className="bg-[var(--white)] py-[6.4rem] lg:py-[8.0rem]">
-        <div className="site-grid">
-          <div className="col-span-4 lg:col-start-4 lg:col-span-10 space-y-[4.0rem]">
-            {page.sections.map((sec) => (
-              <div key={sec.heading}>
-                <h2 className="text-h3 text-[var(--ink-900)] mb-[1.6rem]">{sec.heading}</h2>
-                <div className="space-y-[1.6rem] text-body text-[var(--ink-900)]">
-                  {sec.paragraphs.map((p, idx) => (
-                    <p key={idx}>{p}</p>
-                  ))}
-                  {sec.bullets && (
-                    <ul className="list-disc pl-[2.4rem] space-y-[0.8rem]">
-                      {sec.bullets.map((b, idx) => (
-                        <li key={idx}>{b}</li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+      <div className="ph-head">
+        <div className="wrap">
+          <nav aria-label="Breadcrumb" className="crumbs dk" style={{ margin: '0 0 16px' }}>
+            <Link href="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{page.title}</span>
+          </nav>
+          <p className="over">Legal</p>
+          <h1 className="h1">{page.title}</h1>
+          <p className="xs">{`Last updated ${page.lastUpdated}`}</p>
         </div>
-      </section>
+      </div>
+
+      <div className="wrap">
+        <div className="legal-prose">
+          {page.sections.map((sec) => (
+            <React.Fragment key={sec.heading}>
+              <h2>{sec.heading}</h2>
+              {sec.paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))}
+              {sec.bullets && (
+                <ul>
+                  {sec.bullets.map((b, idx) => (
+                    <li key={idx}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
     </>
   )
 }

@@ -1,19 +1,14 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { Breadcrumb } from '@/components/ui/Breadcrumb'
-import { KeyFacts } from '@/components/blocks/KeyFacts'
-import { ContactAside } from '@/components/blocks/ContactAside'
-import { TestimonialBlock } from '@/components/blocks/TestimonialBlock'
-import { Gallery } from '@/components/blocks/Gallery'
-import { ProjectGrid } from '@/components/blocks/ProjectGrid'
-import { CtaBand } from '@/components/blocks/CtaBand'
+import Link from 'next/link'
+import Image from 'next/image'
 import {
   getMachinesBySlugs,
   getPublishedProjectBySlug,
   getPublishedProjects,
   getPublishedServices,
-  getPublishedTestimonials,
+  getSiteSettings,
 } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
@@ -49,11 +44,11 @@ export default async function ProjectCaseStudyPage({
   const project = await getPublishedProjectBySlug(slug)
   if (!project) notFound()
 
-  const [allServices, linkedMachines, testimonials, allProjects] = await Promise.all([
+  const [allServices, linkedMachines, allProjects, settings] = await Promise.all([
     getPublishedServices(),
     getMachinesBySlugs(project.equipmentSlugs),
-    getPublishedTestimonials({ projectSlug: project.slug }),
     getPublishedProjects(),
+    getSiteSettings(),
   ])
   const linkedServices = allServices.filter((s) => project.serviceSlugs.includes(s.slug))
 
@@ -61,7 +56,7 @@ export default async function ProjectCaseStudyPage({
     .filter(
       (p) =>
         p.slug !== project.slug &&
-        p.serviceSlugs.some((s) => project.serviceSlugs.includes(s)),
+        p.serviceSlugs.some((s) => project.serviceSlugs.includes(s))
     )
     .slice(0, 3)
 
@@ -81,13 +76,11 @@ export default async function ProjectCaseStudyPage({
       ? [
           {
             term: 'Services',
-            value: linkedServices.map((s) => s.shortTitle).join(', '),
+            value: linkedServices.map((s) => s.shortTitle || s.title).join(', '),
           },
         ]
       : []),
   ]
-
-  const primaryServiceSlug = project.serviceSlugs[0] || ''
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -104,6 +97,11 @@ export default async function ProjectCaseStudyPage({
     ],
   }
 
+  const phone = settings.contact?.phoneDisplay || '+254 718 971 896'
+  const telHref = `tel:${settings.contact?.phoneE164?.replace(/[\s-]/g, '') || '+254718971896'}`
+  const galleryImages =
+    project.gallery && project.gallery.length > 0 ? project.gallery : [project.heroImage]
+
   return (
     <>
       <script
@@ -111,85 +109,118 @@ export default async function ProjectCaseStudyPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* 1. Full-bleed Hero Image (header white on this page per SITE-PLAN.md 6.8) */}
-      <div className="pt-[5.2rem] lg:pt-[12.8rem] bg-[var(--white)]">
-        <div className="aspect-square md:aspect-video w-full overflow-hidden bg-[var(--grey-100)]">
-          <img
-            src={project.heroImage.url}
-            alt={project.heroImage.alt}
-            fetchPriority="high"
-            className="h-full w-full object-cover"
-          />
-        </div>
-      </div>
-
-      {/* 2. Title Block */}
-      <section className="bg-[var(--white)] pt-[4.0rem] lg:pt-[5.6rem] pb-[2.4rem]">
-        <div className="site-grid">
-          <div className="col-span-4 lg:col-start-2 lg:col-span-14">
-            <div className="mb-[1.6rem]">
-              <Breadcrumb items={breadcrumbs} />
-            </div>
-            <p className="text-overline text-[var(--ink-600)] mb-[0.8rem]">Projects</p>
-            <h1 className="text-h1 text-[var(--ink-900)] mb-[1.2rem]">{project.title}</h1>
-            <p className="text-label text-[var(--accent-500)]">
-              {project.location.town}, {project.location.county}
-            </p>
-            {project.heroImage.caption && (
-              <p className="text-figcaption text-[var(--ink-600)] mt-[1.6rem]">
-                {project.heroImage.caption}
-              </p>
-            )}
-          </div>
+      {/* 1. Header & Hero Image */}
+      <section className="ph-head" style={{ paddingBottom: '32px' }}>
+        <div className="wrap">
+          <nav aria-label="Breadcrumb" className="crumbs dk" style={{ margin: '0 0 16px' }}>
+            <Link href="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/projects">Projects</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{project.title}</span>
+          </nav>
+          <p className="over">Projects</p>
+          <h1 className="h1" style={{ marginBottom: '12px' }}>{project.title}</h1>
+          <p className="lead" style={{ color: 'var(--accent)', fontWeight: 700, fontSize: '18px' }}>
+            {`${project.location.town}, ${project.location.county}`}
+          </p>
         </div>
       </section>
 
-      {/* 3. KeyFacts */}
-      <KeyFacts items={keyFactItems} />
-
-      {/* 4. Body (subtle surface: Prose col 2-9 + ContactAside col 12-4) */}
-      <section
-        data-surface="subtle"
-        className="bg-[var(--grey-100)] py-[6.4rem] lg:py-[8.0rem] border-b border-[var(--grey-300)]"
-      >
-        <div className="site-grid items-start gap-y-[4.8rem]">
-          <div className="col-span-4 lg:col-start-2 lg:col-span-9 space-y-[4.0rem]">
-            <div>
-              <h2 className="text-h2 text-[var(--ink-900)] mb-[1.6rem]">The brief</h2>
-              <p className="text-body text-[var(--ink-900)]">{project.brief}</p>
-            </div>
-            <div>
-              <h2 className="text-h2 text-[var(--ink-900)] mb-[1.6rem]">The work</h2>
-              <p className="text-body text-[var(--ink-900)]">{project.work}</p>
-            </div>
-            <div>
-              <h2 className="text-h2 text-[var(--ink-900)] mb-[1.6rem]">The result</h2>
-              <p className="text-body text-[var(--ink-900)]">{project.result}</p>
-            </div>
-          </div>
-
-          <div className="col-span-4 lg:col-start-12 lg:col-span-4">
-            <ContactAside
-              waContext={{ type: 'project', projectTitle: project.title }}
+      <section style={{ padding: '0 0 48px' }}>
+        <div className="wrap">
+          <div className="ph" style={{ aspectRatio: '16/9', width: '100%', position: 'relative' }}>
+            <Image
+              src={project.heroImage.url}
+              alt={project.heroImage.alt}
+              fill
+              priority
+              sizes="100vw"
             />
           </div>
+          {project.heroImage.caption && (
+            <p className="xs" style={{ marginTop: '12px', fontStyle: 'italic' }}>
+              {project.heroImage.caption}
+            </p>
+          )}
         </div>
       </section>
 
-      {/* 5. TestimonialBlock (if permitted) */}
-      <TestimonialBlock testimonials={testimonials} />
+      {/* 2. Key Facts */}
+      <section style={{ padding: '32px 0 48px', borderTop: '1px solid var(--g300)' }}>
+        <div className="wrap">
+          <h2 className="sr">Project details</h2>
+          <dl className="kf" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))' }}>
+            {keyFactItems.map((kf, idx) => (
+              <div key={idx}>
+                <dt>{kf.term}</dt>
+                <dd>{kf.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
-      {/* 6. Stat Row (keyFigures) */}
+      {/* 3. Brief, Work & Result */}
+      <section data-surface="subtle" style={{ background: 'var(--g100)', padding: '64px 0' }}>
+        <div className="wrap">
+          <div className="msplit">
+            <div className="mlead">
+              <div style={{ marginBottom: '40px' }}>
+                <h2 className="h3" style={{ marginBottom: '16px' }}>The brief</h2>
+                <p className="lead" style={{ fontSize: '18px', lineHeight: '28px' }}>
+                  {project.brief}
+                </p>
+              </div>
+              <div style={{ marginBottom: '40px' }}>
+                <h2 className="h3" style={{ marginBottom: '16px' }}>The work</h2>
+                <p style={{ fontSize: '16px', lineHeight: '26px' }}>
+                  {project.work}
+                </p>
+              </div>
+              <div>
+                <h2 className="h3" style={{ marginBottom: '16px' }}>The result</h2>
+                <p style={{ fontSize: '16px', lineHeight: '26px' }}>
+                  {project.result}
+                </p>
+              </div>
+            </div>
+
+            <aside className="mside">
+              <div className="office" style={{ padding: '32px', background: '#fff' }}>
+                <h3 className="h4" style={{ marginBottom: '16px' }}>Need similar work?</h3>
+                <p className="sm" style={{ marginBottom: '24px' }}>
+                  Tell us about your site and what you want built.
+                </p>
+                <Link className="btn pri" href={`/contact?type=project&project=${project.slug}`} style={{ width: '100%', marginBottom: '12px' }}>
+                  Request a quote
+                </Link>
+                <a
+                  className="btn outl"
+                  href={`https://wa.me/254718971896?text=${encodeURIComponent(`Hello Shena Works, I saw the ${project.title} project and would like to discuss a similar project.`)}`}
+                  target="_blank"
+                  rel="noopener"
+                  style={{ width: '100%' }}
+                >
+                  WhatsApp us
+                </a>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Key Figures */}
       {project.keyFigures.length > 0 && (
-        <section className="bg-[var(--white)] py-[5.6rem] lg:py-[6.4rem] border-b border-[var(--grey-300)]">
-          <div className="site-grid">
-            <div className="col-span-4 lg:col-start-2 lg:col-span-14 grid grid-cols-1 md:grid-cols-3 gap-[3.2rem]">
-              {project.keyFigures.map((fig) => (
-                <div key={fig.label}>
-                  <p className="font-[var(--font-header)] text-h2 text-[var(--accent-500)] leading-none mb-[0.8rem]">
+        <section style={{ padding: '48px 0', borderBottom: '1px solid var(--g300)' }}>
+          <div className="wrap">
+            <div className="grid c3">
+              {project.keyFigures.map((fig, idx) => (
+                <div key={idx} style={{ padding: '16px 0' }}>
+                  <p className="h2" style={{ color: 'var(--accent)', marginBottom: '8px' }}>
                     {fig.value}
                   </p>
-                  <p className="text-body-sm text-[var(--ink-600)]">{fig.label}</p>
+                  <p className="sm">{fig.label}</p>
                 </div>
               ))}
             </div>
@@ -197,85 +228,160 @@ export default async function ProjectCaseStudyPage({
         </section>
       )}
 
-      {/* 7. Gallery */}
-      <section className="bg-[var(--white)] py-[6.4rem] lg:py-[8.0rem]">
-        <div className="site-grid">
-          <div className="col-span-4 lg:col-start-2 lg:col-span-14">
-            <h2 className="text-h2 text-[var(--ink-900)] mb-[3.2rem]">Project gallery</h2>
-            <Gallery
-              id={`gallery-${project.slug}`}
-              title={`${project.title} photos`}
-              images={project.gallery}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* 8. Credits (Equipment used & Related services) */}
-      <section className="bg-[var(--white)] pb-[6.4rem] border-b border-[var(--grey-300)]">
-        <div className="site-grid">
-          <div className="col-span-4 lg:col-start-2 lg:col-span-14 grid grid-cols-1 md:grid-cols-2 gap-[3.2rem]">
-            {linkedMachines.length > 0 && (
-              <div className="border-t-2 border-[var(--grey-300)] pt-[1.6rem]">
-                <p className="text-overline text-[var(--ink-600)] mb-[1.2rem]">Equipment used</p>
-                <div className="flex flex-wrap gap-[1.6rem]">
-                  {linkedMachines.map((m) => (
-                    <a
-                      key={m.slug}
-                      href={`/equipment/${m.categorySlug}/${m.slug}`}
-                      className="text-label text-[var(--ink-900)] no-underline u-draw"
-                    >
-                      {m.name}
-                    </a>
-                  ))}
+      {/* 5. Gallery */}
+      {galleryImages.length > 1 && (
+        <section style={{ padding: '64px 0' }} aria-labelledby="gal-h">
+          <div className="wrap">
+            <h2 className="h2" id="gal-h" style={{ marginBottom: '32px' }}>
+              Project gallery
+            </h2>
+            <div className="grid c3">
+              {galleryImages.map((img, idx) => (
+                <div key={idx} className="ph warm r43">
+                  <Image
+                    src={img.url}
+                    alt={img.alt || `${project.title} photo ${idx + 1}`}
+                    fill
+                    loading="lazy"
+                    sizes="(min-width: 1024px) 33vw, 100vw"
+                  />
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-            {linkedServices.length > 0 && (
-              <div className="border-t-2 border-[var(--grey-300)] pt-[1.6rem]">
-                <p className="text-overline text-[var(--ink-600)] mb-[1.2rem]">Related services</p>
-                <div className="flex flex-wrap gap-[1.6rem]">
-                  {linkedServices.map((s) => (
-                    <a
-                      key={s.slug}
-                      href={
-                        s.parentSlug ? `/services/${s.parentSlug}/${s.slug}` : `/services/${s.slug}`
+      {/* 6. Credits: Equipment used & Related Services */}
+      {(linkedMachines.length > 0 || linkedServices.length > 0) && (
+        <section style={{ padding: '48px 0 64px', borderTop: '1px solid var(--g300)' }}>
+          <div className="wrap">
+            <div className="grid c2" style={{ gap: '48px' }}>
+              {linkedMachines.length > 0 && (
+                <div>
+                  <p className="over" style={{ marginBottom: '16px' }}>Equipment used</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                    {linkedMachines.map((m) => (
+                      <Link
+                        key={m.slug}
+                        href={`/equipment/${m.categorySlug}/${m.slug}`}
+                        className="lbl"
+                        style={{ color: 'var(--ink-900)' }}
+                      >
+                        {m.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {linkedServices.length > 0 && (
+                <div>
+                  <p className="over" style={{ marginBottom: '16px' }}>Related services</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                    {linkedServices.map((s) => (
+                      <Link
+                        key={s.slug}
+                        href={s.parentSlug ? `/services/${s.parentSlug}/${s.slug}` : `/services/${s.slug}`}
+                        className="lbl"
+                        style={{ color: 'var(--ink-900)' }}
+                      >
+                        {s.shortTitle || s.title}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 7. More projects */}
+      {relatedProjects.length > 0 && (
+        <section style={{ background: 'var(--g100)', padding: '64px 0 80px' }} data-surface="subtle" aria-labelledby="mp-h">
+          <div className="wrap">
+            <div className="intro">
+              <div>
+                <p className="over">Projects</p>
+                <h2 className="h2" id="mp-h" style={{ marginTop: '8px' }}>
+                  More projects
+                </h2>
+              </div>
+              <Link className="arrow" href="/projects">
+                All projects{' '}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M4 12h16m-6-6 6 6-6 6" />
+                </svg>
+              </Link>
+            </div>
+            <div className="grid c3">
+              {relatedProjects.map((p) => (
+                <article className="card pcard" key={p.slug}>
+                  <div className="ph r43">
+                    <Image
+                      src={
+                        p.heroImage?.url ||
+                        'https://images.pexels.com/photos/16120138/pexels-photo-16120138.jpeg?auto=compress&cs=tinysrgb&w=1200'
                       }
-                      className="text-label text-[var(--ink-900)] no-underline u-draw"
-                    >
-                      {s.title}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
+                      alt={p.heroImage?.alt || p.title}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, 100vw"
+                    />
+                  </div>
+                  <h3 className="h4">
+                    <Link href={`/projects/${p.slug}`}>{p.title}</Link>
+                  </h3>
+                  <p className="meta">{p.location ? `${p.location.town}, ${p.location.county}` : 'Kenya'}</p>
+                </article>
+              ))}
+            </div>
           </div>
+        </section>
+      )}
+
+      {/* 8. CtaBand */}
+      <section aria-labelledby="cta-h" className="cta" style={{ paddingTop: '80px' }}>
+        <div className="grid16">
+          <div className="cta-photo" data-surface="photo">
+            <div className="ph">
+              <Image
+                src="https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="People and machines on a Shena road site"
+                fill
+                sizes="(min-width: 1024px) 70vw, 100vw"
+              />
+            </div>
+            <div className="in">
+              <h2 className="d" id="cta-h">
+                Planning something
+                <br /> similar?
+              </h2>
+              <Link className="btn pri" href={`/contact?type=project&service=${project.serviceSlugs[0] || ''}`}>
+                Request a quote
+              </Link>
+            </div>
+          </div>
+          <aside className="cta-card">
+            <p className="over">Talk to us</p>
+            <h3 className="h4">Call or WhatsApp</h3>
+            <p>{phone}</p>
+            <div className="btns">
+              <a className="btn sec" href={telHref}>
+                Call
+              </a>
+              <a
+                className="btn outl"
+                href={`https://wa.me/254718971896?text=${encodeURIComponent('Hello Shena Works, I found you on your website and would like to talk about a project.')}`}
+                rel="noopener"
+                target="_blank"
+              >
+                WhatsApp
+              </a>
+            </div>
+          </aside>
         </div>
       </section>
-
-      {/* 9. Related Projects */}
-      <ProjectGrid
-        variant="related"
-        overline="Projects"
-        heading="More projects"
-        actionLabel="All projects"
-        actionHref="/projects"
-        projects={relatedProjects}
-        services={allServices}
-      />
-
-      {/* 10. CtaBand */}
-      <CtaBand
-        headlineLine1="Planning something"
-        headlineLine2="similar?"
-        buttonLabel="Request a quote"
-        buttonHref={
-          primaryServiceSlug
-            ? `/contact?type=project&service=${primaryServiceSlug}`
-            : '/contact?type=project'
-        }
-      />
     </>
   )
 }

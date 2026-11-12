@@ -1,15 +1,8 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { Breadcrumb } from '@/components/ui/Breadcrumb'
-import { Gallery } from '@/components/blocks/Gallery'
-import { ScopeList } from '@/components/blocks/ScopeList'
-import { KeyFacts } from '@/components/blocks/KeyFacts'
-import { EnquiryForm } from '@/components/blocks/EnquiryForm'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Icon } from '@/components/ui/Icon'
-import { DataTable, type TableColumn } from '@/components/ui/Table'
+import Link from 'next/link'
+import Image from 'next/image'
 import {
   getPublishedEquipmentCategories,
   getPublishedMachine,
@@ -18,7 +11,6 @@ import {
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildMachineProductJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import type { KeyFactItem } from '@/types/content'
 
 export async function generateStaticParams() {
   const machines = await getPublishedMachines()
@@ -42,11 +34,6 @@ export async function generateMetadata({
     description: `Hire our ${machine.make} ${machine.model} ${cat.singular} with operator in Meru and across Kenya. ${machine.capacity}. Check availability and request a quote.`,
     path: `/equipment/${cat.slug}/${machine.slug}`,
   })
-}
-
-interface SpecRow {
-  spec: string
-  value: string
 }
 
 export default async function MachineDetailPage({
@@ -75,47 +62,24 @@ export default async function MachineDetailPage({
     model: machine.model,
   })
 
-  const specRows: SpecRow[] = [
-    { spec: 'Make', value: machine.make },
-    { spec: 'Model', value: machine.model },
-    ...(machine.year ? [{ spec: 'Year', value: machine.year }] : []),
-    ...(machine.operatingWeight
-      ? [{ spec: 'Operating weight', value: machine.operatingWeight }]
-      : []),
-    ...(machine.attachmentSize
-      ? [{ spec: 'Bucket / blade / drum size', value: machine.attachmentSize }]
-      : []),
-    ...(machine.enginePower ? [{ spec: 'Engine power', value: machine.enginePower }] : []),
-  ]
-
-  const specColumns: TableColumn<SpecRow>[] = [
-    { key: 'spec', header: 'Specification', render: (r) => r.spec },
-    { key: 'value', header: 'Details', render: (r) => r.value },
-  ]
-
-  const hireFacts: KeyFactItem[] = [
-    { term: 'Operator', value: machine.hireTerms.operator },
-    { term: 'Fuel', value: machine.hireTerms.fuel },
-    { term: 'Transport', value: machine.hireTerms.transport },
-    { term: 'Minimum hire', value: machine.hireTerms.minimumHire },
-    { term: 'Service area', value: machine.hireTerms.serviceArea },
-  ]
-
   const [allCategories, allMachines] = await Promise.all([
     getPublishedEquipmentCategories(),
     getPublishedMachines(),
   ])
   const catMap = new Map<string, string>()
-  allCategories.forEach((c) => catMap.set(c.slug, c.singular))
+  allCategories.forEach((c) => catMap.set(c.slug, c.name))
 
   const otherMachines = allMachines
     .filter((m) => m.slug !== machine.slug)
     .sort(
       (a, b) =>
         Number(b.categorySlug === machine.categorySlug) -
-        Number(a.categorySlug === machine.categorySlug),
+        Number(a.categorySlug === machine.categorySlug)
     )
     .slice(0, 3)
+
+  const galleryImages =
+    machine.gallery && machine.gallery.length > 0 ? machine.gallery : [machine.heroImage]
 
   const path = `/equipment/${cat.slug}/${machine.slug}`
   const jsonLd = {
@@ -141,92 +105,287 @@ export default async function MachineDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* 1. Header layout (white, no photo hero; header white per SITE-PLAN.md 6.11) */}
-      <section className="bg-[var(--white)] pt-[9.2rem] lg:pt-[18.4rem] pb-[6.4rem] border-b border-[var(--grey-300)]">
-        <div className="site-grid items-start gap-y-[3.2rem]">
-          {/* Left col 2-8: Gallery 4:3 */}
-          <div className="col-span-4 lg:col-start-2 lg:col-span-8">
-            <Gallery
-              id={`machine-gallery-${machine.slug}`}
-              title={`${machine.name} photos`}
-              images={machine.gallery.length > 0 ? machine.gallery : [machine.heroImage]}
-              aspectRatio="4:3"
-            />
+      {/* 1. Header & Gallery */}
+      <section aria-label={machine.name}>
+        <div className="wrap mhead">
+          <div
+            aria-label="Machine gallery"
+            aria-roledescription="carousel"
+            className="gal"
+            id="gal"
+            role="region"
+            tabIndex={0}
+          >
+            <div className="gtrack" id="gt">
+              {galleryImages.map((img, idx) => (
+                <div
+                  key={idx}
+                  aria-label={`${machine.name}, image ${idx + 1} of ${galleryImages.length}`}
+                  className="ph warm"
+                  role="img"
+                >
+                  <Image
+                    src={img.url}
+                    alt={img.alt || `${machine.name} photo ${idx + 1}`}
+                    fill
+                    priority={idx === 0}
+                    loading={idx === 0 ? undefined : 'lazy'}
+                    sizes="(min-width: 1024px) 58vw, 100vw"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="gctl">
+              <button aria-label="Previous image" id="gp" type="button">
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m15 6-6 6 6 6" />
+                </svg>
+              </button>
+              <span aria-live="polite" className="ct" id="gc">
+                {`1 / ${galleryImages.length}`}
+              </span>
+              <button aria-label="Next image" id="gn" type="button">
+                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m9 6 6 6-6 6" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          {/* Right col 10-5: Breadcrumb, overline, h1, availability, spec table, buttons */}
-          <div className="col-span-4 lg:col-start-10 lg:col-span-6">
-            <div className="mb-[1.6rem]">
-              <Breadcrumb items={breadcrumbs} />
-            </div>
-            <p className="text-overline text-[var(--ink-600)] mb-[0.8rem]">{cat.singular}</p>
-            <h1 className="text-h1 text-[var(--ink-900)] mb-[1.6rem]">{machine.name}</h1>
-
-            <p className="inline-flex items-center gap-[0.8rem] text-body-xs font-bold text-[var(--ink-900)] mb-[2.4rem]">
-              <Icon name={isAvailable ? 'check' : 'info'} size={18} />
-              <span>
-                Availability: {isAvailable ? 'Available' : 'On hire, ask for dates'}
-              </span>
+          <div className="minfo">
+            <nav aria-label="Breadcrumb" className="crumbs dk" style={{ margin: 0 }}>
+              <Link href="/">Home</Link>
+              <span aria-hidden="true">/</span>
+              <Link href="/equipment">Equipment</Link>
+              <span aria-hidden="true">/</span>
+              <Link href={`/equipment/${cat.slug}`}>{cat.name}</Link>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{machine.name}</span>
+            </nav>
+            <p className="over">{cat.singular || cat.name.replace(/s$/, '')}</p>
+            <h1 className="h1">{machine.name}</h1>
+            <p className="avl">
+              <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m5 12 5 5 9-10" />
+              </svg>
+              Availability: {isAvailable ? 'Available' : 'On hire, ask for dates'}
             </p>
-
-            <div className="mb-[3.2rem]">
-              <DataTable
-                caption={`${machine.name} specifications`}
-                hideCaption
-                columns={specColumns}
-                rows={specRows}
-                getRowKey={(r) => r.spec}
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center gap-[1.2rem]">
-              <Button href="#enquiry" variant="primary">
+            <p className="sm" style={{ maxWidth: '30em' }}>
+              {`${machine.make} ${machine.model} (${machine.capacity}). Hired with our own trained operator.`}
+            </p>
+            <div className="btns">
+              <a className="btn pri" href="#enquiry">
                 Request hire
-              </Button>
-              <Button href={whatsappUrl} external variant="outline">
+              </a>
+              <a className="btn outl" href={whatsappUrl} rel="noopener" target="_blank">
                 WhatsApp us
-              </Button>
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Typical uses ScopeList */}
-      <ScopeList heading="Typical uses" items={machine.uses} />
+      {/* 2. Typical uses */}
+      {machine.uses && machine.uses.length > 0 && (
+        <section aria-labelledby="us-h" data-surface="subtle" style={{ background: 'var(--g100)', padding: '64px 0' }}>
+          <div className="wrap">
+            <h2 className="h2" id="us-h">
+              Typical uses
+            </h2>
+            <ul className="scope">
+              {machine.uses.map((use, idx) => (
+                <li key={idx}>
+                  <h3 className="h4">{use.title}</h3>
+                  <p className="sm">{use.description}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
-      {/* 3. Hire terms KeyFacts */}
-      <KeyFacts heading="Hire terms" items={hireFacts} />
+      {/* 3. Hire terms */}
+      <section aria-labelledby="ht-h" style={{ padding: '64px 0' }}>
+        <div className="wrap">
+          <h2 className="h2" id="ht-h" style={{ marginBottom: '32px' }}>
+            Hire terms
+          </h2>
+          <dl className="kf" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))' }}>
+            <div>
+              <dt>Operator</dt>
+              <dd>{machine.hireTerms.operator}</dd>
+            </div>
+            <div>
+              <dt>Fuel</dt>
+              <dd>{machine.hireTerms.fuel}</dd>
+            </div>
+            <div>
+              <dt>Transport</dt>
+              <dd>{machine.hireTerms.transport}</dd>
+            </div>
+            <div>
+              <dt>Service area</dt>
+              <dd>{machine.hireTerms.serviceArea}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
 
-      {/* 4. EnquiryForm */}
-      <EnquiryForm
-        id="enquiry"
-        overline="Request hire"
-        heading={`Hire the ${machine.name}`}
-        body="Tell us your start date and site location. We'll confirm availability and transport cost."
-        defaultType="hire"
-        defaultEquipment={machine.slug}
-      />
+      {/* 4. Request hire form */}
+      <section aria-labelledby="en-h" id="enquiry" style={{ background: 'var(--g100)', padding: '64px 0 80px' }}>
+        <div className="wrap">
+          <p className="over">Request hire</p>
+          <h2 className="h2" id="en-h" style={{ margin: '8px 0 16px' }}>
+            {`Hire the ${machine.name}`}
+          </h2>
+          <p className="lead" style={{ fontSize: '18px', lineHeight: '26px', maxWidth: '34em' }}>
+            Tell us the machine, dates and site. We’ll confirm availability and price.
+          </p>
+          <form action="/api/enquiry" className="form f" id="hf" method="post" noValidate>
+            <div className="sum" hidden id="sum" role="alert" tabIndex={-1}>
+              <h3>Please fix these before sending</h3>
+              <ul id="sl" />
+            </div>
+            <p className="help" style={{ margin: 0 }}>
+              * required
+            </p>
+            <input name="type" type="hidden" value="hire" />
+            <input name="sourcePage" type="hidden" value={path} />
+            <div aria-hidden="true" className="hp">
+              <label>
+                Company website
+                <input autoComplete="off" name="company_website" tabIndex={-1} type="text" />
+              </label>
+            </div>
+            <div className="row2">
+              <div>
+                <label htmlFor="name">Your name *</label>
+                <input autoComplete="name" id="name" name="name" required type="text" />
+              </div>
+              <div>
+                <label htmlFor="phone">Phone number *</label>
+                <input
+                  aria-describedby="ph-h"
+                  autoComplete="tel"
+                  id="phone"
+                  name="phone"
+                  required
+                  type="tel"
+                />
+                <p className="help" id="ph-h">
+                  We’ll call or WhatsApp you on this number.
+                </p>
+              </div>
+            </div>
+            <div className="row2">
+              <div>
+                <label htmlFor="email">Email (optional)</label>
+                <input autoComplete="email" id="email" name="email" type="email" />
+              </div>
+              <div>
+                <label htmlFor="org">Company or organisation (optional)</label>
+                <input autoComplete="organization" id="org" name="organisation" type="text" />
+              </div>
+            </div>
+            <div className="row2">
+              <div>
+                <label htmlFor="equipment">Machine *</label>
+                <select id="equipment" name="equipment" required defaultValue={machine.name}>
+                  <option value="">Choose a machine or type</option>
+                  {allMachines.map((m) => (
+                    <option key={m.slug} value={m.name}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="location">Site location *</label>
+                <input
+                  aria-describedby="lc-h"
+                  autoComplete="address-level2"
+                  id="location"
+                  name="location"
+                  required
+                  type="text"
+                />
+                <p className="help" id="lc-h">
+                  Town, area or road, e.g. Makutano, Meru.
+                </p>
+              </div>
+            </div>
+            <div className="row2">
+              <div>
+                <label htmlFor="start">Start date *</label>
+                <input id="start" name="hireStart" required type="date" />
+              </div>
+              <div>
+                <label htmlFor="dur">How long do you need it? *</label>
+                <select id="dur" name="hireDuration" required defaultValue="">
+                  <option value="">Choose a duration</option>
+                  <option>1 day</option>
+                  <option>2–6 days</option>
+                  <option>1–2 weeks</option>
+                  <option>2–4 weeks</option>
+                  <option>More than a month</option>
+                  <option>Not sure</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label htmlFor="msg">Anything we should know about the site or work? (optional)</label>
+              <textarea id="msg" maxLength={3000} name="message" />
+            </div>
+            <div className="chk">
+              <input id="consent" name="consent" required type="checkbox" />
+              <label htmlFor="consent">
+                I agree that Shena Works may use these details to respond to my enquiry, as described in
+                the <Link href="/privacy">privacy notice</Link>. *
+              </label>
+            </div>
+            <div>
+              <button className="btn pri" type="submit">
+                Request hire
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
 
       {/* 5. Other machines */}
       {otherMachines.length > 0 && (
-        <section className="bg-[var(--white)] py-[6.4rem] lg:py-[8.0rem]">
-          <div className="site-grid">
-            <div className="col-span-4 lg:col-start-2 lg:col-span-14">
-              <h2 className="text-h2 text-[var(--ink-900)] mb-[3.2rem]">Other machines</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-[3.2rem]">
-                {otherMachines.map((m) => (
-                  <Card
-                    key={m.slug}
-                    href={`/equipment/${m.categorySlug}/${m.slug}`}
-                    imageSrc={m.heroImage.url}
-                    imageAlt={m.heroImage.alt}
-                    aspectRatio="4:3"
-                    overline={catMap.get(m.categorySlug) || m.categorySlug}
-                    title={m.name}
-                    summary={`${m.make} ${m.model} · ${m.capacity}`}
-                  />
-                ))}
-              </div>
+        <section aria-labelledby="om-h" style={{ padding: '64px 0 80px' }}>
+          <div className="wrap">
+            <h2 className="h2" id="om-h" style={{ marginBottom: '40px' }}>
+              Other machines
+            </h2>
+            <div className="grid c3">
+              {otherMachines.map((m) => (
+                <article className="card mc" key={m.slug}>
+                  <div className="ph warm r43">
+                    <Image
+                      src={
+                        m.heroImage?.url ||
+                        'https://images.pexels.com/photos/8809464/pexels-photo-8809464.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                      }
+                      alt={m.heroImage?.alt || m.name}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, 100vw"
+                    />
+                  </div>
+                  <p className="over">{catMap.get(m.categorySlug) || m.categorySlug}</p>
+                  <h3 className="h4">
+                    <Link href={`/equipment/${m.categorySlug}/${m.slug}`}>{m.name}</Link>
+                  </h3>
+                  <p className="meta">{`${m.make} ${m.model} · ${m.capacity}`}</p>
+                  <p className="av">
+                    <svg fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m5 12 5 5 9-10" />
+                    </svg>
+                    {m.availability === 'available' ? 'Available' : 'On hire, ask for dates'}
+                  </p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
