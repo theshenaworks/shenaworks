@@ -313,6 +313,22 @@ body.lock .actions{display:none}
   .step{padding:32px 0 0;border-left:0;border-top:2px solid var(--g300)}
   .step::before{left:0;top:-7px}
 }
+/* talk-to-us card, McCarthy style */
+.cta-card{background:none;padding:0;margin-top:-24px;position:relative;z-index:2;display:grid}
+.cta-card .box{background:#fff;box-shadow:0 6px 16px rgb(61 57 52/.2);text-align:center;display:grid;justify-items:center;align-content:center;padding:64px 24px}
+.cta-card .over{font-size:15px;line-height:19px;color:#767676;margin-bottom:8px}
+.cta-card .h4{font-weight:700;--head-s:22px;line-height:32px;margin:0 0 8px}
+.cta-card .num{font:700 20px/24px var(--head);letter-spacing:.3px}
+.cta-card .btns{flex-direction:row;justify-content:center;margin-top:32px}
+.cta-card .btn{flex:none;padding:6px 18px 5px}
+.cta-photo .d{--head-s:36px;line-height:40px}
+@media(min-width:1024px){
+  .cta .grid16{align-items:stretch}
+  .cta-photo{min-height:640px}.cta-photo .d{--head-s:88px;line-height:92px}
+  .cta-card{padding:80px 0;margin-top:0;box-shadow:none;background:none}
+  .cta-card .box{padding:48px;height:100%}
+  .cta-card .h4{--head-s:28px}.cta-card .btn{padding:7px 18px}
+}
 </style>
 </head>
 <body>
@@ -416,19 +432,19 @@ body.lock .actions{display:none}
     <div class="cta-photo" data-surface="photo">
       <div class="ph"><img src="https://images.pexels.com/photos/8809466/pexels-photo-8809466.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Crew standing beside a road roller on a murram road" loading="lazy"></div>
       <div class="in">
-        <h2 class="d" id="cta-h">Let’s talk about<br> your site</h2>
+        <h2 class="d" id="cta-h">Let’s talk about <strong>your site</strong></h2>
         <a class="btn pri" href="/contact">Contact us</a>
       </div>
     </div>
-    <aside class="cta-card">
+    <aside class="cta-card"><div class="box">
       <p class="over">Talk to us</p>
       <h3 class="h4">Call or WhatsApp</h3>
-      <p>+254 718 971 896</p>
+      <p class="num">+254 718 971 896</p>
       <div class="btns">
         <a class="btn sec" href="tel:+254718971896">Call</a>
         <a class="btn outl" href="https://wa.me/254718971896?text=Hello%20Shena%20Works%2C%20I%20found%20you%20on%20your%20website%20and%20would%20like%20to%20talk%20about%20a%20project." target="_blank" rel="noopener">WhatsApp</a>
       </div>
-    </aside>
+    </div></aside>
   </div>
 </section>
 

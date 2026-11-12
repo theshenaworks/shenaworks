@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { getPublishedProjects, getPublishedServices, getSiteSettings } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { CtaBand } from '@/components/blocks/CtaBand'
 
 export const metadata: Metadata = buildPageMetadata({
   title: 'Projects: Roads, Paving and Buildings | Shena Works',
@@ -207,47 +208,7 @@ export default async function ProjectsIndexPage({
       </section>
 
       {/* 3. CtaBand */}
-      <section aria-labelledby="cta-h" className="cta" style={{ paddingTop: '80px' }}>
-        <div className="grid16">
-          <div className="cta-photo" data-surface="photo">
-            <div className="ph">
-              <Image
-                src="https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="People and machines on a Shena road site"
-                fill
-                sizes="(min-width: 1024px) 70vw, 100vw"
-              />
-            </div>
-            <div className="in">
-              <h2 className="d" id="cta-h">
-                Let’s talk about
-                <br /> your site
-              </h2>
-              <Link className="btn pri" href="/contact?type=project">
-                Request a quote
-              </Link>
-            </div>
-          </div>
-          <aside className="cta-card">
-            <p className="over">Talk to us</p>
-            <h3 className="h4">Call or WhatsApp</h3>
-            <p>{phone}</p>
-            <div className="btns">
-              <a className="btn sec" href={telHref}>
-                Call
-              </a>
-              <a
-                className="btn outl"
-                href="https://wa.me/254718971896?text=Hello%20Shena%20Works%2C%20I%20found%20you%20on%20your%20website%20and%20would%20like%20to%20talk%20about%20a%20project."
-                rel="noopener"
-                target="_blank"
-              >
-                WhatsApp
-              </a>
-            </div>
-          </aside>
-        </div>
-      </section>
+      <CtaBand settings={settings} />
     </>
   )
 }

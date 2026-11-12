@@ -254,7 +254,7 @@ export default async function AboutPage() {
       <LocationsBand heading="Our offices" locations={locations} />
 
       {/* 11. CtaBand */}
-      <CtaBand buttonLabel="Contact us" buttonHref="/contact" />
+      <CtaBand settings={settings} buttonLabel="Contact us" buttonHref="/contact" />
     </>
   )
 }

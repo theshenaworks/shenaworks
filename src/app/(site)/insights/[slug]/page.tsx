@@ -8,6 +8,7 @@ import {
   getPublishedPostBySlug,
   getPublishedPostCategories,
   getPublishedServiceBySlug,
+  getSiteSettings,
   getTeamMember,
 } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
@@ -37,10 +38,11 @@ export default async function ArticlePage({
   const post = await getPublishedPostBySlug(slug)
   if (!post) notFound()
 
-  const [categories, author, relatedService] = await Promise.all([
+  const [categories, author, relatedService, settings] = await Promise.all([
     getPublishedPostCategories(),
     getTeamMember(),
     getPublishedServiceBySlug(post.relatedServiceSlug),
+    getSiteSettings(),
   ])
   const category = categories.find((c) => c.slug === post.categorySlug)
 
@@ -130,7 +132,7 @@ export default async function ArticlePage({
           image={relatedService.heroImage}
         />
       ) : (
-        <CtaBand />
+        <CtaBand settings={settings} />
       )}
     </>
   )

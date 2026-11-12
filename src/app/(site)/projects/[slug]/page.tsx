@@ -12,6 +12,7 @@ import {
 } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { CtaBand } from '@/components/blocks/CtaBand'
 import type { KeyFactItem } from '@/types/content'
 
 export async function generateStaticParams() {
@@ -341,47 +342,12 @@ export default async function ProjectCaseStudyPage({
       )}
 
       {/* 8. CtaBand */}
-      <section aria-labelledby="cta-h" className="cta" style={{ paddingTop: '80px' }}>
-        <div className="grid16">
-          <div className="cta-photo" data-surface="photo">
-            <div className="ph">
-              <Image
-                src="https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="People and machines on a Shena road site"
-                fill
-                sizes="(min-width: 1024px) 70vw, 100vw"
-              />
-            </div>
-            <div className="in">
-              <h2 className="d" id="cta-h">
-                Planning something
-                <br /> similar?
-              </h2>
-              <Link className="btn pri" href={`/contact?type=project&service=${project.serviceSlugs[0] || ''}`}>
-                Request a quote
-              </Link>
-            </div>
-          </div>
-          <aside className="cta-card">
-            <p className="over">Talk to us</p>
-            <h3 className="h4">Call or WhatsApp</h3>
-            <p>{phone}</p>
-            <div className="btns">
-              <a className="btn sec" href={telHref}>
-                Call
-              </a>
-              <a
-                className="btn outl"
-                href={`https://wa.me/254718971896?text=${encodeURIComponent('Hello Shena Works, I found you on your website and would like to talk about a project.')}`}
-                rel="noopener"
-                target="_blank"
-              >
-                WhatsApp
-              </a>
-            </div>
-          </aside>
-        </div>
-      </section>
+      <CtaBand
+        settings={settings}
+        headlineLine1="Planning something"
+        headlineLine2="similar?"
+        buttonHref={`/contact?type=project&service=${project.serviceSlugs[0] || ''}`}
+      />
     </>
   )
 }

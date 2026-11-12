@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/blocks/PageHeader'
 import { CtaBand } from '@/components/blocks/CtaBand'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { getPublishedPostCategories, getPublishedPosts } from '@/lib/payload'
+import { getPublishedPostCategories, getPublishedPosts, getSiteSettings } from '@/lib/payload'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export const metadata = buildPageMetadata({
@@ -20,9 +20,10 @@ export default async function InsightsCategoryPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const [categories, allPosts] = await Promise.all([
+  const [categories, allPosts, settings] = await Promise.all([
     getPublishedPostCategories(),
     getPublishedPosts(),
+    getSiteSettings(),
   ])
   const activeCat = categories.find((c) => c.slug === slug)
   if (!activeCat) notFound()
@@ -86,7 +87,7 @@ export default async function InsightsCategoryPage({
         </div>
       </section>
 
-      <CtaBand />
+      <CtaBand settings={settings} />
     </>
   )
 }

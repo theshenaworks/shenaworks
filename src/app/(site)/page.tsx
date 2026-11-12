@@ -140,7 +140,7 @@ export default async function HomePage({
       <LocationsBand locations={locations} />
 
       {/* 11 CtaBand */}
-      <CtaBand hasBox settings={settings} />
+      <CtaBand settings={settings} />
     </>
   )
 }

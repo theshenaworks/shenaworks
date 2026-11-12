@@ -289,23 +289,23 @@ section.intent{padding:56px 0 72px}
   .cta-photo .in{padding:56px}
   .cta-card{grid-column:12/17;grid-row:1;padding:40px;margin-right:0;box-shadow:0 4px 24px rgb(var(--shade)/.18);background:#fff;position:relative;z-index:1}
 }
-/* McCarthy box variant for Home */
-body:has(.hero:not(.page)) .cta-card{background:none;padding:0;margin-top:-24px;position:relative;z-index:2;display:grid;box-shadow:none}
+/* Standardized homepage CTA card across all pages per user instruction */
+.cta-card{background:none;padding:0;margin-top:-24px;position:relative;z-index:2;display:grid;box-shadow:none}
 .cta-card .box{background:#fff;box-shadow:0 6px 16px rgb(61 57 52/.2);text-align:center;display:grid;justify-items:center;align-content:center;padding:64px 24px}
 .cta-card .box .over{font-size:15px;line-height:19px;color:#767676;margin-bottom:8px}
 .cta-card .box .h4{font-weight:700;--head-s:22px;line-height:32px;margin:0 0 8px}
 .cta-card .num{font:700 20px/24px var(--head);letter-spacing:.3px}
 .cta-card .box .btns{flex-direction:row;justify-content:center;margin-top:32px}
 .cta-card .box .btn{flex:none;padding:6px 18px 5px}
-body:has(.hero:not(.page)) .cta-photo .d{--head-s:36px;line-height:40px}
+.cta-photo .d{--head-s:36px;line-height:40px}
 @media(min-width:1024px){
-  body:has(.hero:not(.page)) .cta .grid16{align-items:stretch}
-  body:has(.hero:not(.page)) .cta-photo{min-height:640px}
-  body:has(.hero:not(.page)) .cta-photo .d{--head-s:88px;line-height:92px}
-  body:has(.hero:not(.page)) .cta-card{padding:80px 0;margin-top:0;box-shadow:none;background:none}
-  body:has(.hero:not(.page)) .cta-card .box{padding:48px;height:100%}
-  body:has(.hero:not(.page)) .cta-card .h4{--head-s:28px}
-  body:has(.hero:not(.page)) .cta-card .btn{padding:7px 18px}
+  .cta .grid16{align-items:stretch}
+  .cta-photo{min-height:640px}
+  .cta-photo .d{--head-s:88px;line-height:92px}
+  .cta-card{padding:80px 0;margin-top:0;box-shadow:none;background:none}
+  .cta-card .box{padding:48px;height:100%}
+  .cta-card .h4{--head-s:28px}
+  .cta-card .btn{padding:7px 18px}
 }
 
 /* ---- top bar + footer, McCarthy style ---- */
@@ -709,10 +709,10 @@ a.chip{display:inline-flex;align-items:center}
 @media(min-width:1024px){.legal-prose h2{font-size:28px;line-height:32px}}
 
 /* error page (404) */
-.links{list-style:none;padding:0;margin:8px 0 40px;max-width:520px;border-top:2px solid var(--ink-900)}
-.links a{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--g300);font:700 16px/20px var(--head);letter-spacing:.3px;text-transform:uppercase;transition:color .2s}
-.links a:hover{color:var(--accent)}
-.links svg{width:22px;height:22px;flex:none}
+ul.links{list-style:none;padding:0;margin:8px 0 40px;max-width:520px;border-top:2px solid var(--ink-900)}
+ul.links a{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--g300);font:700 16px/20px var(--head);letter-spacing:.3px;text-transform:uppercase;transition:color .2s}
+ul.links a:hover{color:var(--accent)}
+ul.links svg{width:22px;height:22px;flex:none}
 
 /* equipment category & machine card */
 .cat{padding:64px 0}

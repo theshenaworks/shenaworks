@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/blocks/PageHeader'
 import { CtaBand } from '@/components/blocks/CtaBand'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { getPublishedPostCategories, getPublishedPosts } from '@/lib/payload'
+import { getPublishedPostCategories, getPublishedPosts, getSiteSettings } from '@/lib/payload'
 import { buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -16,9 +16,10 @@ export const metadata = buildPageMetadata({
 })
 
 export default async function InsightsIndexPage() {
-  const [posts, categories] = await Promise.all([
+  const [posts, categories, settings] = await Promise.all([
     getPublishedPosts(),
     getPublishedPostCategories(),
+    getSiteSettings(),
   ])
   // SITE-PLAN.md 8: Insights index renders only when >= 1 published post; otherwise 404
   if (posts.length === 0) {
@@ -85,7 +86,7 @@ export default async function InsightsIndexPage() {
         </div>
       </section>
 
-      <CtaBand />
+      <CtaBand settings={settings} />
     </>
   )
 }

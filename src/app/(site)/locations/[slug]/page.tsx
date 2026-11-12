@@ -15,6 +15,7 @@ import {
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { CtaBand } from '@/components/blocks/CtaBand'
 
 export async function generateStaticParams() {
   const locs = await getPublishedLocations()
@@ -344,47 +345,7 @@ export default async function LocationPage({
       )}
 
       {/* 8. CtaBand */}
-      <section aria-labelledby="cta-h" className="cta" style={{ paddingTop: '80px' }}>
-        <div className="grid16">
-          <div className="cta-photo" data-surface="photo">
-            <div className="ph">
-              <Image
-                src="https://images.pexels.com/photos/8809466/pexels-photo-8809466.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="Crew standing beside a road roller on a murram road"
-                fill
-                sizes="(min-width: 1024px) 70vw, 100vw"
-              />
-            </div>
-            <div className="in">
-              <h2 className="d" id="cta-h">
-                Let’s talk about
-                <br /> your site
-              </h2>
-              <Link className="btn pri" href="/contact?type=project">
-                Request a quote
-              </Link>
-            </div>
-          </div>
-          <aside className="cta-card">
-            <p className="over">Talk to us</p>
-            <h3 className="h4">Call or WhatsApp</h3>
-            <p>{phone}</p>
-            <div className="btns">
-              <a className="btn sec" href={telHref}>
-                Call
-              </a>
-              <a
-                className="btn outl"
-                href={`https://wa.me/254718971896?text=${encodeURIComponent('Hello Shena Works, I found you on your website and would like to talk about a project.')}`}
-                rel="noopener"
-                target="_blank"
-              >
-                WhatsApp
-              </a>
-            </div>
-          </aside>
-        </div>
-      </section>
+      <CtaBand settings={settings} />
     </>
   )
 }

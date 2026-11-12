@@ -2,7 +2,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { CtaBand } from '@/components/blocks/CtaBand'
-import { getTeamMember } from '@/lib/payload'
+import { getSiteSettings, getTeamMember } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -14,7 +14,7 @@ export const metadata = buildPageMetadata({
 })
 
 export default async function LeadershipPage() {
-  const team = await getTeamMember()
+  const [team, settings] = await Promise.all([getTeamMember(), getSiteSettings()])
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
@@ -203,7 +203,7 @@ export default async function LeadershipPage() {
       </section>
 
       {/* 6. CtaBand */}
-      <CtaBand buttonLabel="Request a quote" buttonHref="/contact?type=project" />
+      <CtaBand settings={settings} buttonLabel="Request a quote" buttonHref="/contact?type=project" />
     </>
   )
 }
