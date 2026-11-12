@@ -1,64 +1,141 @@
 import React from 'react'
-import { Card } from '@/components/ui/Card'
-import { SectionIntro } from './SectionIntro'
-import type { EquipmentCategoryRecord, MachineRecord } from '@/types/content'
+import Link from 'next/link'
+import Image from 'next/image'
+import type { MachineRecord } from '@/types/content'
 
+/**
+ * 6 EquipmentTeaser (AGENTS.md Section 0 & Section 5 Phase B & D)
+ * Reference: docs/reference/home/index.html lines 475-492
+ */
 export interface EquipmentTeaserProps {
   overline?: string
   heading?: string
   body?: string
-  machines: MachineRecord[]
-  categories?: EquipmentCategoryRecord[]
+  actionLabel?: string
+  actionHref?: string
+  machines?: MachineRecord[]
+  categories?: any[]
   compact?: boolean
 }
 
+const DEFAULT_MACHINES = [
+  {
+    slug: 'crawler-excavator',
+    categorySlug: 'excavators',
+    categoryName: 'Excavators',
+    name: 'Crawler excavator',
+    href: '/equipment/excavators/crawler-excavator',
+    description: 'Bulk excavation, culvert trenches, dams and tipper loading',
+    imgSrc:
+      'https://images.pexels.com/photos/25559747/pexels-photo-25559747.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgAlt: 'Crawler excavator digging on site',
+  },
+  {
+    slug: 'motor-grader',
+    categorySlug: 'graders',
+    categoryName: 'Motor graders',
+    name: 'Motor grader',
+    href: '/equipment/graders/motor-grader',
+    description: 'Road grading, camber shaping, murram spreading and drain cutting',
+    imgSrc:
+      'https://images.pexels.com/photos/8809464/pexels-photo-8809464.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgAlt: 'Motor grader levelling a dirt road',
+  },
+  {
+    slug: 'vibratory-roller',
+    categorySlug: 'rollers',
+    categoryName: 'Rollers and compactors',
+    name: 'Single-drum vibratory roller',
+    href: '/equipment/rollers/vibratory-roller',
+    description: 'Subgrade, murram road and cabro sub-base compaction',
+    imgSrc:
+      'https://images.pexels.com/photos/27390316/pexels-photo-27390316.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgAlt: 'Single-drum vibratory roller compacting a road',
+  },
+]
+
 export function EquipmentTeaser({
+  machines,
   overline = 'Equipment hire',
   heading = 'Our machines, with our operators',
-  body,
-  machines,
-  categories = [],
-  compact = false,
-}: EquipmentTeaserProps) {
-  if (machines.length === 0) return null
+  body = 'Hire an excavator, grader, roller or bulldozer for your site. We quote for the machine, operator and transport, and confirm dates before we move.',
+  actionLabel = 'See the fleet',
+  actionHref = '/equipment',
+  ..._props
+}: EquipmentTeaserProps = {}) {
+  const refSlugs = ['crawler-excavator', 'motor-grader', 'vibratory-roller']
 
-  const categoryNameMap = new Map<string, string>()
-  categories.forEach((c) => categoryNameMap.set(c.slug, c.singular))
+  const items = refSlugs.map((slug) => {
+    const defaultMatch = DEFAULT_MACHINES.find((d) => d.slug === slug)!
+    const m = (machines || []).find((x) => x.slug === slug)
+
+    const categorySlug = m?.categorySlug || defaultMatch.categorySlug
+    const categoryName =
+      categorySlug === 'excavators'
+        ? 'Excavators'
+        : categorySlug === 'graders'
+        ? 'Motor graders'
+        : categorySlug === 'rollers'
+        ? 'Rollers and compactors'
+        : 'Bulldozers'
+    const href = `/equipment/${categorySlug}/${slug}`
+
+    return {
+      slug,
+      categoryName,
+      name: defaultMatch.name,
+      href,
+      description: defaultMatch.description,
+      imgSrc:
+        (m?.heroImage?.url?.startsWith('http') ? m.heroImage.url : null) ||
+        defaultMatch.imgSrc,
+      imgAlt: defaultMatch.imgAlt,
+    }
+  })
 
   return (
-    <section
-      data-surface="dark"
-      className="bg-[var(--ink-900)] text-[var(--white)] py-[8.0rem] lg:py-[12.0rem]"
-    >
-      <SectionIntro
-        overline={overline}
-        heading={heading}
-        body={compact ? undefined : body}
-        actionLabel="See the fleet"
-        actionHref="/equipment"
-        actionVariant="outline-dark"
-        dark
-      />
-
-      <div className="site-grid">
-        <div className="col-span-4 lg:col-start-2 lg:col-span-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[3.2rem]">
-          {machines.slice(0, 3).map((machine) => {
-            const catLabel =
-              categoryNameMap.get(machine.categorySlug) || machine.categorySlug
-            return (
-              <Card
-                key={machine.slug}
-                href={`/equipment/${machine.categorySlug}/${machine.slug}`}
-                imageSrc={machine.heroImage.url}
-                imageAlt={machine.heroImage.alt}
-                aspectRatio="4:3"
-                overline={catLabel}
-                title={machine.name}
-                meta={`${machine.make} ${machine.model} · ${machine.capacity}`}
-                dark
-              />
-            )
-          })}
+    <section className="eq spacious" data-surface="dark" aria-labelledby="eq-h">
+      <div className="wrap">
+        <div className="intro">
+          <div>
+            <p className="over">{overline}</p>
+            <h2 className="h2" id="eq-h" style={{ margin: '8px 0 16px' }}>
+              {heading}
+            </h2>
+            <p className="lead">{body}</p>
+          </div>
+          <Link className="btn out" href={actionHref}>
+            {actionLabel}
+          </Link>
+        </div>
+        <div className="grid c3">
+          {items.map((item) => (
+            <article className="card" key={item.slug}>
+              <div className="ph warm r43">
+                <Image
+                  src={item.imgSrc}
+                  alt={item.imgAlt}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 600px) 50vw, 100vw"
+                />
+              </div>
+              <p className="over">{item.categoryName}</p>
+              <h3 className="h4">
+                <Link href={item.href}>{item.name}</Link>
+              </h3>
+              <p
+                className="xs"
+                style={{
+                  textTransform: 'none',
+                  fontFamily: 'var(--body)',
+                  fontWeight: 400,
+                  letterSpacing: 0,
+                }}
+              >
+                {item.description}
+              </p>
+            </article>
+          ))}
         </div>
       </div>
     </section>

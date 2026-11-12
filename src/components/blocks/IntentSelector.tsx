@@ -1,79 +1,72 @@
 import React from 'react'
-import { Icon } from '@/components/ui/Icon'
+import Link from 'next/link'
+import type { ServiceRecord } from '@/types/content'
 
-export interface IntentTile {
-  number: string
-  title: string
-  description: string
-  href: string
-}
-
+/**
+ * 2 IntentSelector (AGENTS.md Section 0 & Section 5 Phase B & D)
+ * Reference: docs/reference/home/index.html lines 404-415
+ */
 export interface IntentSelectorProps {
+  services?: ServiceRecord[]
   architecturePublished?: boolean
 }
 
-export function IntentSelector({ architecturePublished = false }: IntentSelectorProps) {
-  const tiles: IntentTile[] = [
-    {
-      number: '01',
-      title: 'Build a project',
-      description: 'Roads, paving, homes and commercial buildings.',
-      href: '/services',
-    },
-    {
-      number: '02',
-      title: 'Hire equipment',
-      description: 'Excavators, graders, rollers and bulldozers with operators.',
-      href: '/equipment',
-    },
-    {
-      number: '03',
-      title: 'Design and interiors',
-      description: architecturePublished
-        ? 'Drawings, interiors and fit-outs.'
-        : 'Interior fit-outs for homes, lounges and hotels.',
-      href: architecturePublished
-        ? '/services#planning-and-delivery'
-        : '/services/interior-design',
-    },
-    {
-      number: '04',
-      title: 'Work with us',
-      description: 'Suppliers, subcontractors and people looking for work.',
-      href: '/contact?type=other',
-    },
-  ]
+export function IntentSelector({ services, ..._props }: IntentSelectorProps = {}) {
+  const showInteriors =
+    !services ||
+    services.length === 0 ||
+    services.some((s) => s.slug === 'interior-design' && s._status === 'published')
 
   return (
-    <section aria-labelledby="intent-selector-heading" className="bg-[var(--white)] py-[4.8rem] lg:py-[6.4rem]">
-      <h2 id="intent-selector-heading" className="sr-only">
-        What do you need?
-      </h2>
-      <div className="site-grid">
-        <div className="col-span-4 lg:col-start-2 lg:col-span-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-[1.6rem] md:gap-[3.2rem]">
-          {tiles.map((tile) => (
-            <article
-              key={tile.number}
-              className="group relative flex flex-col justify-between pt-[2.0rem] pb-[1.6rem] u-draw-top focus-within:outline-2 focus-within:outline-[var(--ink-900)] focus-within:outline-offset-4"
-            >
-              <div>
-                <p className="text-overline text-[var(--ink-600)] mb-[0.8rem]">{tile.number}</p>
-                <h3 className="text-h4 text-[var(--ink-900)] mb-[0.8rem]">
-                  <a
-                    href={tile.href}
-                    className="no-underline text-[var(--ink-900)] after:absolute after:inset-0"
-                  >
-                    {tile.title}
-                  </a>
-                </h3>
-                <p className="text-body-sm text-[var(--ink-600)] mb-[1.6rem]">{tile.description}</p>
-              </div>
-              <div className="flex justify-end text-[var(--ink-900)] transition-transform duration-200 group-hover:translate-x-[0.4rem]">
-                <Icon name="arrow-right" size={24} />
-              </div>
-            </article>
-          ))}
-        </div>
+    <section className="intent" aria-labelledby="intent-h">
+      <div className="wrap">
+        <h2 className="sr" id="intent-h">
+          What do you need?
+        </h2>
+        <ul>
+          <li>
+            <Link href="/services">
+              <span className="over">01</span>
+              <span className="h4">Build a project</span>
+              <p className="sm">Roads, paving, homes and commercial buildings.</p>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 12h16m-6-6 6 6-6 6" />
+              </svg>
+            </Link>
+          </li>
+          <li>
+            <Link href="/equipment">
+              <span className="over">02</span>
+              <span className="h4">Hire equipment</span>
+              <p className="sm">Excavators, graders, rollers and bulldozers with operators.</p>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 12h16m-6-6 6 6-6 6" />
+              </svg>
+            </Link>
+          </li>
+          {showInteriors && (
+            <li>
+              <Link href="/services/interior-design">
+                <span className="over">03</span>
+                <span className="h4">Design and interiors</span>
+                <p className="sm">Interior fit-outs for homes, lounges and hotels.</p>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 12h16m-6-6 6 6-6 6" />
+                </svg>
+              </Link>
+            </li>
+          )}
+          <li>
+            <Link href="/contact?type=other">
+              <span className="over">04</span>
+              <span className="h4">Work with us</span>
+              <p className="sm">Suppliers, subcontractors and people looking for work.</p>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 12h16m-6-6 6 6-6 6" />
+              </svg>
+            </Link>
+          </li>
+        </ul>
       </div>
     </section>
   )

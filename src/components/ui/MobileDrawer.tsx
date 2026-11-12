@@ -1,393 +1,176 @@
-'use client'
+import React from 'react'
+import Link from 'next/link'
+import {
+  getSiteSettings,
+  getPublishedServices,
+  getPublishedEquipmentCategories,
+  getPublishedCredentials,
+} from '@/lib/payload'
 
-import React, { useEffect, useRef, useState } from 'react'
-import { Icon } from './Icon'
-import { Button } from './Button'
-import { trackEvent } from '@/lib/analytics'
-import { lockScroll } from '@/behaviors/scrollLock'
-import type { EquipmentCategoryRecord, ServiceRecord } from '@/types/content'
+/**
+ * MobileDrawer (AGENTS.md Section 0 & Section 5 Phase A & D)
+ * Server Component emitting reference DOM with dynamic Payload data and reference fallbacks.
+ * Toggle state, lockScroll and drawer behaviour are handled by SiteBehaviors via DOM classes.
+ */
+export async function MobileDrawer() {
+  const [settings, services, equipmentCategories, credentials] = await Promise.all([
+    getSiteSettings().catch(() => null),
+    getPublishedServices().catch(() => []),
+    getPublishedEquipmentCategories().catch(() => []),
+    getPublishedCredentials().catch(() => []),
+  ])
 
-export interface MobileDrawerProps {
-  open: boolean
-  onClose: () => void
-  services: ServiceRecord[]
-  equipmentCategories: EquipmentCategoryRecord[]
-  hasCredentials: boolean
-  hasInsights: boolean
-  hasCompanyProfile: boolean
-  phoneE164: string
-  phoneDisplay: string
-  email: string
-  whatsappUrl: string
-}
+  const phoneDisplay = settings?.contact?.phoneDisplay || '+254 718 971 896'
+  const phoneE164 = settings?.contact?.phoneE164 || '+254718971896'
+  const whatsappNumber = settings?.contact?.whatsappNumber || '254718971896'
+  const email = settings?.contact?.email || 'shenaworksltd@gmail.com'
+  const hasCredentials = credentials.length > 0
+  const hasCompanyProfile = Boolean(settings?.files?.companyProfile?.url)
 
-type SubMenuKey = null | 'services' | 'equipment' | 'about'
-
-export function MobileDrawer({
-  open,
-  onClose,
-  services,
-  equipmentCategories,
-  hasCredentials,
-  hasInsights,
-  hasCompanyProfile,
-  phoneE164,
-  phoneDisplay,
-  email,
-  whatsappUrl,
-}: MobileDrawerProps) {
-  const [subMenu, setSubMenu] = useState<SubMenuKey>(null)
-  const drawerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const html = document.documentElement
-    const main = document.getElementById('main-content')
-    const footer = document.querySelector('footer')
-
-    if (open) {
-      html.setAttribute('data-drawer-open', 'true')
-      const unlock = lockScroll()
-      main?.setAttribute('inert', '')
-      footer?.setAttribute('inert', '')
-
-      return () => {
-        html.removeAttribute('data-drawer-open')
-        unlock()
-        main?.removeAttribute('inert')
-        footer?.removeAttribute('inert')
-      }
-    } else {
-      html.removeAttribute('data-drawer-open')
-      main?.removeAttribute('inert')
-      footer?.removeAttribute('inert')
-      setSubMenu(null)
-    }
-  }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        onClose()
-        return
-      }
-
-      if (e.key === 'Tab' && drawerRef.current) {
-        const focusables = Array.from(
-          drawerRef.current.querySelectorAll<HTMLElement>(
-            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-          ),
-        ).filter((el) => el.offsetParent !== null)
-
-        if (focusables.length === 0) return
-
-        const first = focusables[0]
-        const last = focusables[focusables.length - 1]
-
-        if (e.shiftKey) {
-          if (document.activeElement === first || !drawerRef.current.contains(document.activeElement)) {
-            e.preventDefault()
-            last.focus()
-          }
-        } else {
-          if (document.activeElement === last || !drawerRef.current.contains(document.activeElement)) {
-            e.preventDefault()
-            first.focus()
-          }
-        }
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [open, onClose])
-
-  if (!open) return null
-
-  const topLevelServices = services.filter((s) => !s.parentSlug)
-  const cabroService = services.find((s) => s.slug === 'cabro-paving')
+  const publishedServices = services.filter((s) => s._status === 'published')
+  const hasServices = publishedServices.length > 0
+  const hasCategories = equipmentCategories.length > 0
 
   return (
-    <div
-      ref={drawerRef}
-      id="mobile-drawer"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Site navigation"
-      data-menu-level={subMenu ? '1' : '0'}
-      className="fixed inset-x-0 top-[5.2rem] bottom-0 z-[50] flex flex-col justify-between overflow-y-auto bg-[var(--white)] border-t border-[var(--grey-300)] lg:hidden"
-    >
-      <div className="px-[2.4rem] pt-[1.6rem] pb-[2.4rem]">
-        {subMenu === null ? (
-          <nav aria-label="Primary mobile">
-            <ul className="divide-y divide-[var(--grey-300)] border-b border-[var(--grey-300)]">
-              <li className="flex items-center justify-between py-[1.4rem]">
-                <a
-                  href="/services"
-                  onClick={onClose}
-                  className="text-h4 text-[var(--ink-900)] no-underline"
-                >
-                  Services
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setSubMenu('services')}
-                  aria-label="Open Services submenu"
-                  className="inline-flex h-[4.4rem] w-[4.4rem] items-center justify-center text-[var(--ink-900)]"
-                >
-                  <Icon name="chevron-right" size={18} />
-                </button>
-              </li>
-              <li className="py-[1.4rem]">
-                <a
-                  href="/projects"
-                  onClick={onClose}
-                  className="block text-h4 text-[var(--ink-900)] no-underline"
-                >
-                  Projects
-                </a>
-              </li>
-              <li className="flex items-center justify-between py-[1.4rem]">
-                <a
-                  href="/equipment"
-                  onClick={onClose}
-                  className="text-h4 text-[var(--ink-900)] no-underline"
-                >
-                  Equipment
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setSubMenu('equipment')}
-                  aria-label="Open Equipment submenu"
-                  className="inline-flex h-[4.4rem] w-[4.4rem] items-center justify-center text-[var(--ink-900)]"
-                >
-                  <Icon name="chevron-right" size={18} />
-                </button>
-              </li>
-              <li className="flex items-center justify-between py-[1.4rem]">
-                <a
-                  href="/about"
-                  onClick={onClose}
-                  className="text-h4 text-[var(--ink-900)] no-underline"
-                >
-                  About
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setSubMenu('about')}
-                  aria-label="Open About submenu"
-                  className="inline-flex h-[4.4rem] w-[4.4rem] items-center justify-center text-[var(--ink-900)]"
-                >
-                  <Icon name="chevron-right" size={18} />
-                </button>
-              </li>
-              {hasInsights && (
-                <li className="py-[1.4rem]">
-                  <a
-                    href="/insights"
-                    onClick={onClose}
-                    className="block text-h4 text-[var(--ink-900)] no-underline"
-                  >
-                    Insights
-                  </a>
-                </li>
-              )}
-              <li className="py-[1.4rem]">
-                <a
-                  href="/contact"
-                  onClick={onClose}
-                  className="block text-h4 text-[var(--ink-900)] no-underline"
-                >
-                  Contact
-                </a>
-              </li>
-            </ul>
-
-            <div className="mt-[2.4rem]">
-              <Button
-                href="/contact?type=project"
-                variant="primary"
-                className="w-full justify-center"
-                onClick={onClose}
-              >
-                Request a quote
-              </Button>
-            </div>
-          </nav>
-        ) : (
-          <div>
-            <button
-              type="button"
-              onClick={() => setSubMenu(null)}
-              className="mb-[1.6rem] inline-flex min-h-[4.4rem] items-center gap-[0.8rem] text-label text-[var(--ink-900)]"
-            >
-              <Icon name="chevron-left" size={18} />
-              <span>Back</span>
-            </button>
-
-            {subMenu === 'services' && (
-              <ul className="divide-y divide-[var(--grey-300)] border-t border-b border-[var(--grey-300)]">
-                <li className="py-[1.4rem]">
-                  <a
-                    href="/services"
-                    onClick={onClose}
-                    className="block text-h4 text-[var(--ink-900)] no-underline"
-                  >
-                    All services
-                  </a>
-                </li>
-                {topLevelServices.map((service) => (
-                  <React.Fragment key={service.slug}>
-                    <li className="py-[1.4rem]">
-                      <a
-                        href={`/services/${service.slug}`}
-                        onClick={onClose}
-                        className="block text-h4 text-[var(--ink-900)] no-underline"
-                      >
-                        {service.title}
-                      </a>
-                    </li>
-                    {service.slug === 'road-construction-and-earthworks' && cabroService && (
-                      <li className="py-[1.2rem] pl-[1.6rem]">
-                        <a
-                          href="/services/road-construction-and-earthworks/cabro-paving"
-                          onClick={onClose}
-                          className="block text-body text-[var(--ink-600)] no-underline"
-                        >
-                          Cabro paving
-                        </a>
-                      </li>
-                    )}
-                  </React.Fragment>
-                ))}
-              </ul>
-            )}
-
-            {subMenu === 'equipment' && (
-              <ul className="divide-y divide-[var(--grey-300)] border-t border-b border-[var(--grey-300)]">
-                {equipmentCategories.map((cat) => (
-                  <li key={cat.slug} className="py-[1.4rem]">
-                    <a
-                      href={`/equipment/${cat.slug}`}
-                      onClick={onClose}
-                      className="block text-h4 text-[var(--ink-900)] no-underline"
-                    >
-                      {cat.name}
-                    </a>
-                  </li>
-                ))}
-                <li className="py-[1.4rem]">
-                  <a
-                    href="/equipment"
-                    onClick={onClose}
-                    className="block text-h4 text-[var(--ink-900)] no-underline"
-                  >
-                    All equipment
-                  </a>
-                </li>
-                <li className="py-[1.4rem]">
-                  <a
-                    href="/equipment#how-hire-works"
-                    onClick={onClose}
-                    className="block text-body text-[var(--ink-600)] no-underline"
-                  >
-                    How hire works
-                  </a>
-                </li>
-              </ul>
-            )}
-
-            {subMenu === 'about' && (
-              <ul className="divide-y divide-[var(--grey-300)] border-t border-b border-[var(--grey-300)]">
-                <li className="py-[1.4rem]">
-                  <a
-                    href="/about"
-                    onClick={onClose}
-                    className="block text-h4 text-[var(--ink-900)] no-underline"
-                  >
-                    Company
-                  </a>
-                </li>
-                <li className="py-[1.4rem]">
-                  <a
-                    href="/about/leadership"
-                    onClick={onClose}
-                    className="block text-h4 text-[var(--ink-900)] no-underline"
-                  >
-                    Leadership
-                  </a>
-                </li>
-                {hasCredentials && (
-                  <li className="py-[1.4rem]">
-                    <a
-                      href="/about/credentials-and-safety"
-                      onClick={onClose}
-                      className="block text-h4 text-[var(--ink-900)] no-underline"
-                    >
-                      Credentials and safety
-                    </a>
-                  </li>
-                )}
-                {hasCompanyProfile && (
-                  <li className="py-[1.4rem]">
-                    <a
-                      href="/downloads/company-profile"
-                      onClick={() => {
-                        trackEvent('file_download', { file_name: 'company-profile' })
-                        onClose()
-                      }}
-                      className="inline-flex items-center gap-[0.8rem] text-h4 text-[var(--ink-900)] no-underline"
-                    >
-                      <span>Download company profile</span>
-                      <Icon name="download" size={18} />
-                    </a>
-                  </li>
-                )}
-              </ul>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div
-        data-surface="subtle"
-        className="min-h-[12.8rem] border-t border-[var(--grey-300)] bg-[var(--grey-100)] px-[2.4rem] py-[2.0rem]"
-      >
-        <ul className="space-y-[0.8rem] text-body-sm text-[var(--ink-900)]">
+    <div className="drawer" id="dr">
+      <details>
+        <summary>
+          Services
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </summary>
+        <ul>
           <li>
-            <a
-              href={`tel:${phoneE164}`}
-              onClick={() => trackEvent('call_click', { location: 'header' })}
-              className="inline-flex items-center gap-[0.8rem] font-bold text-[var(--ink-900)] no-underline"
-            >
-              <Icon name="phone" size={18} />
-              <span>Call {phoneDisplay}</span>
-            </a>
+            <Link href="/services">All services</Link>
+          </li>
+          {hasServices ? (
+            publishedServices.map((s) => (
+              <li key={s.slug} className={s.parentSlug ? 'in' : undefined}>
+                <Link
+                  href={
+                    s.parentSlug
+                      ? `/services/${s.parentSlug}/${s.slug}`
+                      : `/services/${s.slug}`
+                  }
+                >
+                  {s.title}
+                </Link>
+              </li>
+            ))
+          ) : (
+            <>
+              <li>
+                <Link href="/services/road-construction-and-earthworks">
+                  Road construction and earthworks
+                </Link>
+              </li>
+              <li className="in">
+                <Link href="/services/road-construction-and-earthworks/cabro-paving">Cabro paving</Link>
+              </li>
+              <li>
+                <Link href="/services/general-construction">General construction</Link>
+              </li>
+              <li>
+                <Link href="/services/interior-design">Interior design</Link>
+              </li>
+              <li>
+                <Link href="/services/project-management">Project management</Link>
+              </li>
+            </>
+          )}
+        </ul>
+      </details>
+      <Link className="row" href="/projects">
+        Projects
+      </Link>
+      <details>
+        <summary>
+          Equipment
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </summary>
+        <ul>
+          {hasCategories ? (
+            equipmentCategories.map((c) => (
+              <li key={c.slug}>
+                <Link href={`/equipment/${c.slug}`}>{c.name}</Link>
+              </li>
+            ))
+          ) : (
+            <>
+              <li>
+                <Link href="/equipment/excavators">Excavators</Link>
+              </li>
+              <li>
+                <Link href="/equipment/graders">Motor graders</Link>
+              </li>
+              <li>
+                <Link href="/equipment/rollers">Rollers and compactors</Link>
+              </li>
+              <li>
+                <Link href="/equipment/bulldozers">Bulldozers</Link>
+              </li>
+            </>
+          )}
+          <li>
+            <Link href="/equipment">All equipment</Link>
           </li>
           <li>
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackEvent('whatsapp_click', { location: 'header' })}
-              className="inline-flex items-center gap-[0.8rem] text-[var(--ink-900)] no-underline"
-            >
-              <Icon name="whatsapp" size={18} />
-              <span>WhatsApp us</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href={`mailto:${email}`}
-              onClick={() => trackEvent('email_click', { location: 'header' })}
-              className="inline-flex items-center gap-[0.8rem] text-[var(--ink-600)] no-underline"
-            >
-              <Icon name="mail" size={18} />
-              <span>{email}</span>
-            </a>
+            <Link href="/equipment#how-hire-works">How hire works</Link>
           </li>
         </ul>
-      </div>
+      </details>
+      <details>
+        <summary>
+          About
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </summary>
+        <ul>
+          <li>
+            <Link href="/about">Company</Link>
+          </li>
+          <li>
+            <Link href="/about/leadership">Leadership</Link>
+          </li>
+          {hasCredentials && (
+            <li>
+              <Link href="/about/credentials-and-safety">Credentials and safety</Link>
+            </li>
+          )}
+          {hasCompanyProfile && (
+            <li>
+              <Link href="/downloads/company-profile">Company profile</Link>
+            </li>
+          )}
+        </ul>
+      </details>
+      <Link className="row" href="/contact">
+        Contact
+      </Link>
+      <Link className="btn pri" href="/contact?type=project">
+        Request a quote
+      </Link>
+      <p>
+        <a href={`tel:${phoneE164}`}>Call {phoneDisplay}</a>
+      </p>
+      <p>
+        <a
+          href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+            'Hello Shena Works, I found you on your website and would like to talk about a project.'
+          )}`}
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp us
+        </a>
+      </p>
+      <p>
+        <a href={`mailto:${email}`}>Email us</a>
+      </p>
     </div>
   )
 }

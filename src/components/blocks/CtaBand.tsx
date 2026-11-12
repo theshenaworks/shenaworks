@@ -1,105 +1,94 @@
-'use client'
-
 import React from 'react'
-import { Button } from '@/components/ui/Button'
-import { buildWhatsAppUrl } from '@/lib/whatsapp'
-import { trackEvent } from '@/lib/analytics'
-import type { MediaItem } from '@/types/content'
+import Link from 'next/link'
+import Image from 'next/image'
+import type { SiteSettingsRecord } from '@/types/content'
 
-const DEFAULT_IMAGE: MediaItem = {
-  url: '/media/hero-aerial-road.svg',
-  alt: 'Aerial perspective of a civil road construction project by Shena Works',
-  caption: 'Civil road construction and earthworks across Kenya.',
-}
-
+/**
+ * 11 CtaBand (AGENTS.md Section 0 & Section 5 Phase B & D)
+ * Reference: docs/reference/home/index.html & docs/reference/pages/*.html
+ */
 export interface CtaBandProps {
-  headlineLine1?: string
-  headlineLine2?: string
+  settings?: SiteSettingsRecord | null
+  heading?: string
+  body?: string
   buttonLabel?: string
   buttonHref?: string
-  image?: MediaItem
-  phoneE164?: string
-  phoneDisplay?: string
-  whatsappNumber?: string
-  officeHours?: string
+  headlineLine1?: string
+  headlineLine2?: string
+  hasBox?: boolean
 }
 
 export function CtaBand({
-  headlineLine1 = "Let's talk about",
-  headlineLine2 = 'your site',
+  settings,
   buttonLabel = 'Request a quote',
   buttonHref = '/contact?type=project',
-  image = DEFAULT_IMAGE,
-  phoneE164 = '+254718971896',
-  phoneDisplay = '+254 718 971 896',
-  whatsappNumber = '254718971896',
-  officeHours = 'Monday – Friday 8:00 am – 5:00 pm, Saturday 8:00 am – 1:00 pm',
-}: CtaBandProps) {
-  const whatsappUrl = buildWhatsAppUrl({ type: 'default' }, whatsappNumber)
+  hasBox = false,
+}: CtaBandProps = {}) {
+  const phoneDisplay = settings?.contact?.phoneDisplay || '+254 718 971 896'
+  const phoneE164 = settings?.contact?.phoneE164 || '+254718971896'
+  const whatsappNumber = settings?.contact?.whatsappNumber || '254718971896'
+  const imgSrc =
+    (settings?.ctaImage?.url?.startsWith('http') ? settings.ctaImage.url : null) ||
+    (hasBox
+      ? 'https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1600'
+      : 'https://images.pexels.com/photos/8809466/pexels-photo-8809466.jpeg?auto=compress&cs=tinysrgb&w=1200')
+  const imgAlt =
+    settings?.ctaImage?.alt ||
+    (hasBox ? 'People and machines on a Shena road site' : 'Crew standing beside a road roller on a murram road')
+
+  const cardContent = (
+    <>
+      <p className="over">Talk to us</p>
+      <h3 className="h4">Call or WhatsApp</h3>
+      <p className={hasBox ? 'num' : undefined}>{phoneDisplay}</p>
+      <div className="btns">
+        <a className="btn sec" href={`tel:${phoneE164}`}>
+          Call
+        </a>
+        <a
+          className="btn outl"
+          href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+            'Hello Shena Works, I found you on your website and would like to talk about a project.'
+          )}`}
+          target="_blank"
+          rel="noopener"
+        >
+          WhatsApp
+        </a>
+      </div>
+    </>
+  )
 
   return (
-    <section className="bg-[var(--white)] py-[8.0rem] lg:py-[12.0rem]">
-      <div className="site-grid items-center">
-        {/* Left photo panel (col 1-11 at lg) */}
-        <div
-          data-surface="photo"
-          className="col-span-4 lg:col-start-1 lg:col-span-11 lg:row-start-1 relative min-h-[36.0rem] lg:min-h-[48.0rem] flex items-end overflow-hidden bg-[var(--ink-900)] text-[var(--white)] p-[2.4rem] lg:p-[5.6rem]"
-        >
-          <img
-            src={image.url}
-            alt={image.alt}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{ background: 'var(--gradient-photo)' }}
-          />
-          <div className="relative z-10">
-            <h2 className="text-display text-[var(--white)] mb-[2.4rem]">
-              {headlineLine1} <br className="hidden md:inline" />
-              {headlineLine2}
-            </h2>
-            <Button
-              href={buttonHref}
-              variant="primary"
-              onClick={() => trackEvent('cta_click', { cta_id: 'ctaband_quote' })}
-            >
+    <section className="cta" style={{ paddingTop: '80px' }} aria-labelledby="cta-h">
+      <div className="grid16">
+        <div className="cta-photo" data-surface="photo">
+          <div className="ph">
+            <Image
+              src={imgSrc}
+              alt={imgAlt}
+              fill
+              sizes="(min-width: 1024px) 75vw, 100vw"
+            />
+          </div>
+          <div className="in">
+            {hasBox ? (
+              <h2 className="d" id="cta-h">
+                Let’s talk about <strong>your site</strong>
+              </h2>
+            ) : (
+              <h2 className="d" id="cta-h">
+                Let’s talk about<br /> your site
+              </h2>
+            )}
+            <Link className="btn pri" href={buttonHref}>
               {buttonLabel}
-            </Button>
+            </Link>
           </div>
         </div>
-
-        {/* Right overlapping card (col 12-4 at lg) */}
-        <div
-          data-surface="subtle"
-          className="col-span-4 lg:col-start-12 lg:col-span-4 lg:row-start-1 z-20 bg-[var(--grey-100)] lg:bg-[var(--white)] lg:shadow-[var(--shadow-1)] lg:border lg:border-[var(--grey-300)] p-[2.4rem] lg:p-[4.0rem]"
-        >
-          <p className="text-overline text-[var(--ink-600)] mb-[0.8rem]">Talk to us</p>
-          <h3 className="text-h4 text-[var(--ink-900)] mb-[1.2rem]">Call or WhatsApp</h3>
-          <p className="text-body font-bold text-[var(--ink-900)] mb-[0.4rem]">{phoneDisplay}</p>
-          {officeHours && (
-            <p className="text-body-xs text-[var(--ink-600)] mb-[2.4rem]">{officeHours}</p>
-          )}
-          <div className="flex flex-wrap items-center gap-[0.8rem]">
-            <Button
-              href={`tel:${phoneE164}`}
-              variant="secondary"
-              onClick={() => trackEvent('call_click', { location: 'cta_band' })}
-            >
-              Call
-            </Button>
-            <Button
-              href={whatsappUrl}
-              external
-              variant="outline"
-              onClick={() => trackEvent('whatsapp_click', { location: 'cta_band' })}
-            >
-              WhatsApp
-            </Button>
-          </div>
-        </div>
+        <aside className="cta-card">
+          {hasBox ? <div className="box">{cardContent}</div> : cardContent}
+        </aside>
       </div>
     </section>
   )

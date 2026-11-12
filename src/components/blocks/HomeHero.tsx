@@ -1,71 +1,59 @@
-'use client'
-
 import React from 'react'
-import { Button } from '@/components/ui/Button'
-import { trackEvent } from '@/lib/analytics'
-import type { MediaItem } from '@/types/content'
+import Link from 'next/link'
+import Image from 'next/image'
+import type { HomePageRecord } from '@/types/content'
 
+/**
+ * 1 HomeHero (AGENTS.md Section 0 & Section 5 Phase B & D)
+ * Reference: docs/reference/home/index.html lines 392-402
+ * Section 0 Rule 6: Image uses fill, priority, sizes="100vw".
+ */
 export interface HomeHeroProps {
-  overline: string
-  headline: string
-  lead: string
-  heroImage: MediaItem
+  hero?: HomePageRecord | null
+  overline?: string
+  headline?: string
+  lead?: string
+  heroImage?: any
 }
 
-export function HomeHero({ overline, headline, lead, heroImage }: HomeHeroProps) {
+export function HomeHero({ hero, ..._props }: HomeHeroProps = {}) {
+  const imgSrc =
+    (typeof _props.heroImage === 'string'
+      ? _props.heroImage
+      : _props.heroImage?.url) ||
+    (hero?.heroImage?.url?.startsWith('http') ? hero.heroImage.url : null) ||
+    'https://images.pexels.com/photos/37333412/pexels-photo-37333412.jpeg?auto=compress&cs=tinysrgb&w=1600'
+
+  const imgAlt =
+    (typeof _props.heroImage === 'object' && _props.heroImage?.alt) ||
+    hero?.heroImage?.alt ||
+    'Road construction crew and equipment working on a road'
+
   return (
-    <section
-      data-surface="photo"
-      className="relative min-h-[56.0rem] lg:min-h-[72.0rem] flex items-end overflow-hidden bg-[var(--ink-900)] text-[var(--white)] pt-[12.0rem] lg:pt-[16.0rem]"
-    >
-      <div className="hero-media absolute inset-0 z-0">
-        <img
-          src={heroImage.url}
-          alt={heroImage.alt}
-          fetchPriority="high"
-          className="h-full w-full object-cover"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{ background: 'var(--gradient-photo-top)' }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{ background: 'var(--gradient-photo)' }}
+    <section className="hero" style={{ padding: 0 }} data-surface="photo">
+      <div className="ph">
+        <Image
+          src={imgSrc}
+          alt={imgAlt}
+          fill
+          priority
+          sizes="100vw"
         />
       </div>
-
-      <div className="site-grid relative z-10 w-full pb-[6.4rem] lg:pb-[8.0rem]">
-        <div className="col-span-4 lg:col-start-2 lg:col-span-9">
-          <p className="text-overline text-[var(--white)] mb-[1.6rem]">{overline}</p>
-          <h1 className="text-display text-[var(--white)] mb-[2.4rem]">{headline}</h1>
-          <p className="text-lead text-[var(--white)] max-w-[56ch] mb-[3.2rem]">{lead}</p>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-[0.8rem]">
-            <Button
-              href="/contact?type=project"
-              variant="primary"
-              onClick={() => trackEvent('cta_click', { cta_id: 'hero_quote' })}
-            >
-              Request a quote
-            </Button>
-            <Button
-              href="/equipment"
-              variant="outline-dark"
-              onClick={() => trackEvent('cta_click', { cta_id: 'hero_hire' })}
-            >
-              Hire equipment
-            </Button>
-          </div>
+      <div className="wrap">
+        <h1 className="d">
+          <span className="sr">Road and building contractors in Meru and Nairobi: </span>
+          Roads, earthworks and buildings, <strong>built with our own machines.</strong>
+        </h1>
+        <div className="btns">
+          <Link className="btn pri" href="/contact?type=project">
+            Request a quote
+          </Link>
+          <Link className="btn out" href="/equipment">
+            Hire equipment
+          </Link>
         </div>
       </div>
-
-      {heroImage.caption && (
-        <p className="hidden md:block absolute right-[2.4rem] bottom-[2.4rem] z-10 text-caption text-white/80">
-          {heroImage.caption}
-        </p>
-      )}
     </section>
   )
 }

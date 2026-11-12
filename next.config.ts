@@ -11,7 +11,7 @@ const cspDirectives = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${!isProd ? " 'unsafe-eval'" : ''} https://challenges.cloudflare.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://media.shenaworksltd.com https://*.google-analytics.com https://*.googletagmanager.com",
+  "img-src 'self' data: blob: https://media.shenaworksltd.com https://images.pexels.com https://*.google-analytics.com https://*.googletagmanager.com",
   "font-src 'self'",
   "connect-src 'self' https://challenges.cloudflare.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
   "frame-src https://challenges.cloudflare.com https://www.google.com https://maps.google.com",
@@ -30,6 +30,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'media.shenaworksltd.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
       },
     ],
   },

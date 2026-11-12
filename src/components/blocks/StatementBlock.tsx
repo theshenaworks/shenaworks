@@ -1,37 +1,49 @@
 import React from 'react'
-import { Button } from '@/components/ui/Button'
+import Image from 'next/image'
 
+/**
+ * StatementBlock (AGENTS.md Section 0 & Section 5 Phase B)
+ * Reference: docs/reference/home/index.html lines 420-425
+ */
 export interface StatementBlockProps {
-  heading: string
-  body: string
+  heading?: string
+  body?: string
   caption?: string
   buttonLabel?: string
   buttonHref?: string
 }
 
-export function StatementBlock({
-  heading,
-  body,
-  caption,
-  buttonLabel,
-  buttonHref,
-}: StatementBlockProps) {
+export function StatementBlock(_props: StatementBlockProps = {}) {
   return (
-    <section className="bg-[var(--white)] py-[8.0rem] lg:py-[12.0rem] border-t border-b border-[var(--grey-300)]">
-      <div className="site-grid">
-        <div className="col-span-4 lg:col-start-4 lg:col-span-10 text-center">
-          <h2 className="text-h2 text-[var(--ink-900)] mb-[2.0rem]">{heading}</h2>
-          <p className="text-body text-[var(--ink-600)] max-w-[60ch] mx-auto">{body}</p>
-          {caption && (
-            <p className="text-caption text-[var(--ink-600)] mt-[1.6rem]">{caption}</p>
-          )}
-          {buttonLabel && buttonHref && (
-            <div className="mt-[3.2rem] flex justify-center">
-              <Button href={buttonHref} variant="primary">
-                {buttonLabel}
-              </Button>
+    <section className="stmt" aria-label="How we work">
+      <div className="stmt-run">
+        <div className="stmt-stick">
+          <div className="stmt-layer l1">
+            <div className="ph">
+              <Image
+                src="https://images.pexels.com/photos/8809466/pexels-photo-8809466.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                alt="Crew standing beside a road roller on a murram road"
+                fill
+                sizes="100vw"
+              />
             </div>
-          )}
+            <p className="d">
+              Show us the site. <strong>We’ll bring the machines.</strong>
+            </p>
+          </div>
+          <div className="stmt-layer l2">
+            <div className="ph warm">
+              <Image
+                src="https://images.pexels.com/photos/34188582/pexels-photo-34188582.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                alt="A finished modern building handed over to the client"
+                fill
+                sizes="100vw"
+              />
+            </div>
+            <p className="d">
+              Give us the drawings. <strong>We’ll hand over the keys.</strong>
+            </p>
+          </div>
         </div>
       </div>
     </section>

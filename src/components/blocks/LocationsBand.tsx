@@ -1,65 +1,59 @@
 import React from 'react'
-import { Icon } from '@/components/ui/Icon'
-import { SectionIntro } from './SectionIntro'
+import Link from 'next/link'
 import type { LocationRecord } from '@/types/content'
 
+/**
+ * 10 LocationsBand (AGENTS.md Section 0 & Section 5 Phase B & D)
+ * Reference: docs/reference/home/index.html lines 513-532
+ */
 export interface LocationsBandProps {
   heading?: string
-  locations: LocationRecord[]
+  locations?: LocationRecord[]
 }
 
-export function LocationsBand({ heading = 'Where to find us', locations }: LocationsBandProps) {
-  if (locations.length === 0) return null
+export function LocationsBand({ heading = 'Where to find us', locations }: LocationsBandProps = {}) {
+  const meruLocation = locations?.find((l) => l.slug === 'meru')
+  const nairobiLocation = locations?.find((l) => l.slug === 'nairobi')
 
   return (
-    <section
-      data-surface="subtle"
-      className="bg-[var(--grey-100)] py-[6.4rem] lg:py-[8.0rem] border-t border-[var(--grey-300)]"
-    >
-      <SectionIntro heading={heading} />
-
-      <div className="site-grid">
-        <div className="col-span-4 lg:col-start-2 lg:col-span-14 grid grid-cols-1 md:grid-cols-2 gap-[3.2rem]">
-          {locations.map((loc) => (
-            <div
-              key={loc.slug}
-              className="border-t-2 border-[var(--grey-300)] pt-[2.4rem] flex flex-col justify-between"
-            >
-              <div>
-                <h3 className="text-h3 text-[var(--ink-900)] mb-[1.2rem]">{loc.town}</h3>
-                <address className="not-italic text-body text-[var(--ink-600)] mb-[0.8rem]">
-                  {loc.address}
-                </address>
-                <p className="text-body font-bold text-[var(--ink-900)] mb-[0.8rem]">
-                  <a href={`tel:${loc.phone.replace(/\s+/g, '')}`} className="no-underline u-draw">
-                    {loc.phone}
-                  </a>
-                </p>
-                {loc.hours && (
-                  <p className="text-body-xs text-[var(--ink-600)] mb-[2.0rem]">{loc.hours}</p>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-[2.4rem]">
-                <a
-                  href={loc.directionsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-[0.6rem] text-label text-[var(--ink-900)] no-underline u-draw"
-                >
-                  <span>Get directions</span>
-                  <Icon name="external-link" size={16} />
-                </a>
-                <a
-                  href={`/locations/${loc.slug}`}
-                  className="inline-flex items-center gap-[0.6rem] text-label text-[var(--ink-900)] no-underline u-draw"
-                >
-                  <span>{loc.town} page</span>
-                  <Icon name="arrow-right" size={16} />
-                </a>
-              </div>
+    <section className="loc" data-surface="subtle" aria-labelledby="loc-h">
+      <div className="wrap">
+        <h2 className="h2" id="loc-h">
+          {heading}
+        </h2>
+        <div className="cols" style={{ marginTop: '32px' }}>
+          <div>
+            <p className="over">Headquarters and plant yard</p>
+            <h3 className="h3">Meru</h3>
+            <p className="sm">
+              {(meruLocation as any)?.homeSummary ||
+                'Our yard, team and heavy plant are based here, so we can visit your plot quickly and keep mobilisation costs down across Meru County and Mount Kenya East.'}
+            </p>
+            <div className="links">
+              <Link className="arrow" href="/locations/meru">
+                Meru contractors{' '}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 12h16m-6-6 6 6-6 6" />
+                </svg>
+              </Link>
             </div>
-          ))}
+          </div>
+          <div>
+            <p className="over">Branch office</p>
+            <h3 className="h3">Nairobi</h3>
+            <p className="sm">
+              {nairobiLocation?.heroLead ||
+                'We handle building, paving and interior fit-outs across Nairobi, Kiambu, Machakos and Kajiado, and meet clients who are building in Meru.'}
+            </p>
+            <div className="links">
+              <Link className="arrow" href="/locations/nairobi">
+                Nairobi contractors{' '}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 12h16m-6-6 6 6-6 6" />
+                </svg>
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>

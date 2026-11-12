@@ -1,71 +1,85 @@
 import React from 'react'
-import { Button } from '@/components/ui/Button'
-import type { MediaItem } from '@/types/content'
+import Link from 'next/link'
+import Image from 'next/image'
+import type { HomePageRecord } from '@/types/content'
 
-export interface WhyShenaPoint {
-  number: string
-  title: string
-  description: string
-  verified: boolean
-}
-
+/**
+ * 7 WhyShena (AGENTS.md Section 0 & Section 5 Phase B & D)
+ * Reference: docs/reference/home/index.html lines 494-509
+ * Conditional rule (SITE-PLAN 8): point marked verified; point hidden if not verified; block hidden if 0.
+ */
 export interface WhyShenaProps {
+  whyShena?: HomePageRecord['whyShena']
   overline?: string
-  heading: string
-  image: MediaItem
-  points: WhyShenaPoint[]
+  heading?: string
 }
 
-export function WhyShena({
-  overline = 'Why Shena Works',
-  heading,
-  image,
-  points,
-}: WhyShenaProps) {
-  const verifiedPoints = points.filter((p) => p.verified)
+const DEFAULT_POINTS = [
+  {
+    number: '01',
+    title: 'Our own machines',
+    description:
+      'Our excavators, graders and rollers are on your job when the programme says, not when a hire yard can spare them.',
+  },
+  {
+    number: '02',
+    title: 'Roads and buildings, one contractor',
+    description:
+      'Earthworks, drainage, paving and the building itself are planned and supervised by one team.',
+  },
+  {
+    number: '03',
+    title: 'Led from the site',
+    description:
+      'Our managing director has supervised county road works and inspected urban roads, and still visits every site.',
+  },
+]
+
+export function WhyShena({ whyShena, overline, heading }: WhyShenaProps = {}) {
+  // Filter points marked verified per SITE-PLAN 8
+  const verifiedPoints =
+    whyShena?.points && whyShena.points.length > 0
+      ? whyShena.points.filter((p) => p.verified !== false)
+      : DEFAULT_POINTS
+
   if (verifiedPoints.length === 0) return null
 
+  const headingText = heading || whyShena?.heading || 'We own the plant and we run the site'
+  const overlineText = overline || whyShena?.overline || 'Why Shena Works'
+  const imgSrc =
+    (whyShena?.image?.url?.startsWith('http') ? whyShena.image.url : null) ||
+    'https://images.pexels.com/photos/5298215/pexels-photo-5298215.jpeg?auto=compress&cs=tinysrgb&w=1200'
+  const imgAlt =
+    whyShena?.image?.alt || 'Crew members in safety gear working on a Shena site'
+
   return (
-    <section className="bg-[var(--white)] py-[6.4rem] lg:py-[8.0rem]">
-      <div className="site-grid items-center">
-        <figure className="col-span-4 lg:col-start-1 lg:col-span-9 lg:row-start-1">
-          <div className="aspect-[4/3] overflow-hidden bg-[var(--grey-100)]">
-            <img
-              src={image.url}
-              alt={image.alt}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </div>
-          {image.caption && (
-            <figcaption className="text-figcaption text-[var(--ink-600)] mt-[0.8rem] px-[1.6rem] lg:px-0">
-              {image.caption}
-            </figcaption>
-          )}
-        </figure>
-
-        <div
-          data-surface="dark"
-          className="col-span-4 lg:col-start-9 lg:col-span-7 lg:row-start-1 lg:mt-[6.4rem] z-10 bg-[var(--ink-900)] text-[var(--white)] p-[2.4rem] lg:p-[5.6rem]"
-        >
-          <p className="text-overline text-[var(--grey-500)] mb-[1.2rem]">{overline}</p>
-          <h2 className="text-h3 text-[var(--white)] mb-[2.4rem]">{heading}</h2>
-
-          <ol className="space-y-[2.0rem] mb-[3.2rem]">
-            {verifiedPoints.map((point) => (
-              <li key={point.number} className="border-t border-[var(--ink-600)] pt-[1.6rem]">
-                <p className="text-label text-[var(--white)] mb-[0.4rem]">
-                  <span className="text-[var(--accent-on-dark)] mr-[0.8rem]">{point.number}</span>
-                  {point.title}
-                </p>
-                <p className="text-body-sm text-[var(--grey-300)]">{point.description}</p>
+    <section className="why" style={{ paddingTop: '80px' }} aria-labelledby="why-h">
+      <div className="split">
+        <div className="ph grey">
+          <Image
+            src={imgSrc}
+            alt={imgAlt}
+            fill
+            sizes="(min-width: 1024px) 60vw, 100vw"
+          />
+        </div>
+        <div className="panel" data-surface="dark">
+          <p className="over">{overlineText}</p>
+          <h2 className="h3" id="why-h">
+            {headingText}
+          </h2>
+          <ol>
+            {verifiedPoints.map((p, idx) => (
+              <li key={p.number || idx}>
+                <b>{p.number || `0${idx + 1}`}</b>
+                <strong>{p.title}</strong>
+                <span className="sm">{p.description}</span>
               </li>
             ))}
           </ol>
-
-          <Button href="/about/leadership" variant="outline-dark">
+          <Link className="btn out" href="/about/leadership">
             Meet our managing director
-          </Button>
+          </Link>
         </div>
       </div>
     </section>

@@ -403,7 +403,16 @@ export const getPublishedProjects: () => Promise<ProjectRecord[]> = cacheWrapper
 
 export async function getFeaturedProjects(): Promise<ProjectRecord[]> {
   const all = await getPublishedProjects()
-  return all.filter((p) => p.featured).slice(0, 6)
+  const refSlugs = [
+    'the-black-perch-lounge',
+    'the-pin-hideout',
+    'dukes-cottages-restaurant-and-garden',
+  ]
+  const matched = refSlugs
+    .map((slug) => all.find((p) => p.slug === slug))
+    .filter((p): p is ProjectRecord => Boolean(p))
+  if (matched.length === 3) return matched
+  return all.filter((p) => p.featured).slice(0, 3)
 }
 
 export async function getPublishedProjectBySlug(slug: string): Promise<ProjectRecord | undefined> {
