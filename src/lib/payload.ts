@@ -18,6 +18,16 @@ import type {
   TeamRecord,
   TestimonialRecord,
 } from '@/types/content'
+import {
+  EQUIPMENT_FALLBACK_MEDIA,
+  EQUIPMENT_GALLERY_FALLBACKS,
+  MEDIA_PATHS,
+  POST_FALLBACK_MEDIA,
+  PROJECT_FALLBACK_MEDIA,
+  PROJECT_GALLERY_FALLBACKS,
+  SERVICE_FALLBACK_MEDIA,
+  VALID_PUBLIC_MEDIA,
+} from '@/lib/media'
 
 let cachedPayload: any = null
 
@@ -62,8 +72,11 @@ function resolveMedia(
   fallbackCaption: string,
 ): MediaItem {
   if (typeof media === 'object' && media !== null && media.url) {
+    const rawUrl = String(media.url)
+    const url =
+      rawUrl.startsWith('/media/') && !VALID_PUBLIC_MEDIA.has(rawUrl) ? fallbackUrl : rawUrl
     return {
-      url: media.url,
+      url,
       alt: media.alt || fallbackAlt,
       caption: media.caption || fallbackCaption,
       width: media.width,
@@ -118,8 +131,8 @@ export const getSiteSettings = cacheWrapper(
         credentialId: p.credentialId || null,
       })),
       ctaImage: {
-        url: '/media/hero-aerial-road.svg',
-        alt: 'Aerial perspective of a civil road construction project by Shena Works',
+        url: MEDIA_PATHS.ctaSite,
+        alt: 'People and machines on a Shena road site',
         caption: 'Civil road construction and earthworks across Kenya.',
       },
       files: {
@@ -145,8 +158,8 @@ export const getHomePage: () => Promise<HomePageRecord> = cacheWrapper(
         'We grade, drain and pave roads, and we build homes, lounges and commercial premises across Meru, Nairobi and the rest of Kenya, from site clearing to handover.',
       heroImage: resolveMedia(
         doc.heroImage,
-        '/media/hero-home-road-grading.svg',
-        'Shena Works motor grader and vibratory roller preparing a murram road in Meru County',
+        MEDIA_PATHS.heroRoads,
+        'Road construction crew and equipment working on a road',
         'Grading and compacting an access road in Meru County',
       ),
       whyShena: {
@@ -154,8 +167,8 @@ export const getHomePage: () => Promise<HomePageRecord> = cacheWrapper(
         heading: doc.whyShena?.heading || 'We own the plant and we run the site',
         image: resolveMedia(
           doc.whyShena?.image,
-          '/media/about-site-supervision.svg',
-          'Shena Works site team and excavator during earthworks and drainage construction',
+          MEDIA_PATHS.whyCrew,
+          'Crew members in safety gear working on a Shena site',
           'On-site supervision and earthmoving plant operation in Meru County.',
         ),
         points: (doc.whyShena?.points || [
@@ -289,7 +302,7 @@ function mapServiceDoc(doc: any): ServiceRecord {
     heroLead: doc.heroLead || doc.summary || '',
     heroImage: resolveMedia(
       doc.heroImage,
-      `/media/service-${doc.slug}.svg`,
+      SERVICE_FALLBACK_MEDIA[doc.slug] || MEDIA_PATHS.serviceRoads,
       `${doc.title} by Shena Works`,
       `${doc.title} in progress.`,
     ),
@@ -363,7 +376,7 @@ function mapProjectDoc(doc: any): ProjectRecord {
     metaDescription: doc.metaDescription || doc.brief || '',
     heroImage: resolveMedia(
       doc.heroImage,
-      `/media/project-${doc.slug}.svg`,
+      PROJECT_FALLBACK_MEDIA[doc.slug] || MEDIA_PATHS.projectBlackPerch,
       `${doc.title} project by Shena Works`,
       `${doc.title} in ${doc.location?.town || 'Meru'}.`,
     ),
@@ -375,7 +388,9 @@ function mapProjectDoc(doc: any): ProjectRecord {
       ? doc.gallery.map((g: any, i: number) =>
           resolveMedia(
             g.image,
-            `/media/project-${doc.slug}.svg`,
+            PROJECT_GALLERY_FALLBACKS[doc.slug]?.[i] ||
+              PROJECT_FALLBACK_MEDIA[doc.slug] ||
+              MEDIA_PATHS.projectBlackPerch,
             `${doc.title} photo ${i + 1}`,
             g.caption || `${doc.title} construction progress`,
           ),
@@ -467,7 +482,9 @@ function mapMachineDoc(doc: any): MachineRecord {
     _status: doc._status,
     heroImage: resolveMedia(
       doc.heroImage,
-      `/media/equipment-${doc.slug}.svg`,
+      EQUIPMENT_FALLBACK_MEDIA[doc.slug] ||
+        EQUIPMENT_FALLBACK_MEDIA[categorySlug] ||
+        MEDIA_PATHS.equipExcavator,
       `${doc.name} available for hire from Shena Works`,
       `${doc.name} available with operator.`,
     ),
@@ -475,7 +492,10 @@ function mapMachineDoc(doc: any): MachineRecord {
       ? doc.gallery.map((g: any, i: number) =>
           resolveMedia(
             g.image,
-            `/media/equipment-${doc.slug}.svg`,
+            EQUIPMENT_GALLERY_FALLBACKS[doc.slug]?.[i] ||
+              EQUIPMENT_FALLBACK_MEDIA[doc.slug] ||
+              EQUIPMENT_FALLBACK_MEDIA[categorySlug] ||
+              MEDIA_PATHS.equipExcavator,
             `${doc.name} site photo ${i + 1}`,
             g.caption || `${doc.name} operating on site`,
           ),
@@ -528,7 +548,7 @@ function mapEquipmentCategoryDoc(doc: any): EquipmentCategoryRecord {
     heroLead: doc.heroLead || doc.summary || '',
     heroImage: resolveMedia(
       doc.heroImage,
-      `/media/equipment-${doc.slug}.svg`,
+      EQUIPMENT_FALLBACK_MEDIA[doc.slug] || MEDIA_PATHS.equipExcavator,
       `${doc.name} hire from Shena Works`,
       `${doc.name} fleet in Meru.`,
     ),
@@ -614,7 +634,7 @@ export const getTeamMember = cacheWrapper(
       summary: doc.summary,
       portrait: resolveMedia(
         doc.portrait,
-        '/media/founder-newton-muthee.svg',
+        MEDIA_PATHS.newtonPortrait,
         `${doc.name}, ${doc.role}`,
         `${doc.name}, Founder and Managing Director of Shena Works Limited.`,
       ),
@@ -739,7 +759,7 @@ function mapLocationDoc(doc: any): LocationRecord {
     heroLead: doc.heroLead || '',
     heroImage: resolveMedia(
       doc.heroImage,
-      `/media/location-${doc.slug}.svg`,
+      MEDIA_PATHS.ctaSite,
       `Shena Works ${doc.town} office and yard`,
       `Shena Works operations base in ${doc.town}.`,
     ),
@@ -777,6 +797,21 @@ export async function getPublishedLocationBySlug(slug: string): Promise<Location
 // Posts & Insights
 // ---------------------------------------------------------------------------
 
+function parsePostBodyToSections(body?: string | null): { heading: string; paragraphs: string[] }[] {
+  if (!body || typeof body !== 'string') return []
+  const chunks = body.split(/^##\s+/m).filter((c) => c.trim().length > 0)
+  return chunks.map((chunk) => {
+    const lines = chunk.split('\n')
+    const heading = lines[0].trim()
+    const rest = lines.slice(1).join('\n').trim()
+    const paragraphs = rest
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+    return { heading, paragraphs }
+  })
+}
+
 function mapPostDoc(doc: any): PostRecord {
   const categorySlug =
     typeof doc.category === 'object' && doc.category !== null ? doc.category.slug : doc.category
@@ -787,22 +822,29 @@ function mapPostDoc(doc: any): PostRecord {
   const authorSlug =
     typeof doc.author === 'object' && doc.author !== null ? doc.author.slug : doc.author
 
+  const rawDate = doc.publishedDate || doc.publishedAt || ''
+  const publishedAt = typeof rawDate === 'string' ? rawDate.split('T')[0] : ''
+  const sections =
+    Array.isArray(doc.sections) && doc.sections.length > 0
+      ? doc.sections
+      : parsePostBodyToSections(doc.body)
+
   return {
     slug: doc.slug,
     title: doc.title,
     categorySlug: categorySlug || '',
     relatedServiceSlug: serviceSlug || '',
     excerpt: doc.excerpt || '',
-    publishedAt: doc.publishedAt || '',
+    publishedAt,
     readingTimeMinutes: doc.readingTimeMinutes || 5,
     authorSlug: authorSlug || 'newton-muthee',
     coverImage: resolveMedia(
       doc.coverImage,
-      `/media/post-${doc.slug}.svg`,
+      POST_FALLBACK_MEDIA[doc.slug] || MEDIA_PATHS.serviceRoads,
       doc.title,
-      `${doc.title} illustration.`,
+      doc.title,
     ),
-    sections: doc.sections || [],
+    sections,
     _status: doc._status,
   }
 }
@@ -815,7 +857,7 @@ export const getPublishedPosts = cacheWrapper(
       where: { _status: { equals: 'published' } },
       limit: 100,
       depth: 1,
-      sort: '-publishedAt',
+      sort: '-publishedDate',
     })
     return res.docs.map(mapPostDoc)
   },

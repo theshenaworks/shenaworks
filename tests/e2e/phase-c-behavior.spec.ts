@@ -3,7 +3,7 @@ import path from 'path'
 import fs from 'fs'
 
 const SCREENSHOT_DIR = path.resolve(process.cwd(), 'docs/screenshots/phase-c')
-const ARTIFACT_DIR = '/home/cooper/.gemini/antigravity/brain/8156e791-8428-4f50-9baa-ea3fc84de309/screenshots/phase-c'
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR || path.resolve(process.cwd(), 'docs/screenshots/artifacts/phase-c')
 
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true })
 fs.mkdirSync(ARTIFACT_DIR, { recursive: true })

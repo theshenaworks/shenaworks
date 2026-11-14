@@ -1,13 +1,13 @@
-import React from 'react'
+'use client'
+
+import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { ProjectRecord } from '@/types/content'
 
 /**
- * 5 Projects (AGENTS.md Section 0 & Section 5 Phase B, C & D)
- * Reference: docs/reference/home/index.html lines 448-473
- * Progressive enhancement: form wrapper allows GET filter when JS is disabled.
- * Dynamic Payload CMS data integration with reference fallbacks.
+ * ProjectGrid (Next.js 16 Declarative React Component)
+ * Client-driven filtering with progressive enhancement (form GET fallback when JS disabled).
  */
 export interface ProjectGridProps {
   variant?: string
@@ -30,8 +30,7 @@ const DEFAULT_CARDS = [
     tagList: ['build', 'hosp', 'int', 'roads'],
     overline: 'General construction, Interior design',
     meta: 'Meru · Meru County',
-    imgSrc:
-      'https://images.pexels.com/photos/16120138/pexels-photo-16120138.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/project-black-perch.jpg',
     imgAlt: 'The Black Perch Lounge interior with sofas and ambient lighting',
   },
   {
@@ -42,8 +41,7 @@ const DEFAULT_CARDS = [
     tagList: ['roads', 'hosp'],
     overline: 'Road construction, Cabro paving',
     meta: 'Meru County',
-    imgSrc:
-      'https://images.pexels.com/photos/29989994/pexels-photo-29989994.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/project-pin-hideout.jpg',
     imgAlt: 'Outdoor seating on a paved courtyard',
   },
   {
@@ -54,8 +52,7 @@ const DEFAULT_CARDS = [
     tagList: ['build', 'hosp'],
     overline: 'General construction, Project management',
     meta: 'Meru · 2020–2021',
-    imgSrc:
-      'https://images.pexels.com/photos/35612209/pexels-photo-35612209.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/project-dukes.jpg',
     imgAlt: 'Cottages and gardens at the Dukes restaurant',
   },
 ]
@@ -92,6 +89,9 @@ export function ProjectGrid({
   body = 'Lounges, cottages, villas, paved compounds and roads in Meru County and beyond. Each project page says what we did and who delivered it.',
   ..._props
 }: ProjectGridProps = {}) {
+  const [filter, setFilter] = useState<string>(activeFilter)
+  const [hasInteracted, setHasInteracted] = useState(false)
+
   const cards =
     projects && projects.length > 0
       ? projects.slice(0, 3).map((p) => {
@@ -121,8 +121,14 @@ export function ProjectGrid({
       : DEFAULT_CARDS
 
   const shownCount = cards.filter(
-    (card) => activeFilter === 'all' || card.tagList.includes(activeFilter)
+    (card) => filter === 'all' || card.tagList.includes(filter)
   ).length
+
+  const handleChipClick = (e: React.MouseEvent, f: string) => {
+    e.preventDefault()
+    setHasInteracted(true)
+    setFilter(f)
+  }
 
   return (
     <section data-surface="subtle" style={{ background: 'var(--g100)' }} aria-labelledby="pj-h">
@@ -143,8 +149,9 @@ export function ProjectGrid({
               name="filter"
               value="all"
               className="chip"
-              aria-pressed={activeFilter === 'all' ? 'true' : 'false'}
+              aria-pressed={filter === 'all' ? 'true' : 'false'}
               data-f="all"
+              onClick={(e) => handleChipClick(e, 'all')}
             >
               All
             </button>
@@ -153,8 +160,9 @@ export function ProjectGrid({
               name="filter"
               value="roads"
               className="chip"
-              aria-pressed={activeFilter === 'roads' ? 'true' : 'false'}
+              aria-pressed={filter === 'roads' ? 'true' : 'false'}
               data-f="roads"
+              onClick={(e) => handleChipClick(e, 'roads')}
             >
               Roads and paving
             </button>
@@ -163,8 +171,9 @@ export function ProjectGrid({
               name="filter"
               value="build"
               className="chip"
-              aria-pressed={activeFilter === 'build' ? 'true' : 'false'}
+              aria-pressed={filter === 'build' ? 'true' : 'false'}
               data-f="build"
+              onClick={(e) => handleChipClick(e, 'build')}
             >
               Buildings
             </button>
@@ -173,8 +182,9 @@ export function ProjectGrid({
               name="filter"
               value="hosp"
               className="chip"
-              aria-pressed={activeFilter === 'hosp' ? 'true' : 'false'}
+              aria-pressed={filter === 'hosp' ? 'true' : 'false'}
               data-f="hosp"
+              onClick={(e) => handleChipClick(e, 'hosp')}
             >
               Hospitality
             </button>
@@ -183,32 +193,35 @@ export function ProjectGrid({
               name="filter"
               value="int"
               className="chip"
-              aria-pressed={activeFilter === 'int' ? 'true' : 'false'}
+              aria-pressed={filter === 'int' ? 'true' : 'false'}
               data-f="int"
+              onClick={(e) => handleChipClick(e, 'int')}
             >
               Interiors
             </button>
           </div>
         </form>
         <p className="sr" id="pcount" aria-live="polite">
-          {activeFilter !== 'all' ? `${shownCount} project${shownCount === 1 ? '' : 's'} shown` : ''}
+          {hasInteracted || filter !== 'all'
+            ? `${shownCount} project${shownCount === 1 ? '' : 's'} shown`
+            : ''}
         </p>
         <div className="grid c3" id="pgrid">
           {cards.map((card) => {
-            const isVisible = activeFilter === 'all' || card.tagList.includes(activeFilter)
+            const isVisible = filter === 'all' || card.tagList.includes(filter)
             return (
               <article
                 key={card.id}
                 className="card"
                 data-t={card.tags}
-                hidden={!isVisible}
+                style={{ display: isVisible ? undefined : 'none' }}
               >
                 <div className="ph r43">
                   <Image
                     src={card.imgSrc}
                     alt={card.imgAlt}
                     fill
-                    sizes="(min-width: 1024px) 33vw, (min-width: 600px) 50vw, 100vw"
+                    sizes="(min-width: 1024px) 33vw, 100vw"
                   />
                 </div>
                 <p className="over" style={{ color: 'var(--ink-600)' }}>

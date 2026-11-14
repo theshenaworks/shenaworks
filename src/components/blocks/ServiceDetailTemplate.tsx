@@ -12,6 +12,7 @@ import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd, buildServiceJsonLd } from '@/lib/seo/jsonld'
 import type { ServiceRecord } from '@/types/content'
 import type { BreadcrumbItem } from '@/components/ui/Breadcrumb'
+import { InlineEnquiryForm } from '@/components/blocks/InlineEnquiryForm'
 
 export interface ServiceDetailTemplateProps {
   service: ServiceRecord
@@ -58,7 +59,7 @@ export async function ServiceDetailTemplate({
 
   const heroImg =
     service.heroImage?.url ||
-    'https://images.pexels.com/photos/12267902/pexels-photo-12267902.jpeg?auto=compress&cs=tinysrgb&w=1600'
+    '/media/service-roads.jpg'
   const heroAlt = service.heroImage?.alt || service.title
 
   return (
@@ -171,7 +172,7 @@ export async function ServiceDetailTemplate({
                 <article className="card" key={child.slug}>
                   <div className="ph warm r43">
                     <Image
-                      src={child.heroImage?.url || 'https://images.pexels.com/photos/33566707/pexels-photo-33566707.jpeg?auto=compress&cs=tinysrgb&w=1200'}
+                      src={child.heroImage?.url || '/media/service-cabro.jpg'}
                       alt={child.heroImage?.alt || child.title}
                       fill
                       sizes="(min-width: 1024px) 33vw, 100vw"
@@ -234,7 +235,7 @@ export async function ServiceDetailTemplate({
                   <article className="card pcard" key={p.slug}>
                     <div className="ph r43">
                       <Image
-                        src={p.heroImage?.url || 'https://images.pexels.com/photos/16120138/pexels-photo-16120138.jpeg?auto=compress&cs=tinysrgb&w=1200'}
+                        src={p.heroImage?.url || '/media/project-black-perch.jpg'}
                         alt={p.heroImage?.alt || p.title}
                         fill
                         sizes="(min-width: 1024px) 33vw, 100vw"
@@ -267,7 +268,7 @@ export async function ServiceDetailTemplate({
                   <article className="card" key={m.slug}>
                     <div className="ph warm r43">
                       <Image
-                        src={m.heroImage?.url || 'https://images.pexels.com/photos/25559747/pexels-photo-25559747.jpeg?auto=compress&cs=tinysrgb&w=1200'}
+                        src={m.heroImage?.url || '/media/equip-excavator.jpg'}
                         alt={m.heroImage?.alt || m.name}
                         fill
                         sizes="(min-width: 1024px) 33vw, 100vw"
@@ -321,129 +322,15 @@ export async function ServiceDetailTemplate({
               {service.formIntro ||
                 'Tell us the location, approximate length or area, and your required scope.'}
             </p>
-            <form className="f" id="cf" method="post" action="/api/enquiry" encType="multipart/form-data" noValidate>
-              <div className="sum" id="sum" role="alert" tabIndex={-1} hidden>
-                <h3 id="st"></h3>
-                <ul id="sl"></ul>
-              </div>
-              <p className="help" style={{ margin: 0 }}>
-                * required
-              </p>
-              <input type="hidden" name="type" value="project" />
-              <input type="hidden" name="service" value={service.slug} />
-              <input type="hidden" name="sourcePage" value={`/services/${service.slug}`} />
-              <div className="hp" aria-hidden="true">
-                <label>
-                  Company website
-                  <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
-                </label>
-              </div>
-              <div className="row2">
-                <div>
-                  <label htmlFor="name">Your name *</label>
-                  <input id="name" name="name" type="text" autoComplete="name" required />
-                </div>
-                <div>
-                  <label htmlFor="phone">Phone number *</label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    aria-describedby="phh"
-                    required
-                  />
-                  <p className="help" id="phh">
-                    We’ll call or WhatsApp you on this number.
-                  </p>
-                </div>
-              </div>
-              <div className="row2">
-                <div>
-                  <label htmlFor="email">Email (optional)</label>
-                  <input id="email" name="email" type="email" autoComplete="email" />
-                </div>
-                <div>
-                  <label htmlFor="org">Company or organisation (optional)</label>
-                  <input id="org" name="organisation" type="text" autoComplete="organization" />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="location">Site location *</label>
-                <input
-                  id="location"
-                  name="location"
-                  type="text"
-                  autoComplete="address-level2"
-                  aria-describedby="lch"
-                  required
-                />
-                <p className="help" id="lch">
-                  Town, area or road, e.g. Makutano, Meru.
-                </p>
-              </div>
-              <div className="row2">
-                <div>
-                  <label htmlFor="budget">Budget</label>
-                  <select id="budget" name="budgetBand">
-                    <option value="">Choose a range</option>
-                    <option>Under KES 1 million</option>
-                    <option>KES 1–5 million</option>
-                    <option>KES 5–20 million</option>
-                    <option>KES 20–50 million</option>
-                    <option>Over KES 50 million</option>
-                    <option>Not sure yet</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="timeline">When do you want to start?</label>
-                  <select id="timeline" name="timeline">
-                    <option value="">Choose a time</option>
-                    <option>As soon as possible</option>
-                    <option>Within 3 months</option>
-                    <option>3–6 months</option>
-                    <option>Later than 6 months</option>
-                    <option>Just pricing for now</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="message">Tell us about the project *</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  maxLength={3000}
-                  aria-describedby="mh"
-                  required
-                ></textarea>
-                <p className="help" id="mh">
-                  Size, what’s there now, and what you want at the end.
-                </p>
-              </div>
-              <div>
-                <label htmlFor="files">Attach drawings, BoQ or photos (optional)</label>
-                <input
-                  id="files"
-                  name="files"
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png,.webp"
-                />
-                <p className="help">Up to 3 files, 10 MB each. PDF, JPG, PNG or WEBP.</p>
-              </div>
-              <div className="chk">
-                <input type="checkbox" id="consent" name="consent" required />
-                <label htmlFor="consent">
-                  I agree that Shena Works may use these details to respond to my enquiry, as described in the{' '}
-                  <Link href="/privacy">privacy notice</Link>. *
-                </label>
-              </div>
-              <div>
-                <button className="btn pri" type="submit" id="sb">
-                  {service.ctaLabel || 'Request a quote'}
-                </button>
-              </div>
-            </form>
+            <InlineEnquiryForm
+              mode="project"
+              sourcePage={`/services/${service.slug}`}
+              fixedService={service.slug}
+              locationRequired={true}
+              messageLabel="Tell us about the project *"
+              messageHelp="Size, what’s there now, and what you want at the end."
+              submitLabel={service.ctaLabel || 'Request a quote'}
+            />
           </div>
           <aside className="cside" aria-labelledby="pt-h">
             <h2 className="h4" id="pt-h">

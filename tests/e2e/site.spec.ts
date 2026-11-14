@@ -19,6 +19,9 @@ const PUBLISHED_ROUTES = [
   '/equipment/excavators',
   '/equipment/excavators/crawler-excavator',
   '/locations/meru',
+  '/insights',
+  '/insights/category/roads-and-paving',
+  '/insights/murram-gravel-cabro-or-tarmac-access-road',
   '/contact',
   '/privacy',
   '/cookies',
@@ -29,7 +32,6 @@ const GATED_ROUTES = [
   '/services/bills-of-quantities-and-estimating',
   '/locations/nairobi',
   '/about/credentials-and-safety',
-  '/insights',
 ]
 
 const BANNED_SUPERLATIVES =
@@ -62,6 +64,8 @@ test.describe('WCAG 2.2 AA Accessibility (axe-core)', () => {
     '/services/road-construction-and-earthworks',
     '/projects/the-black-perch-lounge',
     '/equipment/excavators/crawler-excavator',
+    '/insights',
+    '/insights/murram-gravel-cabro-or-tarmac-access-road',
     '/contact',
   ]
 
@@ -90,8 +94,72 @@ test.describe('Progressive enhancement (JavaScript disabled)', () => {
     expect(projectsRes?.status()).toBe(200)
     await expect(page.locator('h1')).toContainText('Work we can show you')
 
+    const insightsRes = await page.goto('/insights?category=equipment')
+    expect(insightsRes?.status()).toBe(200)
+    await expect(page.locator('h1')).toContainText('Notes from site')
+    await expect(page.locator('#cnt')).toContainText('Showing 2 of 8 articles')
+
     const contactRes = await page.goto('/contact?type=hire')
     expect(contactRes?.status()).toBe(200)
     await expect(page.locator('form[action="/api/enquiries"]')).toBeVisible()
+  })
+})
+
+test.describe('Insights index, filtering, and article detail', () => {
+  test('Navigation and footer expose Insights link once published posts exist', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/')
+    await expect(page.locator('header .nav a[href="/insights"]')).toBeVisible()
+    await expect(page.locator('footer .f-nav a[href="/insights"]')).toBeVisible()
+  })
+
+  test('Insights index supports search, category filtering, reset, and featured layout', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/insights')
+
+    await expect(page.locator('body')).toHaveClass(/\bhw\b/)
+    await expect(page.locator('h1')).toContainText('Notes from site')
+    await expect(page.locator('#cnt')).toContainText('Showing 8 of 8 articles')
+    await expect(page.locator('#pg .pc.feat')).toHaveCount(1)
+    await expect(page.locator('#pg .pc')).toHaveCount(8)
+    await expect(page.locator('#promo')).toBeVisible()
+
+    // Filter by category via select dropdown
+    await page.selectOption('#cat', 'equipment')
+    await expect(page.locator('#cnt')).toContainText('Showing 2 of 8 articles')
+    await expect(page.locator('#pg .pc.feat')).toHaveCount(0)
+
+    // Filter by search input
+    await page.fill('#q', 'grader')
+    await expect(page.locator('#cnt')).toContainText('Showing 1 of 8 articles')
+    await expect(page.locator('#pg .pc h2')).toContainText('motor grader')
+
+    // Empty state + reset
+    await page.fill('#q', 'nonexistent-keyword-xyz')
+    await expect(page.locator('#cnt')).toContainText('Showing 0 of 8 articles')
+    await expect(page.locator('#em')).toBeVisible()
+    await page.click('#clr')
+    await expect(page.locator('#cnt')).toContainText('Showing 8 of 8 articles')
+    await expect(page.locator('#pg .pc.feat')).toHaveCount(1)
+  })
+
+  test('Article page renders cover, body sections, share controls, author card, related service, and related articles', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/insights/murram-gravel-cabro-or-tarmac-access-road')
+
+    await expect(page.locator('h1')).toContainText('Murram, cabro or tarmac')
+    await expect(page.locator('figure.cover img')).toBeVisible()
+    await expect(page.locator('article.art .body h2')).toHaveCount(5)
+    await expect(page.locator('#share #wa')).toHaveAttribute('href', /wa\.me/)
+    await expect(page.locator('#share #li')).toHaveAttribute('href', /linkedin\.com/)
+    await expect(page.locator('aside.acard')).toContainText('Newton')
+    await expect(page.locator('section.fsec .panel')).toContainText('Road construction and earthworks')
+    await expect(page.locator('section.rel .pgrid .pc')).toHaveCount(3)
   })
 })

@@ -1,9 +1,11 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { getPublishedCredentials, getSiteSettings } from '@/lib/payload'
 import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { InlineEnquiryForm } from '@/components/blocks/InlineEnquiryForm'
 
 export const metadata = buildPageMetadata({
   title: 'Credentials and Safety | Shena Works Limited',
@@ -12,70 +14,16 @@ export const metadata = buildPageMetadata({
   path: '/about/credentials-and-safety',
 })
 
-const PLACEHOLDER_CREDENTIALS = [
-  {
-    name: 'Certificate of Incorporation',
-    issuer: 'Registrar of Companies (BRS Kenya)',
-    number: 'To be added',
-    category: 'Limited Company',
-    validUntil: 'Perpetual',
-    fileUrl: null,
-  },
-  {
-    name: 'National Construction Authority: Road Works',
-    issuer: 'National Construction Authority (NCA)',
-    number: 'To be added',
-    category: 'To be added',
-    validUntil: 'To be added',
-    fileUrl: null,
-  },
-  {
-    name: 'National Construction Authority: Building Works',
-    issuer: 'National Construction Authority (NCA)',
-    number: 'To be added',
-    category: 'To be added',
-    validUntil: 'To be added',
-    fileUrl: null,
-  },
-  {
-    name: 'NCA Annual Contractor Practising Licence',
-    issuer: 'National Construction Authority (NCA)',
-    number: 'To be added',
-    category: 'Road and Building Works',
-    validUntil: 'To be added',
-    fileUrl: null,
-  },
-  {
-    name: 'Tax Compliance Certificate',
-    issuer: 'Kenya Revenue Authority (KRA)',
-    number: 'To be added',
-    category: 'Corporate Tax Compliance',
-    validUntil: 'To be added',
-    fileUrl: null,
-  },
-  {
-    name: 'Contractors All Risks / WIBA Insurance',
-    issuer: 'To be added',
-    number: 'To be added',
-    category: 'Site and Workforce Insurance',
-    validUntil: 'To be added',
-    fileUrl: null,
-  },
-  {
-    name: 'Single Business Permit',
-    issuer: 'County Government of Meru',
-    number: 'To be added',
-    category: 'Construction and Engineering',
-    validUntil: 'To be added',
-    fileUrl: null,
-  },
-]
-
 export default async function CredentialsAndSafetyPage() {
   const [credentials, settings] = await Promise.all([
     getPublishedCredentials(),
     getSiteSettings(),
   ])
+
+  // SITE-PLAN.md 8.2: If 0 credentials pass the gate: /about/credentials-and-safety returns 404
+  if (credentials.length === 0) {
+    notFound()
+  }
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
@@ -96,17 +44,14 @@ export default async function CredentialsAndSafetyPage() {
     ],
   }
 
-  const credentialRows =
-    credentials.length > 0
-      ? credentials.map((c) => ({
-          name: c.name,
-          issuer: c.issuer,
-          number: c.number || 'To be added',
-          category: c.category || 'To be added',
-          validUntil: c.validUntil || 'To be added',
-          fileUrl: c.certificateFileUrl,
-        }))
-      : PLACEHOLDER_CREDENTIALS
+  const credentialRows = credentials.map((c) => ({
+    name: c.name,
+    issuer: c.issuer,
+    number: c.number || '',
+    category: c.category || '',
+    validUntil: c.validUntil || '',
+    fileUrl: c.certificateFileUrl,
+  }))
 
   return (
     <>
@@ -224,7 +169,7 @@ export default async function CredentialsAndSafetyPage() {
         <div className="split">
           <div className="ph">
             <Image
-              src="https://images.pexels.com/photos/5298215/pexels-photo-5298215.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              src="/media/why-crew.jpg"
               alt="Crew members in protective equipment on a Shena site"
               fill
               sizes="(min-width: 1024px) 56vw, 100vw"
@@ -265,106 +210,25 @@ export default async function CredentialsAndSafetyPage() {
           <p className="lead" style={{ fontSize: '18px', lineHeight: '26px', maxWidth: '34em' }}>
             Tell us the tender number and what you need. We’ll send certified copies.
           </p>
-          <form className="f" id="cf" method="post" action="/api/enquiries" encType="multipart/form-data" noValidate>
-            <div className="sum" id="sum" role="alert" tabIndex={-1} hidden>
-              <h3 id="st"></h3>
-              <ul id="sl"></ul>
-            </div>
-            <p className="help" style={{ margin: 0 }}>* required</p>
-            <input type="hidden" name="type" value="consultation" />
-            <input type="hidden" name="sourcePage" value="/about/credentials-and-safety" />
-            <div className="hp" aria-hidden="true">
-              <label>
-                Company website
-                <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
-              </label>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="name">Your name *</label>
-                <input id="name" name="name" type="text" autoComplete="name" required />
-              </div>
-              <div>
-                <label htmlFor="phone">Phone number *</label>
-                <input id="phone" name="phone" type="tel" autoComplete="tel" aria-describedby="phh" required />
-                <p className="help" id="phh">We’ll call or WhatsApp you on this number.</p>
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="email">Email (optional)</label>
-                <input id="email" name="email" type="email" autoComplete="email" />
-              </div>
-              <div>
-                <label htmlFor="org">Company or organisation (optional)</label>
-                <input id="org" name="organisation" type="text" autoComplete="organization" />
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="service">Service *</label>
-                <select id="service" name="service" defaultValue="tender">
-                  <option value="">Choose a service</option>
-                  <option value="tender">Tender and procurement documents</option>
-                  <option value="road-construction-and-earthworks">Road construction and earthworks</option>
-                  <option value="general-construction">General construction</option>
-                  <option value="interior-design">Interior design</option>
-                  <option value="project-management">Project management</option>
-                  <option value="not-sure">Not sure yet</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="location">Site location</label>
-                <input id="location" name="location" type="text" autoComplete="address-level2" />
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="budget">Budget</label>
-                <select id="budget" name="budgetBand" defaultValue="">
-                  <option value="">Choose a range</option>
-                  <option>Under KES 1 million</option>
-                  <option>KES 1–5 million</option>
-                  <option>KES 5–20 million</option>
-                  <option>KES 20–50 million</option>
-                  <option>Over KES 50 million</option>
-                  <option>Not sure yet</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="timeline">When do you want to start?</label>
-                <select id="timeline" name="timeline" defaultValue="">
-                  <option value="">Choose a time</option>
-                  <option>As soon as possible</option>
-                  <option>Within 3 months</option>
-                  <option>3–6 months</option>
-                  <option>Later than 6 months</option>
-                  <option>Just pricing for now</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="message">What do you need help with? *</label>
-              <textarea id="message" name="message" maxLength={3000} required></textarea>
-            </div>
-            <div>
-              <label htmlFor="files">Attach drawings, BoQ or photos (optional)</label>
-              <input id="files" name="files" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" />
-              <p className="help">Up to 3 files, 10 MB each. PDF, JPG, PNG or WEBP.</p>
-            </div>
-            <div className="chk">
-              <input type="checkbox" id="consent" name="consent" required />
-              <label htmlFor="consent">
-                I agree that Shena Works may use these details to respond to my enquiry, as described in the{' '}
-                <Link href="/privacy">privacy notice</Link>. *
-              </label>
-            </div>
-            <div>
-              <button className="btn pri" type="submit" id="sb">
-                Send enquiry
-              </button>
-            </div>
-          </form>
+          <InlineEnquiryForm
+            mode="consultation"
+            sourcePage="/about/credentials-and-safety"
+            defaultService="tender"
+            locationRequired={false}
+            serviceOptions={[
+              { value: 'tender', label: 'Tender and procurement documents' },
+              {
+                value: 'road-construction-and-earthworks',
+                label: 'Road construction and earthworks',
+              },
+              { value: 'general-construction', label: 'General construction' },
+              { value: 'interior-design', label: 'Interior design' },
+              { value: 'project-management', label: 'Project management' },
+              { value: 'not-sure', label: 'Not sure yet' },
+            ]}
+            messageLabel="What do you need help with? *"
+            submitLabel="Send enquiry"
+          />
         </div>
       </section>
     </>

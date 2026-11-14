@@ -1,13 +1,15 @@
 'use client'
 
 import React from 'react'
+import { useNavigation } from './NavigationContext'
 
-export interface ScrimProps {
-  visible?: boolean
-  onClick?: () => void
-}
+export function Scrim() {
+  const { closePanels, closeDrawer } = useNavigation()
 
-export function Scrim({ visible = true, onClick }: ScrimProps) {
-  if (!visible) return null
-  return <div className="scrim" onClick={onClick} aria-hidden="true" />
+  const handleClick = () => {
+    closePanels()
+    closeDrawer()
+  }
+
+  return <div className="scrim" id="sc" onClick={handleClick} aria-hidden="true" />
 }

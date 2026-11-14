@@ -11,6 +11,7 @@ export type AnalyticsEventName =
   | 'form_start'
   | 'form_error'
   | 'filter_use'
+  | 'share'
 
 declare global {
   interface Window {

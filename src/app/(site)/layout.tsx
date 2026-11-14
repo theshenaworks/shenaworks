@@ -1,5 +1,7 @@
 import React from 'react'
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
+import '@/styles/globals.css'
 import '@/styles/site.css'
 import { LogoSprite } from '@/components/ui/LogoSprite'
 import { Header } from '@/components/ui/Header'
@@ -8,7 +10,47 @@ import { Footer } from '@/components/ui/Footer'
 import { MobileActionBar } from '@/components/ui/MobileActionBar'
 import { CookieBanner } from '@/components/ui/CookieBanner'
 import { AnalyticsLoader } from '@/components/ui/AnalyticsLoader'
-import { SiteBehaviors } from '@/behaviors/SiteBehaviors'
+import { NavigationProvider } from '@/components/ui/NavigationContext'
+import { Scrim } from '@/components/ui/Scrim'
+
+const roboto = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/roboto-v32-latin-400.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/roboto-v32-latin-400italic.woff2',
+      weight: '400',
+      style: 'italic',
+    },
+    {
+      path: '../../../public/fonts/roboto-v32-latin-700.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-roboto',
+  display: 'swap',
+})
+
+const robotoCondensed = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/roboto-condensed-v27-latin-400.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/roboto-condensed-v27-latin-700.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-roboto-condensed',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://shenaworksltd.com'),
@@ -24,16 +66,19 @@ export const metadata: Metadata = {
 }
 
 /**
- * Root layout for the public site (AGENTS.md Section 0 & Section 5 Phase A).
- * - Imports site.css verbatim (Rule 1).
- * - Inlines logo sprite once (Rule 4).
- * - Emits exact shell DOM hierarchy (Rule 2).
- * - Runs SiteBehaviors for vanilla DOM events and cleanup (Rule 5).
- * - Keeps CookieBanner mounted unstyled as known gap (Condition 5).
+ * Root layout for the public site (Next.js 16 Best Practices Architecture).
+ * - Optimized local fonts via next/font/local (zero CLS, preloaded).
+ * - Inlines logo sprite once.
+ * - Emits exact shell DOM hierarchy matching approved design.
+ * - Declarative React navigation, drawer, form, and gallery components.
  */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-KE">
+    <html
+      lang="en-KE"
+      className={`${roboto.variable} ${robotoCondensed.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -42,16 +87,17 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
-        <LogoSprite />
-        <div className="scrim" id="sc" aria-hidden="true" />
-        <Header />
-        <MobileDrawer />
-        <main id="main">{children}</main>
-        <Footer />
-        <MobileActionBar />
-        <CookieBanner />
-        <SiteBehaviors />
-        <AnalyticsLoader />
+        <NavigationProvider>
+          <LogoSprite />
+          <Scrim />
+          <Header />
+          <MobileDrawer />
+          <main id="main">{children}</main>
+          <Footer />
+          <MobileActionBar />
+          <CookieBanner />
+          <AnalyticsLoader />
+        </NavigationProvider>
       </body>
     </html>
   )

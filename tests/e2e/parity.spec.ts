@@ -61,7 +61,7 @@ test.describe('Phase E: Visual Parity Test (AGENTS.md Section 5)', () => {
           })
           const refPage = await refContext.newPage()
           const refHtmlPath = path.resolve('docs/reference/home/index.html')
-          await refPage.goto(`file://${refHtmlPath}`, { waitUntil: 'networkidle' })
+          await refPage.goto(`file://${refHtmlPath}`, { waitUntil: 'load' })
 
           // Inject matching self-hosted font-face rules and disable animations
           await refPage.addStyleTag({

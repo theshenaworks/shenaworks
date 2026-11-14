@@ -11,6 +11,8 @@ import {
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildMachineProductJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { MachineGalleryClient } from '@/components/blocks/MachineGalleryClient'
+import { InlineEnquiryForm } from '@/components/blocks/InlineEnquiryForm'
 
 export async function generateStaticParams() {
   const machines = await getPublishedMachines()
@@ -108,49 +110,7 @@ export default async function MachineDetailPage({
       {/* 1. Header & Gallery */}
       <section aria-label={machine.name}>
         <div className="wrap mhead">
-          <div
-            aria-label="Machine gallery"
-            aria-roledescription="carousel"
-            className="gal"
-            id="gal"
-            role="region"
-            tabIndex={0}
-          >
-            <div className="gtrack" id="gt">
-              {galleryImages.map((img, idx) => (
-                <div
-                  key={idx}
-                  aria-label={`${machine.name}, image ${idx + 1} of ${galleryImages.length}`}
-                  className="ph warm"
-                  role="img"
-                >
-                  <Image
-                    src={img.url}
-                    alt={img.alt || `${machine.name} photo ${idx + 1}`}
-                    fill
-                    priority={idx === 0}
-                    loading={idx === 0 ? undefined : 'lazy'}
-                    sizes="(min-width: 1024px) 58vw, 100vw"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="gctl">
-              <button aria-label="Previous image" id="gp" type="button">
-                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m15 6-6 6 6 6" />
-                </svg>
-              </button>
-              <span aria-live="polite" className="ct" id="gc">
-                {`1 / ${galleryImages.length}`}
-              </span>
-              <button aria-label="Next image" id="gn" type="button">
-                <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m9 6 6 6-6 6" />
-                </svg>
-              </button>
-            </div>
-          </div>
+          <MachineGalleryClient machineName={machine.name} images={galleryImages} />
 
           <div className="minfo">
             <nav aria-label="Breadcrumb" className="crumbs dk" style={{ margin: 0 }}>
@@ -173,12 +133,19 @@ export default async function MachineDetailPage({
             <p className="sm" style={{ maxWidth: '30em' }}>
               {`${machine.make} ${machine.model} (${machine.capacity}). Hired with our own trained operator.`}
             </p>
-            <div className="btns">
+            <div className="btns" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
               <a className="btn pri" href="#enquiry">
                 Request hire
               </a>
-              <a className="btn outl" href={whatsappUrl} rel="noopener" target="_blank">
+              <a className="btn outl" href={whatsappUrl} rel="noopener noreferrer" target="_blank">
                 WhatsApp us
+              </a>
+              <a
+                className="btn sec"
+                href={`/downloads/specs/${machine.slug}.pdf`}
+                download
+              >
+                Specification sheet (PDF)
               </a>
             </div>
           </div>
@@ -241,114 +208,13 @@ export default async function MachineDetailPage({
           <p className="lead" style={{ fontSize: '18px', lineHeight: '26px', maxWidth: '34em' }}>
             Tell us the machine, dates and site. We’ll confirm availability and price.
           </p>
-          <form action="/api/enquiry" className="form f" id="hf" method="post" noValidate>
-            <div className="sum" hidden id="sum" role="alert" tabIndex={-1}>
-              <h3>Please fix these before sending</h3>
-              <ul id="sl" />
-            </div>
-            <p className="help" style={{ margin: 0 }}>
-              * required
-            </p>
-            <input name="type" type="hidden" value="hire" />
-            <input name="sourcePage" type="hidden" value={path} />
-            <div aria-hidden="true" className="hp">
-              <label>
-                Company website
-                <input autoComplete="off" name="company_website" tabIndex={-1} type="text" />
-              </label>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="name">Your name *</label>
-                <input autoComplete="name" id="name" name="name" required type="text" />
-              </div>
-              <div>
-                <label htmlFor="phone">Phone number *</label>
-                <input
-                  aria-describedby="ph-h"
-                  autoComplete="tel"
-                  id="phone"
-                  name="phone"
-                  required
-                  type="tel"
-                />
-                <p className="help" id="ph-h">
-                  We’ll call or WhatsApp you on this number.
-                </p>
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="email">Email (optional)</label>
-                <input autoComplete="email" id="email" name="email" type="email" />
-              </div>
-              <div>
-                <label htmlFor="org">Company or organisation (optional)</label>
-                <input autoComplete="organization" id="org" name="organisation" type="text" />
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="equipment">Machine *</label>
-                <select id="equipment" name="equipment" required defaultValue={machine.name}>
-                  <option value="">Choose a machine or type</option>
-                  {allMachines.map((m) => (
-                    <option key={m.slug} value={m.name}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="location">Site location *</label>
-                <input
-                  aria-describedby="lc-h"
-                  autoComplete="address-level2"
-                  id="location"
-                  name="location"
-                  required
-                  type="text"
-                />
-                <p className="help" id="lc-h">
-                  Town, area or road, e.g. Makutano, Meru.
-                </p>
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="start">Start date *</label>
-                <input id="start" name="hireStart" required type="date" />
-              </div>
-              <div>
-                <label htmlFor="dur">How long do you need it? *</label>
-                <select id="dur" name="hireDuration" required defaultValue="">
-                  <option value="">Choose a duration</option>
-                  <option>1 day</option>
-                  <option>2–6 days</option>
-                  <option>1–2 weeks</option>
-                  <option>2–4 weeks</option>
-                  <option>More than a month</option>
-                  <option>Not sure</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="msg">Anything we should know about the site or work? (optional)</label>
-              <textarea id="msg" maxLength={3000} name="message" />
-            </div>
-            <div className="chk">
-              <input id="consent" name="consent" required type="checkbox" />
-              <label htmlFor="consent">
-                I agree that Shena Works may use these details to respond to my enquiry, as described in
-                the <Link href="/privacy">privacy notice</Link>. *
-              </label>
-            </div>
-            <div>
-              <button className="btn pri" type="submit">
-                Request hire
-              </button>
-            </div>
-          </form>
+          <InlineEnquiryForm
+            mode="hire"
+            sourcePage={path}
+            defaultEquipment={machine.name}
+            equipmentOptions={allMachines.map((m) => ({ value: m.name, label: m.name }))}
+            submitLabel="Request hire"
+          />
         </div>
       </section>
 
@@ -366,7 +232,7 @@ export default async function MachineDetailPage({
                     <Image
                       src={
                         m.heroImage?.url ||
-                        'https://images.pexels.com/photos/8809464/pexels-photo-8809464.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                        '/media/equip-grader.jpg'
                       }
                       alt={m.heroImage?.alt || m.name}
                       fill

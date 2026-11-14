@@ -32,8 +32,8 @@ export function CtaBand({
 
   const imgSrc =
     imageSrc ||
-    (settings?.ctaImage?.url?.startsWith('http') ? settings.ctaImage.url : null) ||
-    'https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1600'
+    (settings?.ctaImage?.url ? settings.ctaImage.url : null) ||
+    '/media/cta-site.jpg'
 
   const imgAlt =
     imageAlt ||

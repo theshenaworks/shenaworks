@@ -47,8 +47,8 @@ export function WhyShena({ whyShena, overline, heading }: WhyShenaProps = {}) {
   const headingText = heading || whyShena?.heading || 'We own the plant and we run the site'
   const overlineText = overline || whyShena?.overline || 'Why Shena Works'
   const imgSrc =
-    (whyShena?.image?.url?.startsWith('http') ? whyShena.image.url : null) ||
-    'https://images.pexels.com/photos/5298215/pexels-photo-5298215.jpeg?auto=compress&cs=tinysrgb&w=1200'
+    (whyShena?.image?.url ? whyShena.image.url : null) ||
+    '/media/why-crew.jpg'
   const imgAlt =
     whyShena?.image?.alt || 'Crew members in safety gear working on a Shena site'
 

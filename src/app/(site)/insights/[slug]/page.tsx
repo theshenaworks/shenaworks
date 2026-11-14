@@ -1,17 +1,20 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/blocks/PageHeader'
-import { FeatureSplit } from '@/components/blocks/FeatureSplit'
+import Link from 'next/link'
+import Image from 'next/image'
 import { CtaBand } from '@/components/blocks/CtaBand'
+import { ShareBar } from '@/components/ui/ShareBar'
+import { formatPostDate } from '@/lib/format'
 import {
   getPublishedPostBySlug,
   getPublishedPostCategories,
+  getPublishedPosts,
   getPublishedServiceBySlug,
   getSiteSettings,
   getTeamMember,
 } from '@/lib/payload'
-import { buildBreadcrumbJsonLd, ORG_ID, SITE_URL } from '@/lib/seo/jsonld'
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export async function generateMetadata({
@@ -38,13 +41,25 @@ export default async function ArticlePage({
   const post = await getPublishedPostBySlug(slug)
   if (!post) notFound()
 
-  const [categories, author, relatedService, settings] = await Promise.all([
+  const [categories, author, relatedService, allPosts, settings] = await Promise.all([
     getPublishedPostCategories(),
     getTeamMember(),
-    getPublishedServiceBySlug(post.relatedServiceSlug),
+    post.relatedServiceSlug ? getPublishedServiceBySlug(post.relatedServiceSlug) : Promise.resolve(undefined),
+    getPublishedPosts(),
     getSiteSettings(),
   ])
+
+  const catMap = new Map<string, string>()
+  categories.forEach((c) => catMap.set(c.slug, c.name))
+
   const category = categories.find((c) => c.slug === post.categorySlug)
+  const sameCategory = allPosts.filter(
+    (p) => p.slug !== post.slug && p.categorySlug === post.categorySlug,
+  )
+  const otherPosts = allPosts.filter(
+    (p) => p.slug !== post.slug && p.categorySlug !== post.categorySlug,
+  )
+  const relatedPosts = [...sameCategory, ...otherPosts].slice(0, 3)
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
@@ -59,20 +74,19 @@ export default async function ArticlePage({
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'Article',
+      buildArticleJsonLd({
         headline: post.title,
-        image: `${SITE_URL}${post.coverImage.url}`,
+        description: post.excerpt,
+        image: post.coverImage.url,
         datePublished: post.publishedAt,
-        author: {
-          '@type': 'Person',
-          name: author.name,
-        },
-        publisher: { '@id': ORG_ID },
-      },
+        authorName: author.name,
+        path,
+      }),
       buildBreadcrumbJsonLd(breadcrumbs, path),
     ],
   }
+
+  const formattedDate = formatPostDate(post.publishedAt)
 
   return (
     <>
@@ -81,58 +95,142 @@ export default async function ArticlePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <PageHeader
-        breadcrumbs={breadcrumbs}
-        overline={category?.name || 'Insights'}
-        headline={post.title}
-        meta={`By ${author.name} · ${post.publishedAt} · ${post.readingTimeMinutes} min read`}
-      />
-
-      <section className="bg-[var(--white)] pt-[4.0rem] pb-[6.4rem] lg:pb-[8.0rem]">
-        <div className="site-grid">
-          <figure className="col-span-4 lg:col-start-2 lg:col-span-14 mb-[4.8rem]">
-            <div className="aspect-video overflow-hidden bg-[var(--grey-100)]">
-              <img
-                src={post.coverImage.url}
-                alt={post.coverImage.alt}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            {post.coverImage.caption && (
-              <figcaption className="text-figcaption text-[var(--ink-600)] mt-[0.8rem]">
-                {post.coverImage.caption}
-              </figcaption>
+      <div className="ph-head art-h">
+        <div className="wrap">
+          <nav className="crumbs dk" aria-label="Breadcrumb" style={{ marginBottom: '16px' }}>
+            <Link href="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/insights">Insights</Link>
+            {category && (
+              <>
+                <span aria-hidden="true">/</span>
+                <Link href={`/insights/category/${category.slug}`}>{category.name}</Link>
+              </>
             )}
-          </figure>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{post.title}</span>
+          </nav>
+          <p className="over">{category?.name || 'Insights'}</p>
+          <h1 className="h1">{post.title}</h1>
+          <p className="meta">
+            {`By ${author.name}`}
+            {formattedDate && (
+              <>
+                {' · '}
+                <time dateTime={post.publishedAt}>{formattedDate}</time>
+              </>
+            )}
+            {` · ${post.readingTimeMinutes} min read`}
+          </p>
+        </div>
+      </div>
 
-          <div className="col-span-4 lg:col-start-4 lg:col-span-10 space-y-[3.2rem]">
+      <div className="wrap">
+        <figure className="cover">
+          <div className="ph">
+            <Image
+              src={post.coverImage.url}
+              alt={post.coverImage.alt}
+              fill
+              sizes="(min-width: 1160px) 1048px, 100vw"
+              className="object-cover"
+              priority
+            />
+          </div>
+          {post.coverImage.caption && <figcaption>{post.coverImage.caption}</figcaption>}
+        </figure>
+      </div>
+
+      <article className="art">
+        <div className="wrap">
+          <div className="body">
             {post.sections.map((sec) => (
-              <div key={sec.heading}>
-                <h2 className="text-h2 text-[var(--ink-900)] mb-[1.6rem]">{sec.heading}</h2>
-                <div className="space-y-[1.6rem] text-body text-[var(--ink-900)]">
-                  {sec.paragraphs.map((p, idx) => (
-                    <p key={idx}>{p}</p>
-                  ))}
-                </div>
-              </div>
+              <React.Fragment key={sec.heading}>
+                <h2>{sec.heading}</h2>
+                {sec.paragraphs.map((p, idx) => (
+                  <p key={idx}>{p}</p>
+                ))}
+              </React.Fragment>
             ))}
           </div>
+
+          <ShareBar title={post.title} slug={post.slug} />
+
+          <aside className="acard" aria-label="Author">
+            <div className="ph">
+              <Image
+                src={author.portrait?.url || '/media/newton-portrait.jpg'}
+                alt={author.name}
+                fill
+                sizes="80px"
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <b>{author.name}</b>
+              <span>{author.role || 'Managing Director, Shena Works'}</span>
+            </div>
+          </aside>
         </div>
-      </section>
+      </article>
 
       {relatedService ? (
-        <FeatureSplit
-          imagePosition="left"
-          panelSurface="dark"
-          overline="Need this done?"
-          heading={relatedService.title}
-          body={relatedService.summary}
-          buttonLabel={relatedService.ctaLabel}
-          buttonHref={`/contact?type=${relatedService.formType}&service=${relatedService.slug}`}
-          image={relatedService.heroImage}
-        />
+        <section className="fsec" aria-label="Related service">
+          <div className="split">
+            <div className="ph">
+              <Image
+                src={relatedService.heroImage.url}
+                alt={relatedService.heroImage.alt}
+                fill
+                sizes="(min-width: 1024px) 56vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="panel" data-surface="dark">
+              <p className="over">Need this done?</p>
+              <h2 className="h3">{relatedService.title}</h2>
+              <p>{relatedService.summary}</p>
+              <Link
+                className="btn out"
+                href={`/contact?type=${relatedService.formType}&service=${relatedService.slug}`}
+              >
+                {relatedService.ctaLabel}
+              </Link>
+            </div>
+          </div>
+        </section>
       ) : (
         <CtaBand settings={settings} />
+      )}
+
+      {relatedPosts.length > 0 && (
+        <section className="rel" aria-labelledby="rl-h">
+          <div className="wrap">
+            <h2 className="h2" id="rl-h" style={{ marginBottom: '40px' }}>
+              More from Insights
+            </h2>
+            <div className="pgrid">
+              {relatedPosts.map((rp) => (
+                <article key={rp.slug} className="pc">
+                  <div className="ph r169">
+                    <Image
+                      src={rp.coverImage.url}
+                      alt={rp.coverImage.alt}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 600px) 50vw, 100vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="over">{catMap.get(rp.categorySlug) || rp.categorySlug}</p>
+                  <h3 className="h4">
+                    <Link href={`/insights/${rp.slug}`}>{rp.title}</Link>
+                  </h3>
+                  <p className="sm">{rp.excerpt}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
     </>
   )

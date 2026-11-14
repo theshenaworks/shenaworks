@@ -26,8 +26,7 @@ const DEFAULT_SERVICES = [
     title: 'Road construction and earthworks',
     summary:
       'Grading, murram gravelling, cabro block paving, concrete drains, culverts and tarmac surfacing for access roads and commercial compounds.',
-    imgSrc:
-      'https://images.pexels.com/photos/12267902/pexels-photo-12267902.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/service-roads.jpg',
     imgAlt: 'A grader levelling a murram road',
   },
   {
@@ -37,8 +36,7 @@ const DEFAULT_SERVICES = [
     title: 'General construction',
     summary:
       'Turnkey building construction for hospitality venues, commercial premises, cottages, villas and residential homes, from foundations to handover.',
-    imgSrc:
-      'https://images.pexels.com/photos/33719014/pexels-photo-33719014.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/service-building.jpg',
     imgAlt: 'A building under construction with scaffolding',
   },
   {
@@ -48,8 +46,7 @@ const DEFAULT_SERVICES = [
     title: 'Cabro paving',
     summary:
       '60 mm and 80 mm interlocking cabro paving with machine-compacted sub-base, concrete kerbs and storm drainage for commercial and residential compounds.',
-    imgSrc:
-      'https://images.pexels.com/photos/33566707/pexels-photo-33566707.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/service-cabro.jpg',
     imgAlt: 'Interlocking cabro paving blocks in warm sunlight',
   },
   {
@@ -59,8 +56,7 @@ const DEFAULT_SERVICES = [
     title: 'Interior design',
     summary:
       'Space planning, lighting, custom joinery, flooring and full interior fit-outs for hospitality venues, commercial spaces and homes.',
-    imgSrc:
-      'https://images.pexels.com/photos/7851904/pexels-photo-7851904.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/service-interior.jpg',
     imgAlt: 'A finished interior fit-out with modern furnishings',
   },
   {
@@ -70,8 +66,7 @@ const DEFAULT_SERVICES = [
     title: 'Project management',
     summary:
       'End-to-end site supervision, scheduling, subcontractor coordination, quality inspections and cost tracking for private and commercial builds.',
-    imgSrc:
-      'https://images.pexels.com/photos/8961070/pexels-photo-8961070.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/service-pm.jpg',
     imgAlt: 'Site engineers reviewing project plans',
   },
 ]

@@ -59,6 +59,6 @@ describe('Design System Conformance (AUD-12 to AUD-16)', () => {
     expect(ogContent).toContain('#2e2a25') // ink-900
     expect(ogContent).toContain('#d7d6d6') // grey-300
     expect(ogContent).toContain('#65615d') // ink-600
-    expect(ogContent).toContain('#c14a12') // accent-500
+    expect(ogContent).toContain('#022460') // accent-500
   })
 })

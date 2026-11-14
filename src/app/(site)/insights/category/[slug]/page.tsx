@@ -1,91 +1,103 @@
 import React from 'react'
 import { notFound } from 'next/navigation'
-import { PageHeader } from '@/components/blocks/PageHeader'
+import type { Metadata } from 'next'
+import Link from 'next/link'
 import { CtaBand } from '@/components/blocks/CtaBand'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { InsightsCatalogClient } from '@/components/blocks/InsightsCatalogClient'
 import { getPublishedPostCategories, getPublishedPosts, getSiteSettings } from '@/lib/payload'
+import { buildBlogJsonLd, buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
-export const metadata = buildPageMetadata({
-  title: 'Insights: Roads, Paving and Plant Hire | Shena Works',
-  description:
-    "Practical articles on road construction, cabro paving, plant hire and building in Kenya, written from Shena Works' own projects.",
-  path: '/insights',
-})
-
-export default async function InsightsCategoryPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>
-}) {
+}): Promise<Metadata> {
   const { slug } = await params
+  const categories = await getPublishedPostCategories()
+  const activeCat = categories.find((c) => c.slug === slug)
+  if (!activeCat) return {}
+  return buildPageMetadata({
+    title: `${activeCat.name} Articles & Site Guides | Shena Works`,
+    description: `Practical notes from site covering ${activeCat.name.toLowerCase()} across Meru, Nairobi and Kenya.`,
+    path: `/insights/category/${activeCat.slug}`,
+  })
+}
+
+export default async function InsightsCategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>
+  searchParams?: Promise<{ q?: string }>
+}) {
+  const [{ slug }, queryParams] = await Promise.all([
+    params,
+    searchParams || Promise.resolve({} as { q?: string }),
+  ])
   const [categories, allPosts, settings] = await Promise.all([
     getPublishedPostCategories(),
     getPublishedPosts(),
     getSiteSettings(),
   ])
+
   const activeCat = categories.find((c) => c.slug === slug)
   if (!activeCat) notFound()
 
-  const posts = allPosts.filter((p) => p.categorySlug === slug)
-  if (posts.length === 0) notFound()
+  const categoryPosts = allPosts.filter((p) => p.categorySlug === slug)
+  if (categoryPosts.length === 0) notFound()
 
   const breadcrumbs = [
     { label: 'Home', href: '/' },
     { label: 'Insights', href: '/insights' },
     { label: activeCat.name },
   ]
+  const path = `/insights/category/${activeCat.slug}`
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      buildBlogJsonLd({
+        name: `${activeCat.name} | Insights | Shena Works Limited`,
+        description: `Practical notes from site covering ${activeCat.name.toLowerCase()} across Meru, Nairobi and Kenya.`,
+        path,
+      }),
+      buildBreadcrumbJsonLd(breadcrumbs, path),
+    ],
+  }
 
   return (
     <>
-      <PageHeader
-        breadcrumbs={breadcrumbs}
-        overline="Insights"
-        headline={activeCat.name}
-        lead="Practical articles on roads, paving, plant hire and building, written from jobs we've done."
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <section className="bg-[var(--white)] py-[6.4rem] lg:py-[8.0rem]">
-        <div className="site-grid">
-          <div className="col-span-4 lg:col-start-2 lg:col-span-14 mb-[4.0rem] flex items-center gap-[0.8rem] overflow-x-auto pb-[0.8rem]">
-            <Button href="/insights" variant="subtle" className="shrink-0">
-              All
-            </Button>
-            {categories.map((cat) => (
-              <Button
-                key={cat.slug}
-                href={`/insights/category/${cat.slug}`}
-                variant="subtle"
-                aria-current={cat.slug === slug ? 'page' : undefined}
-                className={
-                  cat.slug === slug
-                    ? 'bg-[var(--ink-900)] text-[var(--white)] border-[var(--ink-900)] shrink-0'
-                    : 'shrink-0'
-                }
-              >
-                {cat.name}
-              </Button>
-            ))}
-          </div>
-
-          <div className="col-span-4 lg:col-start-2 lg:col-span-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[3.2rem]">
-            {posts.map((post) => (
-              <Card
-                key={post.slug}
-                href={`/insights/${post.slug}`}
-                imageSrc={post.coverImage.url}
-                imageAlt={post.coverImage.alt}
-                aspectRatio="16:9"
-                overline={activeCat.name}
-                title={post.title}
-                summary={post.excerpt}
-                meta={`${post.publishedAt} · ${post.readingTimeMinutes} min read`}
-              />
-            ))}
-          </div>
+      <div className="ph-head">
+        <div className="wrap">
+          <nav className="crumbs dk" aria-label="Breadcrumb" style={{ marginBottom: '16px' }}>
+            <Link href="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/insights">Insights</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">{activeCat.name}</span>
+          </nav>
+          <p className="over">Insights</p>
+          <h1 className="h1">{activeCat.name}</h1>
+          <p className="lead">
+            Practical guides on road construction, cabro paving, earthmoving plant and building in
+            Kenya.
+          </p>
         </div>
-      </section>
+      </div>
+
+      <InsightsCatalogClient
+        posts={allPosts}
+        categories={categories}
+        initialCategory={activeCat.slug}
+        initialQuery={(queryParams?.q || '').trim()}
+        basePath={path}
+      />
 
       <CtaBand settings={settings} />
     </>

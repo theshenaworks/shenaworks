@@ -4,6 +4,7 @@ import {
   getPublishedEquipmentCategories,
   getPublishedLocations,
   getPublishedMachines,
+  getPublishedPostCategories,
   getPublishedPosts,
   getPublishedProjects,
   getPublishedServices,
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     categories,
     locations,
     machines,
+    postCategories,
     posts,
     projects,
     services,
@@ -26,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublishedEquipmentCategories(),
     getPublishedLocations(),
     getPublishedMachines(),
+    getPublishedPostCategories(),
     getPublishedPosts(),
     getPublishedProjects(),
     getPublishedServices(),
@@ -105,9 +108,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.85,
   }))
 
+  const postCategoryRoutes: MetadataRoute.Sitemap = postCategories.map((c) => ({
+    url: `${SITE_URL}/insights/category/${c.slug}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.65,
+  }))
+
   const postRoutes: MetadataRoute.Sitemap = posts.map((p) => ({
     url: `${SITE_URL}/insights/${p.slug}`,
-    lastModified: new Date(p.publishedAt),
+    lastModified: p.publishedAt ? new Date(p.publishedAt) : now,
     changeFrequency: 'monthly',
     priority: 0.65,
   }))
@@ -119,6 +129,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryRoutes,
     ...machineRoutes,
     ...locationRoutes,
+    ...postCategoryRoutes,
     ...postRoutes,
   ]
 }

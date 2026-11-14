@@ -7,7 +7,7 @@ import { trackEvent } from '@/lib/analytics'
 import type { MediaItem } from '@/types/content'
 
 const DEFAULT_PORTRAIT: MediaItem = {
-  url: '/media/founder-newton-muthee.svg',
+  url: '/media/newton-portrait.jpg',
   alt: 'Newton M. Muthee, Founder and Managing Director of Shena Works Limited',
   caption: 'Newton Muthee, Founder and Managing Director',
 }
