@@ -401,7 +401,7 @@ Use a single `.site-grid` class across all blocks:
 ### 5.0 NeonDB configuration (`payload.config.ts`)
 
 We use **Neon (NeonDB)** as the managed PostgreSQL database:
-- **Runtime queries (`DATABASE_URI`):** Use the **pooled** Neon connection string (`-pooler` hostname with `?sslmode=require`) for Next.js server components and API routes.
+- **Runtime queries (`DATABASE_URI`):** Use the **pooled** Neon connection string (`-pooler` hostname with `?sslmode=verify-full`) for Next.js server components and API routes.
 - **Schema migrations (`DIRECT_DATABASE_URI`):** Use the **direct (unpooled)** Neon connection string when running `payload migrate` so Drizzle advisory locks and DDL statements execute directly against Postgres.
 - **Environments & branching:** Create a `production` main branch and a `staging` child branch in the Neon project (`eu-central-1` Frankfurt or nearest low-latency region to East Africa). Preview deployments can branch from `staging`.
 
@@ -795,9 +795,9 @@ ENQUIRY_TOKEN_SECRET=replace-with-32-byte-hex-secret
 
 # Database (NeonDB — Serverless PostgreSQL)
 # Pooled connection string (-pooler) for runtime queries:
-DATABASE_URI=postgresql://neondb_owner:password@ep-example-pooler.eu-central-1.aws.neon.tech/shena_works?sslmode=require
+DATABASE_URI=postgresql://neondb_owner:password@ep-example-pooler.eu-central-1.aws.neon.tech/shena_works?sslmode=verify-full
 # Direct (unpooled) connection string for `pnpm payload migrate` and `pg_dump`:
-DIRECT_DATABASE_URI=postgresql://neondb_owner:password@ep-example.eu-central-1.aws.neon.tech/shena_works?sslmode=require
+DIRECT_DATABASE_URI=postgresql://neondb_owner:password@ep-example.eu-central-1.aws.neon.tech/shena_works?sslmode=verify-full
 
 # Cloudflare R2 (S3 compatible)
 R2_ACCOUNT_ID=

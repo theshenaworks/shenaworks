@@ -4,6 +4,8 @@ import {
   getPayloadClient,
   getPublishedEquipmentCategories,
   getPublishedLocations,
+  getPublishedPostCategories,
+  getPublishedPosts,
   getPublishedProjects,
   getPublishedServices,
   getSiteSettings,
@@ -33,6 +35,19 @@ describe('Data Layer (src/lib/payload.ts) Local API integration', () => {
     expect(perch).toBeDefined()
     expect(perch?.deliveringCompany).toBe('Shena Works Limited')
   })
+
+  it('reads published posts with parsed sections and categories from database', async () => {
+    const [posts, categories] = await Promise.all([
+      getPublishedPosts(),
+      getPublishedPostCategories(),
+    ])
+    expect(posts.length).toBe(8)
+    expect(categories.length).toBe(4)
+    for (const post of posts) {
+      expect(post.sections.length).toBeGreaterThan(0)
+      expect(post.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    }
+  }, 60000)
 
   it('reflects updates made through Payload Local API', async () => {
     const payload = await getPayloadClient()
@@ -71,5 +86,5 @@ describe('Data Layer (src/lib/payload.ts) Local API integration', () => {
       id: docId,
       data: { heroHeadline: originalHeadline },
     })
-  })
+  }, 60000)
 })

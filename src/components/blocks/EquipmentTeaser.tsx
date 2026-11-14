@@ -26,8 +26,7 @@ const DEFAULT_MACHINES = [
     name: 'Crawler excavator',
     href: '/equipment/excavators/crawler-excavator',
     description: 'Bulk excavation, culvert trenches, dams and tipper loading',
-    imgSrc:
-      'https://images.pexels.com/photos/25559747/pexels-photo-25559747.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/equip-excavator.jpg',
     imgAlt: 'Crawler excavator digging on site',
   },
   {
@@ -37,8 +36,7 @@ const DEFAULT_MACHINES = [
     name: 'Motor grader',
     href: '/equipment/graders/motor-grader',
     description: 'Road grading, camber shaping, murram spreading and drain cutting',
-    imgSrc:
-      'https://images.pexels.com/photos/8809464/pexels-photo-8809464.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/equip-grader.jpg',
     imgAlt: 'Motor grader levelling a dirt road',
   },
   {
@@ -48,8 +46,7 @@ const DEFAULT_MACHINES = [
     name: 'Single-drum vibratory roller',
     href: '/equipment/rollers/vibratory-roller',
     description: 'Subgrade, murram road and cabro sub-base compaction',
-    imgSrc:
-      'https://images.pexels.com/photos/27390316/pexels-photo-27390316.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    imgSrc: '/media/equip-roller.jpg',
     imgAlt: 'Single-drum vibratory roller compacting a road',
   },
 ]

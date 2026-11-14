@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { assertPublishable } from '@/hooks/publishingGate'
 import {
   credentialsSeed,
   legalPagesSeed,
@@ -41,12 +42,15 @@ describe('Seed Integrity & Fleet Verification (AUD-20, D-08)', () => {
     expect(nairobi?._status).toBe('draft')
   })
 
-  it('ensures credentials and posts are draft', () => {
+  it('ensures credentials are draft and published posts pass the publishing gate with sections', () => {
     for (const cred of credentialsSeed) {
       expect(cred._status).toBe('draft')
     }
-    for (const post of postsSeed) {
-      expect(post._status).toBe('draft')
+    const publishedPosts = postsSeed.filter((p) => p._status === 'published')
+    expect(publishedPosts.length).toBe(8)
+    for (const post of publishedPosts) {
+      expect(post.sections.length).toBeGreaterThan(0)
+      expect(() => assertPublishable('posts', post, undefined)).not.toThrow()
     }
   })
 

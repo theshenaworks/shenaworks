@@ -113,7 +113,7 @@ export function buildMachineProductJsonLd(params: {
     category: params.categoryName,
     image: `${SITE_URL}${params.image}`,
     url: `${SITE_URL}${params.path}`,
-    offers: {
+      offers: {
       '@type': 'Offer',
       availability: params.available
         ? 'https://schema.org/InStock'
@@ -121,5 +121,44 @@ export function buildMachineProductJsonLd(params: {
       businessFunction: 'http://purl.org/goodrelations/v1#LeaseOut',
       seller: { '@id': ORG_ID },
     },
+  }
+}
+
+export function buildBlogJsonLd(params: {
+  name: string
+  description: string
+  path: string
+}) {
+  return {
+    '@type': 'Blog',
+    name: params.name,
+    description: params.description,
+    url: `${SITE_URL}${params.path}`,
+    publisher: { '@id': ORG_ID },
+    inLanguage: 'en-KE',
+  }
+}
+
+export function buildArticleJsonLd(params: {
+  headline: string
+  description: string
+  image: string
+  datePublished: string
+  authorName: string
+  path: string
+}) {
+  return {
+    '@type': 'Article',
+    headline: params.headline,
+    description: params.description,
+    image: params.image.startsWith('http') ? params.image : `${SITE_URL}${params.image}`,
+    datePublished: params.datePublished,
+    author: {
+      '@type': 'Person',
+      name: params.authorName,
+    },
+    publisher: { '@id': ORG_ID },
+    mainEntityOfPage: `${SITE_URL}${params.path}`,
+    inLanguage: 'en-KE',
   }
 }

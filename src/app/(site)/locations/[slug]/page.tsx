@@ -106,7 +106,7 @@ export default async function LocationPage({
       <section className="hero page" data-surface="photo" style={{ padding: 0 }}>
         <div className="ph">
           <Image
-            src={location.heroImage?.url || 'https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1600'}
+            src={location.heroImage?.url || '/media/cta-site.jpg'}
             alt={location.heroImage?.alt || `People and machines on a Shena road site in ${location.town}`}
             fill
             priority
@@ -198,7 +198,7 @@ export default async function LocationPage({
               <article className="card" key={s.slug}>
                 <div className="ph warm r43">
                   <Image
-                    src={s.heroImage?.url || 'https://images.pexels.com/photos/12267902/pexels-photo-12267902.jpeg?auto=compress&cs=tinysrgb&w=1200'}
+                    src={s.heroImage?.url || '/media/service-roads.jpg'}
                     alt={s.heroImage?.alt || s.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, 100vw"
@@ -247,7 +247,7 @@ export default async function LocationPage({
                       <Image
                         src={
                           p.heroImage?.url ||
-                          'https://images.pexels.com/photos/16120138/pexels-photo-16120138.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                          '/media/hero-roads.jpg'
                         }
                         alt={p.heroImage?.alt || p.title}
                         fill
@@ -296,7 +296,7 @@ export default async function LocationPage({
                     <Image
                       src={
                         m.heroImage?.url ||
-                        'https://images.pexels.com/photos/25559747/pexels-photo-25559747.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                        '/media/equip-excavator.jpg'
                       }
                       alt={m.heroImage?.alt || m.name}
                       fill

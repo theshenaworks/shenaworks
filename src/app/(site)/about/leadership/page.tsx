@@ -82,11 +82,7 @@ export default async function LeadershipPage() {
 
   const bioParagraphs =
     team.bio && team.bio.length > 0
-      ? team.bio.map((p) =>
-          p
-            .replace('Before founding Shena Works', 'Before leading Shena Works')
-            .replace('table — as', 'table: as')
-        )
+      ? team.bio.map((p) => p.replace('table — as', 'table: as'))
       : defaultBio
   const experienceList =
     team.experience && team.experience.length > 0
@@ -134,7 +130,7 @@ export default async function LeadershipPage() {
         <div className="wrap person">
           <div className="ph grey" role="img" aria-label={`Portrait of ${team.name?.replace('M. ', '') || 'Newton Muthee'}`}>
             <Image
-              src={team.portrait?.url || 'https://images.pexels.com/photos/17746097/pexels-photo-17746097.jpeg?auto=compress&cs=tinysrgb&w=1200'}
+              src={team.portrait?.url || '/media/newton-portrait.jpg'}
               alt={`Portrait of ${team.name?.replace('M. ', '') || 'Newton Muthee'}`}
               fill
               priority

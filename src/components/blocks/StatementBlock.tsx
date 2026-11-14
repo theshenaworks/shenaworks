@@ -1,9 +1,12 @@
-import React from 'react'
+'use client'
+
+import React, { useEffect, useRef } from 'react'
 import Image from 'next/image'
 
 /**
- * StatementBlock (AGENTS.md Section 0 & Section 5 Phase B)
- * Reference: docs/reference/home/index.html lines 420-425
+ * StatementBlock (Next.js 16 Self-Contained Client Component)
+ * Emits McCarthy-style statement block with self-contained scroll-driven wipe choreography.
+ * Respects prefers-reduced-motion.
  */
 export interface StatementBlockProps {
   heading?: string
@@ -14,14 +17,39 @@ export interface StatementBlockProps {
 }
 
 export function StatementBlock(_props: StatementBlockProps = {}) {
+  const runRef = useRef<HTMLDivElement>(null)
+  const l2Ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const run = runRef.current
+    const l2 = l2Ref.current
+    if (!run || !l2) return
+
+    const handleScroll = () => {
+      const r = run.getBoundingClientRect()
+      const t = -r.top / Math.max(1, r.height - window.innerHeight)
+      l2.style.setProperty('--p', String(Math.min(1, Math.max(0, (t - 0.3) / 0.3))))
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
+  }, [])
+
   return (
     <section className="stmt" aria-label="How we work">
-      <div className="stmt-run">
+      <div className="stmt-run" ref={runRef}>
         <div className="stmt-stick">
           <div className="stmt-layer l1">
             <div className="ph">
               <Image
-                src="https://images.pexels.com/photos/8809466/pexels-photo-8809466.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                src="/media/statement-machines.jpg"
                 alt="Crew standing beside a road roller on a murram road"
                 fill
                 sizes="100vw"
@@ -31,10 +59,10 @@ export function StatementBlock(_props: StatementBlockProps = {}) {
               Show us the site. <strong>We’ll bring the machines.</strong>
             </p>
           </div>
-          <div className="stmt-layer l2">
+          <div className="stmt-layer l2" ref={l2Ref}>
             <div className="ph warm">
               <Image
-                src="https://images.pexels.com/photos/34188582/pexels-photo-34188582.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                src="/media/statement-keys.jpg"
                 alt="A finished modern building handed over to the client"
                 fill
                 sizes="100vw"

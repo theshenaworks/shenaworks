@@ -1,5 +1,11 @@
 import { ImageResponse } from 'next/og'
 import { NextRequest } from 'next/server'
+import {
+  BRAND_COLORS,
+  SHENA_LOGO_GOLD_PATH,
+  SHENA_LOGO_NAVY_PATH,
+  SHENA_LOGO_VIEWBOX,
+} from '@/lib/brand'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -20,7 +26,7 @@ export async function GET(req: NextRequest) {
           backgroundColor: '#2e2a25',
           color: '#ffffff',
           padding: '64px 80px',
-          borderLeft: '8px solid #c14a12',
+          borderLeft: '8px solid #022460',
           fontFamily: 'sans-serif',
         }}
       >
@@ -31,17 +37,15 @@ export async function GET(req: NextRequest) {
             alignItems: 'center',
           }}
         >
-          <span
-            style={{
-              fontSize: '24px',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: '#ff8f50',
-              fontWeight: 700,
-            }}
+          <svg
+            viewBox={SHENA_LOGO_VIEWBOX}
+            width="240"
+            height="36"
+            style={{ display: 'flex' }}
           >
-            SHENA WORKS LIMITED
-          </span>
+            <path d={SHENA_LOGO_GOLD_PATH} fill={BRAND_COLORS.logoGold} fillRule="evenodd" />
+            <path d={SHENA_LOGO_NAVY_PATH} fill="#ffffff" fillRule="evenodd" />
+          </svg>
           <span style={{ fontSize: '20px', color: '#d7d6d6' }}>{subtitle}</span>
         </div>
 

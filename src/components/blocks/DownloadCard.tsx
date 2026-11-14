@@ -14,7 +14,7 @@ export function DownloadCard({ title, sizeMb, href }: DownloadCardProps) {
   return (
     <div
       data-surface="subtle"
-      className="bg-[var(--grey-100)] border-l-4 border-[var(--accent-500)] p-[3.2rem] lg:p-[4.0rem] flex flex-col justify-between gap-[2.0rem]"
+      className="bg-[var(--grey-100)] p-[3.2rem] lg:p-[4.0rem] flex flex-col justify-between gap-[2.0rem]"
     >
       <div>
         <p className="text-overline text-[var(--ink-600)] mb-[0.8rem]">Download</p>

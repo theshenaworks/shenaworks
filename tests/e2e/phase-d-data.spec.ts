@@ -3,7 +3,7 @@ import path from 'path'
 import fs from 'fs'
 
 const SCREENSHOT_DIR = path.resolve(process.cwd(), 'docs/screenshots/phase-d')
-const ARTIFACT_DIR = '/home/cooper/.gemini/antigravity/brain/8156e791-8428-4f50-9baa-ea3fc84de309/screenshots/phase-d'
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR || path.resolve(process.cwd(), 'docs/screenshots/artifacts/phase-d')
 
 fs.mkdirSync(SCREENSHOT_DIR, { recursive: true })
 fs.mkdirSync(ARTIFACT_DIR, { recursive: true })
@@ -86,8 +86,9 @@ test.describe('Phase D: Payload Local API Integration & Conditional Rendering', 
     // Rule: Testimonials hidden unless >= 1 testimonial passes publishing gate
     await expect(page.locator('.testimonials')).toHaveCount(0)
 
-    // Rule: InsightsRow hidden unless >= 3 published posts
-    await expect(page.locator('.insights-row')).toHaveCount(0)
+    // Rule: InsightsRow renders when >= 3 published posts exist
+    await expect(page.locator('.insights-row')).toBeVisible()
+    await expect(page.locator('.insights-row article')).toHaveCount(3)
   })
 
   test('Sections render dynamic Payload data with exact reference DOM structure', async ({ page }) => {

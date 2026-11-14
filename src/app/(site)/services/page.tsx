@@ -27,7 +27,7 @@ const DEFAULT_SERVICES = {
       'Cabro and interlocking block paving',
       'Tarmac and asphalt surfacing',
     ],
-    image: 'https://images.pexels.com/photos/12267902/pexels-photo-12267902.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: '/media/service-roads.jpg',
     alt: 'A grader levelling a murram road',
   },
   buildings: {
@@ -42,7 +42,7 @@ const DEFAULT_SERVICES = {
       'Roofing and rainwater goods',
       'Mechanical, electrical and plumbing (MEP) first and second fix',
     ],
-    image: 'https://images.pexels.com/photos/33719014/pexels-photo-33719014.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: '/media/service-building.jpg',
     alt: 'A building under construction with scaffolding',
   },
   interiors: {
@@ -57,7 +57,7 @@ const DEFAULT_SERVICES = {
       'Custom joinery and fittings',
       'Ceilings and acoustic treatments',
     ],
-    image: 'https://images.pexels.com/photos/7851904/pexels-photo-7851904.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: '/media/service-interior.jpg',
     alt: 'A finished interior fit-out with modern furnishings',
   },
   pm: {
@@ -72,7 +72,7 @@ const DEFAULT_SERVICES = {
       'Cost control and valuation verification',
       'Site safety and regulatory compliance',
     ],
-    image: 'https://images.pexels.com/photos/8961070/pexels-photo-8961070.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    image: '/media/service-pm.jpg',
     alt: 'Site engineers reviewing project plans',
   },
 }
@@ -103,7 +103,7 @@ export default async function ServicesIndexPage() {
       <section className="hero page" style={{ padding: 0 }} data-surface="photo">
         <div className="ph">
           <Image
-            src="https://images.pexels.com/photos/37333412/pexels-photo-37333412.jpeg?auto=compress&cs=tinysrgb&w=1600"
+            src="/media/hero-roads.jpg"
             alt="Road construction crew and equipment working on a road"
             fill
             priority

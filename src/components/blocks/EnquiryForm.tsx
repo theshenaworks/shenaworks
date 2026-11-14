@@ -1,10 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { MessageBanner } from '@/components/ui/MessageBanner'
-import { Icon } from '@/components/ui/Icon'
-import { SectionIntro } from './SectionIntro'
+import Link from 'next/link'
 import { enquirySchema, type EnquiryType } from '@/lib/validation/enquiry'
 import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { trackEvent } from '@/lib/analytics'
@@ -27,17 +24,8 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_MACHINES: Array<{ slug: string; name: string; make?: string; model?: string }> = [
   { slug: 'crawler-excavator', name: 'Crawler Excavator' },
   { slug: 'motor-grader', name: 'Motor Grader' },
-  { slug: 'vibratory-roller', name: 'Vibratory Roller' },
+  { slug: 'vibratory-roller', name: 'Single-Drum Vibratory Roller' },
   { slug: 'crawler-bulldozer', name: 'Crawler Bulldozer' },
-]
-
-const DEFAULT_LOCATIONS = [
-  {
-    slug: 'meru',
-    town: 'Meru',
-    address: 'Meru Town Yard, Meru County',
-    directionsUrl: 'https://maps.google.com/?q=0.0463,37.6559',
-  },
 ]
 
 const DEFAULT_CONTACT = {
@@ -106,16 +94,10 @@ const HIRE_DURATIONS = [
 ]
 
 export function EnquiryForm({
-  id = 'enquiry',
-  overline = 'Request a quote',
-  heading = 'Tell us about your project',
-  body,
+  id = 'cf',
   defaultType = 'project',
   defaultService = '',
   defaultEquipment = '',
-  showSectionIntro = true,
-  surface = 'subtle',
-  showOfficesInAside = false,
   services,
   categories,
   machines,
@@ -143,8 +125,7 @@ export function EnquiryForm({
   const [turnstileToken, setTurnstileToken] = useState<string>('')
 
   const activeContact = contact || DEFAULT_CONTACT
-  const { phoneE164, phoneDisplay, whatsappNumber, officeHours, responseTimeStatement } =
-    activeContact
+  const { phoneE164, phoneDisplay, whatsappNumber } = activeContact
   const contactEmail = 'shenaworksltd@gmail.com'
 
   const summaryRef = useRef<HTMLDivElement>(null)
@@ -187,6 +168,7 @@ export function EnquiryForm({
       script.onload = renderWidget
       document.head.appendChild(script)
     }
+
     if (
       !turnstileToken &&
       typeof window !== 'undefined' &&
@@ -198,22 +180,13 @@ export function EnquiryForm({
     }
   }, [siteKey, turnstileToken])
 
-  const publishedServices = useMemo(
-    () => services || DEFAULT_SERVICES,
-    [services],
-  )
-  const equipmentCategories = useMemo(
-    () => categories || DEFAULT_CATEGORIES,
-    [categories],
-  )
+  const publishedServices = useMemo(() => services || DEFAULT_SERVICES, [services])
+  const equipmentCategories = useMemo(() => categories || DEFAULT_CATEGORIES, [categories])
   const publishedMachines = useMemo(
     () => (machines && machines.length > 0 ? machines : DEFAULT_MACHINES),
     [machines],
   )
-  const publishedLocations = useMemo(
-    () => locations || DEFAULT_LOCATIONS,
-    [locations],
-  )
+  const publishedLocations = useMemo(() => locations || [], [locations])
 
   const handleFirstInteraction = () => {
     if (!started) {
@@ -317,6 +290,9 @@ export function EnquiryForm({
       formData.set('type', type)
       formData.set('consent', consent ? 'true' : 'false')
       formData.set('startedAt', String(startedAtRef.current))
+      if (turnstileToken) {
+        formData.set('cf-turnstile-response', turnstileToken)
+      }
       if (typeof window !== 'undefined') {
         formData.set('sourcePage', window.location.pathname)
       }
@@ -336,6 +312,7 @@ export function EnquiryForm({
             `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${phoneDisplay}.`,
         )
         setSubmitting(false)
+        setTimeout(() => summaryRef.current?.focus(), 20)
         return
       }
 
@@ -352,704 +329,492 @@ export function EnquiryForm({
         `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${phoneDisplay}.`,
       )
       setSubmitting(false)
+      setTimeout(() => summaryRef.current?.focus(), 20)
     }
   }
 
   const errorEntries = Object.entries(errors)
+  const hasBanner = errorEntries.length > 0 || Boolean(serverError)
   const whatsappUrl = buildWhatsAppUrl({ type: 'contact' }, whatsappNumber)
 
   const messageLabel =
     type === 'project'
-      ? 'Tell us about the project'
+      ? 'Tell us about the project *'
       : type === 'hire'
         ? 'Anything we should know about the site or work?'
         : type === 'consultation'
-          ? 'What do you need help with?'
-          : 'Your message'
+          ? 'What do you need help with? *'
+          : 'Your message *'
 
   const todayIso = new Date().toISOString().slice(0, 10)
+  const isProjectOrConsultation = type === 'project' || type === 'consultation'
+  const isHire = type === 'hire'
+  const isOther = type === 'other'
 
   return (
-    <section
-      id={id}
-      data-surface={surface === 'subtle' ? 'subtle' : undefined}
-      className={`${
-        surface === 'subtle' ? 'bg-[var(--grey-100)] border-t border-[var(--grey-300)]' : 'bg-[var(--white)]'
-      } py-[6.4rem] lg:py-[8.0rem]`}
-    >
-      {showSectionIntro && (
-        <SectionIntro overline={overline} heading={heading} body={body} />
-      )}
-
-      <div className="site-grid items-start">
-        {/* Form column (col 2-9 at lg) */}
-        <div className="col-span-4 lg:col-start-2 lg:col-span-9">
-          {errorEntries.length > 0 && (
-            <div ref={summaryRef} tabIndex={-1} className="mb-[3.2rem] outline-none">
-              <MessageBanner
-                variant="error"
-                title={`Please fix ${errorEntries.length} ${
-                  errorEntries.length === 1 ? 'thing' : 'things'
-                } before sending`}
-              >
-                <ul className="mt-[0.8rem] list-disc pl-[2.0rem] space-y-[0.4rem]">
-                  {errorEntries.map(([fieldKey, msg]) => (
-                    <li key={fieldKey}>
-                      <a
-                        href={`#field-${fieldKey}`}
-                        className="font-bold text-[var(--ink-900)] underline"
-                      >
-                        {msg}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </MessageBanner>
-            </div>
+    <div className="wrap cwrap">
+      <form
+        className="f"
+        id={id}
+        method="post"
+        action="/api/enquiries"
+        encType="multipart/form-data"
+        noValidate
+        aria-label="Enquiry form"
+        onSubmit={handleSubmit}
+        onFocus={handleFirstInteraction}
+      >
+        <div
+          className="sum"
+          id="sum"
+          ref={summaryRef}
+          role="alert"
+          tabIndex={-1}
+          hidden={!hasBanner}
+        >
+          <h2 id="st">
+            {serverError
+              ? 'We could not send your enquiry'
+              : errorEntries.length > 0
+                ? `Please fix ${errorEntries.length} ${
+                    errorEntries.length === 1 ? 'thing' : 'things'
+                  } before sending`
+                : ''}
+          </h2>
+          {serverError ? (
+            <p className="sm">{serverError}</p>
+          ) : (
+            <ul id="sl">
+              {errorEntries.map(([fieldKey, msg]) => (
+                <li key={fieldKey}>
+                  <a href={`#field-${fieldKey}`}>{msg}</a>
+                </li>
+              ))}
+            </ul>
           )}
-
-          {serverError && (
-            <div className="mb-[3.2rem]">
-              <MessageBanner variant="error" title="Unable to send enquiry">
-                <p>{serverError}</p>
-              </MessageBanner>
-            </div>
-          )}
-
-          <form
-            action="/api/enquiries"
-            method="POST"
-            encType="multipart/form-data"
-            noValidate
-            onFocus={handleFirstInteraction}
-            onSubmit={handleSubmit}
-            className="space-y-[2.4rem]"
-          >
-            <noscript>
-              <div className="p-[1.6rem] bg-[var(--grey-100)] border border-[var(--grey-300)] text-body mb-[2.4rem]">
-                <p className="text-[var(--ink-900)]">
-                  This form needs JavaScript to check you are not a robot. Please call{' '}
-                  <a href={`tel:${phoneE164}`} className="font-bold underline text-[var(--accent-500)]">
-                    {phoneDisplay}
-                  </a>
-                  ,{' '}
-                  <a href={whatsappUrl} className="font-bold underline text-[var(--accent-500)]">
-                    WhatsApp us
-                  </a>{' '}
-                  or email{' '}
-                  <a href={`mailto:${contactEmail}`} className="font-bold underline text-[var(--accent-500)]">
-                    {contactEmail}
-                  </a>{' '}
-                  instead.
-                </p>
-              </div>
-            </noscript>
-
-            <p className="text-body-xs text-[var(--ink-600)]">* required</p>
-
-            {/* 1. Enquiry type radio group */}
-            <fieldset className="border-0 p-0 m-0">
-              <legend className="text-label text-[var(--ink-900)] mb-[1.2rem]">
-                What can we help with? *
-              </legend>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-[1.2rem]">
-                {TYPE_OPTIONS.map((opt) => {
-                  const checked = type === opt.value
-                  return (
-                    <label
-                      key={opt.value}
-                      className={`flex items-start gap-[1.2rem] p-[1.6rem] border cursor-pointer transition-colors duration-200 ${
-                        checked
-                          ? 'bg-[var(--white)] border-2 border-[var(--ink-900)]'
-                          : 'bg-[var(--white)] border-[var(--grey-500)] hover:border-[var(--ink-900)]'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="type"
-                        value={opt.value}
-                        checked={checked}
-                        onChange={() => setType(opt.value)}
-                        className="mt-[0.3rem] h-[2.0rem] w-[2.0rem] accent-[var(--ink-900)] rounded-full shrink-0"
-                      />
-                      <span className="text-body-sm font-bold text-[var(--ink-900)]">
-                        {opt.label}
-                      </span>
-                    </label>
-                  )
-                })}
-              </div>
-            </fieldset>
-
-            {/* Row: Name & Phone */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-[2.4rem]">
-              <div>
-                <label
-                  htmlFor="field-name"
-                  className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                >
-                  Your name *
-                </label>
-                <input
-                  id="field-name"
-                  name="name"
-                  type="text"
-                  required
-                  autoComplete="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onBlur={() => validateSingleField('name')}
-                  aria-invalid={Boolean(errors.name)}
-                  aria-describedby={errors.name ? 'error-name' : undefined}
-                  className="field-input"
-                />
-                {errors.name && (
-                  <p id="error-name" className="mt-[0.6rem] text-body-xs text-[var(--error)]">
-                    {errors.name}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="field-phone"
-                  className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                >
-                  Phone number *
-                </label>
-                <input
-                  id="field-phone"
-                  name="phone"
-                  type="tel"
-                  required
-                  autoComplete="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  onBlur={() => validateSingleField('phone')}
-                  aria-invalid={Boolean(errors.phone)}
-                  aria-describedby={errors.phone ? 'error-phone help-phone' : 'help-phone'}
-                  className="field-input"
-                />
-                <p id="help-phone" className="mt-[0.6rem] text-body-xs text-[var(--ink-600)]">
-                  We&apos;ll call or WhatsApp you on this number.
-                </p>
-                {errors.phone && (
-                  <p id="error-phone" className="mt-[0.4rem] text-body-xs text-[var(--error)]">
-                    {errors.phone}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Row: Email & Organisation */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-[2.4rem]">
-              <div>
-                <label
-                  htmlFor="field-email"
-                  className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                >
-                  Email (optional)
-                </label>
-                <input
-                  id="field-email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={() => validateSingleField('email')}
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? 'error-email' : undefined}
-                  className="field-input"
-                />
-                {errors.email && (
-                  <p id="error-email" className="mt-[0.6rem] text-body-xs text-[var(--error)]">
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="field-organisation"
-                  className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                >
-                  Company or organisation (optional)
-                </label>
-                <input
-                  id="field-organisation"
-                  name="organisation"
-                  type="text"
-                  autoComplete="organization"
-                  value={organisation}
-                  onChange={(e) => setOrganisation(e.target.value)}
-                  className="field-input"
-                />
-              </div>
-            </div>
-
-            {/* Row: Service/Machine & Location */}
-            {type !== 'other' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-[2.4rem]">
-                {(type === 'project' || type === 'consultation') && (
-                  <div>
-                    <label
-                      htmlFor="field-service"
-                      className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                    >
-                      Service *
-                    </label>
-                    <select
-                      id="field-service"
-                      name="service"
-                      required
-                      value={service}
-                      onChange={(e) => setService(e.target.value)}
-                      onBlur={() => validateSingleField('service')}
-                      aria-invalid={Boolean(errors.service)}
-                      aria-describedby={errors.service ? 'error-service' : undefined}
-                      className="field-input"
-                    >
-                      <option value="">Choose a service</option>
-                      {publishedServices.map((s) => (
-                        <option key={s.slug} value={s.slug}>
-                          {s.title}
-                        </option>
-                      ))}
-                      <option value="tender-documents">Tender and procurement documents</option>
-                      <option value="not-sure">Not sure yet</option>
-                    </select>
-                    {errors.service && (
-                      <p id="error-service" className="mt-[0.6rem] text-body-xs text-[var(--error)]">
-                        {errors.service}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {type === 'hire' && (
-                  <div>
-                    <label
-                      htmlFor="field-equipment"
-                      className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                    >
-                      Machine *
-                    </label>
-                    <select
-                      id="field-equipment"
-                      name="equipment"
-                      required
-                      value={equipment}
-                      onChange={(e) => setEquipment(e.target.value)}
-                      onBlur={() => validateSingleField('equipment')}
-                      aria-invalid={Boolean(errors.equipment)}
-                      aria-describedby={errors.equipment ? 'error-equipment' : undefined}
-                      className="field-input"
-                    >
-                      <option value="">Choose a machine or type</option>
-                      {equipmentCategories.map((cat) => (
-                        <option key={`any-${cat.slug}`} value={`any-${cat.slug}`}>
-                          Any {cat.singular}
-                        </option>
-                      ))}
-                      {publishedMachines.map((m) => (
-                        <option key={m.slug} value={m.slug}>
-                          {m.name}
-                          {'make' in m && 'model' in m && m.make && m.model ? ` (${m.make} ${m.model})` : ''}
-                        </option>
-                      ))}
-                      {defaultEquipment &&
-                        !publishedMachines.some((m) => m.slug === defaultEquipment) &&
-                        !equipmentCategories.some((c) => `any-${c.slug}` === defaultEquipment) && (
-                          <option value={defaultEquipment}>
-                            {defaultEquipment.replace(/-/g, ' ')}
-                          </option>
-                        )}
-                    </select>
-                    {errors.equipment && (
-                      <p
-                        id="error-equipment"
-                        className="mt-[0.6rem] text-body-xs text-[var(--error)]"
-                      >
-                        {errors.equipment}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <div>
-                  <label
-                    htmlFor="field-location"
-                    className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                  >
-                    Site location {type === 'project' || type === 'hire' ? '*' : '(optional)'}
-                  </label>
-                  <input
-                    id="field-location"
-                    name="location"
-                    type="text"
-                    required={type === 'project' || type === 'hire'}
-                    autoComplete="address-level2"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    onBlur={() => validateSingleField('location')}
-                    aria-invalid={Boolean(errors.location)}
-                    aria-describedby={
-                      errors.location ? 'error-location help-location' : 'help-location'
-                    }
-                    className="field-input"
-                  />
-                  <p id="help-location" className="mt-[0.6rem] text-body-xs text-[var(--ink-600)]">
-                    Town, area or road, e.g. Makutano, Meru.
-                  </p>
-                  {errors.location && (
-                    <p
-                      id="error-location"
-                      className="mt-[0.4rem] text-body-xs text-[var(--error)]"
-                    >
-                      {errors.location}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Row: Hire Start & Duration (only for hire) */}
-            {type === 'hire' && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-[2.4rem]">
-                <div>
-                  <label
-                    htmlFor="field-hireStart"
-                    className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                  >
-                    Start date *
-                  </label>
-                  <input
-                    id="field-hireStart"
-                    name="hireStart"
-                    type="date"
-                    min={todayIso}
-                    required
-                    value={hireStart}
-                    onChange={(e) => setHireStart(e.target.value)}
-                    onBlur={() => validateSingleField('hireStart')}
-                    aria-invalid={Boolean(errors.hireStart)}
-                    aria-describedby={errors.hireStart ? 'error-hireStart' : undefined}
-                    className="field-input"
-                  />
-                  {errors.hireStart && (
-                    <p
-                      id="error-hireStart"
-                      className="mt-[0.6rem] text-body-xs text-[var(--error)]"
-                    >
-                      {errors.hireStart}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="field-hireDuration"
-                    className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                  >
-                    How long do you need it? *
-                  </label>
-                  <select
-                    id="field-hireDuration"
-                    name="hireDuration"
-                    required
-                    value={hireDuration}
-                    onChange={(e) => setHireDuration(e.target.value)}
-                    onBlur={() => validateSingleField('hireDuration')}
-                    aria-invalid={Boolean(errors.hireDuration)}
-                    aria-describedby={errors.hireDuration ? 'error-hireDuration' : undefined}
-                    className="field-input"
-                  >
-                    <option value="">Choose duration</option>
-                    {HIRE_DURATIONS.map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.hireDuration && (
-                    <p
-                      id="error-hireDuration"
-                      className="mt-[0.6rem] text-body-xs text-[var(--error)]"
-                    >
-                      {errors.hireDuration}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Row: Budget & Timeline (only for project / consultation) */}
-            {(type === 'project' || type === 'consultation') && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-[2.4rem]">
-                <div>
-                  <label
-                    htmlFor="field-budgetBand"
-                    className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                  >
-                    Budget (optional)
-                  </label>
-                  <select
-                    id="field-budgetBand"
-                    name="budgetBand"
-                    value={budgetBand}
-                    onChange={(e) => setBudgetBand(e.target.value)}
-                    className="field-input"
-                  >
-                    <option value="">Select budget band</option>
-                    {BUDGET_BANDS.map((b) => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="field-timeline"
-                    className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                  >
-                    When do you want to start? (optional)
-                  </label>
-                  <select
-                    id="field-timeline"
-                    name="timeline"
-                    value={timeline}
-                    onChange={(e) => setTimeline(e.target.value)}
-                    className="field-input"
-                  >
-                    <option value="">Select timeline</option>
-                    {TIMELINES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
-
-            {/* Message */}
-            <div>
-              <label
-                htmlFor="field-message"
-                className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-              >
-                {messageLabel} {type !== 'hire' ? '*' : '(optional)'}
-              </label>
-              <textarea
-                id="field-message"
-                name="message"
-                rows={4}
-                required={type !== 'hire'}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onBlur={() => validateSingleField('message')}
-                aria-invalid={Boolean(errors.message)}
-                aria-describedby={errors.message ? 'error-message help-message' : 'help-message'}
-                className="field-input py-[1.2rem] min-h-[12.0rem]"
-              />
-              {type === 'project' && (
-                <p id="help-message" className="mt-[0.6rem] text-body-xs text-[var(--ink-600)]">
-                  Size, what&apos;s there now, and what you want at the end.
-                </p>
-              )}
-              {errors.message && (
-                <p id="error-message" className="mt-[0.4rem] text-body-xs text-[var(--error)]">
-                  {errors.message}
-                </p>
-              )}
-            </div>
-
-            {/* File Attachments (for project, consultation, other) */}
-            {type !== 'hire' && (
-              <div>
-                <label
-                  htmlFor="field-files"
-                  className="block text-label text-[var(--ink-900)] mb-[0.8rem]"
-                >
-                  Attach drawings, BoQ or photos (optional)
-                </label>
-                <input
-                  id="field-files"
-                  name="files"
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png,.webp"
-                  aria-describedby="help-files"
-                  className="block w-full text-body-sm text-[var(--ink-900)] file:mr-[1.6rem] file:py-[1.0rem] file:px-[2.0rem] file:border file:border-[var(--ink-900)] file:bg-[var(--white)] file:text-label file:text-[var(--ink-900)] file:cursor-pointer"
-                />
-                <p id="help-files" className="mt-[0.6rem] text-body-xs text-[var(--ink-600)]">
-                  Up to 3 files, 10 MB each. PDF, JPG, PNG or WEBP.
-                </p>
-              </div>
-            )}
-
-            {/* Consent Checkbox */}
-            <div>
-              <label
-                htmlFor="field-consent"
-                className="flex items-start gap-[1.2rem] cursor-pointer"
-              >
-                <input
-                  id="field-consent"
-                  name="consent"
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => {
-                    setConsent(e.target.checked)
-                    if (e.target.checked) {
-                      setErrors((prev) => {
-                        const next = { ...prev }
-                        delete next.consent
-                        return next
-                      })
-                    }
-                  }}
-                  aria-invalid={Boolean(errors.consent)}
-                  aria-describedby={errors.consent ? 'error-consent' : undefined}
-                  className="mt-[0.3rem] h-[2.0rem] w-[2.0rem] accent-[var(--ink-900)] rounded-none shrink-0"
-                />
-                <span className="text-body-sm text-[var(--ink-900)]">
-                  I agree that Shena Works may use these details to respond to my enquiry, as
-                  described in the{' '}
-                  <a href="/privacy" className="font-bold underline">
-                    privacy notice
-                  </a>
-                  . *
-                </span>
-              </label>
-              {errors.consent && (
-                <p id="error-consent" className="mt-[0.6rem] text-body-xs text-[var(--error)]">
-                  {errors.consent}
-                </p>
-              )}
-            </div>
-
-            {/* Honeypot field (hidden from assistive tech & users) */}
-            <div aria-hidden="true" className="sr-only">
-              <label htmlFor="field-company-website">Company website</label>
-              <input
-                id="field-company-website"
-                name="company_website"
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-                defaultValue=""
-              />
-            </div>
-
-            {/* Cloudflare Turnstile token */}
-            {siteKey ? (
-              <div className="my-[1.6rem]">
-                <div ref={turnstileContainerRef} id="turnstile-widget" />
-                <input
-                  type="hidden"
-                  name="cf-turnstile-response"
-                  value={turnstileToken}
-                />
-                <noscript>
-                  <div className="p-[1.6rem] bg-[var(--surface-warm)] border border-[var(--grey-300)] text-body">
-                    <p className="font-bold text-[var(--ink-900)] mb-[0.8rem]">Security challenge requires JavaScript</p>
-                    <p className="text-[var(--ink-700)] mb-[1.2rem]">
-                      To send an enquiry online, please enable JavaScript, or reach our team directly:
-                    </p>
-                    <div className="flex flex-wrap gap-[1.2rem]">
-                      <a href={`tel:${phoneE164}`} className="font-bold text-[var(--accent-500)] underline">
-                        Call {phoneDisplay}
-                      </a>
-                      <a href={`https://wa.me/${whatsappNumber}`} className="font-bold text-[var(--accent-500)] underline">
-                        Message on WhatsApp
-                      </a>
-                    </div>
-                  </div>
-                </noscript>
-              </div>
-            ) : (
-              <input type="hidden" name="cf-turnstile-response" value="managed-pass" />
-            )}
-
-            <div>
-              <Button type="submit" variant="primary" loading={submitting}>
-                {type === 'hire' ? 'Send hire request' : 'Send enquiry'}
-              </Button>
-            </div>
-          </form>
         </div>
 
-        {/* Aside column (col 11-5 at lg) */}
-        <aside
-          data-surface="subtle"
-          className="col-span-4 lg:col-start-11 lg:col-span-5 mt-[4.8rem] lg:mt-0 bg-[var(--grey-100)] border border-[var(--grey-300)] p-[3.2rem] lg:p-[4.0rem]"
-        >
-          <h3 className="text-h4 text-[var(--ink-900)] mb-[1.6rem]">Prefer to talk?</h3>
-          <div className="flex flex-col gap-[1.2rem] mb-[2.4rem]">
-            <Button
-              href={`tel:${phoneE164}`}
-              variant="secondary"
-              className="w-full justify-center"
-              onClick={() => trackEvent('call_click', { location: 'contact' })}
+        <p className="help" style={{ margin: 0 }}>
+          * required
+        </p>
+
+        <fieldset>
+          <legend>What can we help with? *</legend>
+          <div className="rcs">
+            {TYPE_OPTIONS.map((opt) => (
+              <label key={opt.value} className="rc">
+                <input
+                  type="radio"
+                  name="type"
+                  value={opt.value}
+                  checked={type === opt.value}
+                  onChange={() => {
+                    setType(opt.value)
+                    setErrors({})
+                  }}
+                />
+                {opt.label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div className="hp" aria-hidden="true">
+          <label>
+            Company website
+            <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
+          </label>
+        </div>
+        <input type="hidden" name="sourcePage" value="/contact" />
+        <input type="hidden" name="startedAt" value={String(startedAtRef.current)} />
+
+        <div className="row2">
+          <div className="fw">
+            <label htmlFor="field-name">Your name *</label>
+            <input
+              id="field-name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => validateSingleField('name')}
+              aria-invalid={errors.name ? 'true' : undefined}
+              aria-describedby={errors.name ? 'error-name' : undefined}
+            />
+            {errors.name && (
+              <span className="err" id="error-name">
+                {errors.name}
+              </span>
+            )}
+          </div>
+          <div className="fw">
+            <label htmlFor="field-phone">Phone number *</label>
+            <input
+              id="field-phone"
+              name="phone"
+              type="tel"
+              autoComplete="tel"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              onBlur={() => validateSingleField('phone')}
+              aria-invalid={errors.phone ? 'true' : undefined}
+              aria-describedby={errors.phone ? 'phh error-phone' : 'phh'}
+            />
+            <p className="help" id="phh">
+              We&apos;ll call or WhatsApp you on this number.
+            </p>
+            {errors.phone && (
+              <span className="err" id="error-phone">
+                {errors.phone}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="row2">
+          <div className="fw">
+            <label htmlFor="field-email">Email (optional)</label>
+            <input
+              id="field-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => validateSingleField('email')}
+              aria-invalid={errors.email ? 'true' : undefined}
+              aria-describedby={errors.email ? 'error-email' : undefined}
+            />
+            {errors.email && (
+              <span className="err" id="error-email">
+                {errors.email}
+              </span>
+            )}
+          </div>
+          <div className="fw">
+            <label htmlFor="field-organisation">Company or organisation (optional)</label>
+            <input
+              id="field-organisation"
+              name="organisation"
+              type="text"
+              autoComplete="organization"
+              value={organisation}
+              onChange={(e) => setOrganisation(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="row2" hidden={isOther}>
+          <div className="fw" data-t="project consultation" hidden={!isProjectOrConsultation}>
+            <label htmlFor="field-service">Service *</label>
+            <select
+              id="field-service"
+              name="service"
+              value={service}
+              onChange={(e) => setService(e.target.value)}
+              onBlur={() => validateSingleField('service')}
+              aria-invalid={errors.service ? 'true' : undefined}
+              aria-describedby={errors.service ? 'error-service' : undefined}
             >
-              Call {phoneDisplay}
-            </Button>
-            <Button
-              href={whatsappUrl}
-              external
-              variant="outline"
-              className="w-full justify-center"
-              onClick={() => trackEvent('whatsapp_click', { location: 'contact' })}
-            >
-              WhatsApp us
-            </Button>
+              <option value="">Choose a service</option>
+              {publishedServices.map((s) => (
+                <option key={s.slug} value={s.slug}>
+                  {s.title}
+                </option>
+              ))}
+              <option value="not-sure">Not sure yet</option>
+            </select>
+            {errors.service && (
+              <span className="err" id="error-service">
+                {errors.service}
+              </span>
+            )}
           </div>
 
-          <p className="text-body mb-[0.8rem]">
-            <a
-              href={`mailto:${contactEmail}`}
-              onClick={() => trackEvent('email_click', { location: 'contact' })}
-              className="font-bold text-[var(--ink-900)] no-underline u-draw"
+          <div className="fw" data-t="hire" hidden={!isHire}>
+            <label htmlFor="field-equipment">Machine *</label>
+            <select
+              id="field-equipment"
+              name="equipment"
+              value={equipment}
+              onChange={(e) => setEquipment(e.target.value)}
+              onBlur={() => validateSingleField('equipment')}
+              aria-invalid={errors.equipment ? 'true' : undefined}
+              aria-describedby={errors.equipment ? 'error-equipment' : undefined}
             >
-              {contactEmail}
-            </a>
+              <option value="">Choose a machine or type</option>
+              {equipmentCategories.map((c) => {
+                const singularLabel =
+                  c.singular.toLowerCase().includes('grader')
+                    ? 'motor grader'
+                    : c.singular.toLowerCase().replace(/^a\s+|^an\s+/i, '')
+                const anyValue =
+                  c.slug === 'excavators'
+                    ? 'any-excavator'
+                    : c.slug === 'graders'
+                      ? 'any-grader'
+                      : c.slug === 'rollers'
+                        ? 'any-roller'
+                        : c.slug === 'bulldozers'
+                          ? 'any-bulldozer'
+                          : `any-${c.slug}`
+                return (
+                  <option key={anyValue} value={anyValue}>
+                    Any {singularLabel}
+                  </option>
+                )
+              })}
+              {publishedMachines.map((m) => (
+                <option key={m.slug} value={m.slug}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+            {errors.equipment && (
+              <span className="err" id="error-equipment">
+                {errors.equipment}
+              </span>
+            )}
+          </div>
+
+          <div className="fw" data-t="project hire consultation" hidden={isOther}>
+            <label htmlFor="field-location">
+              Site location {!isProjectOrConsultation || type === 'project' ? '*' : ''}
+            </label>
+            <input
+              id="field-location"
+              name="location"
+              type="text"
+              autoComplete="address-level2"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              onBlur={() => validateSingleField('location')}
+              aria-invalid={errors.location ? 'true' : undefined}
+              aria-describedby={errors.location ? 'lch error-location' : 'lch'}
+            />
+            <p className="help" id="lch">
+              Town, area or road, e.g. Makutano, Meru.
+            </p>
+            {errors.location && (
+              <span className="err" id="error-location">
+                {errors.location}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="row2" data-t="hire" hidden={!isHire}>
+          <div className="fw">
+            <label htmlFor="field-hireStart">Start date *</label>
+            <input
+              id="field-hireStart"
+              name="hireStart"
+              type="date"
+              min={todayIso}
+              value={hireStart}
+              onChange={(e) => setHireStart(e.target.value)}
+              onBlur={() => validateSingleField('hireStart')}
+              aria-invalid={errors.hireStart ? 'true' : undefined}
+              aria-describedby={errors.hireStart ? 'error-hireStart' : undefined}
+            />
+            {errors.hireStart && (
+              <span className="err" id="error-hireStart">
+                {errors.hireStart}
+              </span>
+            )}
+          </div>
+          <div className="fw">
+            <label htmlFor="field-hireDuration">How long do you need it? *</label>
+            <select
+              id="field-hireDuration"
+              name="hireDuration"
+              value={hireDuration}
+              onChange={(e) => setHireDuration(e.target.value)}
+              onBlur={() => validateSingleField('hireDuration')}
+              aria-invalid={errors.hireDuration ? 'true' : undefined}
+              aria-describedby={errors.hireDuration ? 'error-hireDuration' : undefined}
+            >
+              <option value="">Choose a duration</option>
+              {HIRE_DURATIONS.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            {errors.hireDuration && (
+              <span className="err" id="error-hireDuration">
+                {errors.hireDuration}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="row2" data-t="project consultation" hidden={!isProjectOrConsultation}>
+          <div className="fw">
+            <label htmlFor="field-budgetBand">Budget</label>
+            <select
+              id="field-budgetBand"
+              name="budgetBand"
+              value={budgetBand}
+              onChange={(e) => setBudgetBand(e.target.value)}
+            >
+              <option value="">Choose a range</option>
+              {BUDGET_BANDS.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="fw">
+            <label htmlFor="field-timeline">When do you want to start?</label>
+            <select
+              id="field-timeline"
+              name="timeline"
+              value={timeline}
+              onChange={(e) => setTimeline(e.target.value)}
+            >
+              <option value="">Choose a time</option>
+              {TIMELINES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="fw">
+          <label htmlFor="field-message" id="ml">
+            {messageLabel}
+          </label>
+          <textarea
+            id="field-message"
+            name="message"
+            maxLength={3000}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onBlur={() => validateSingleField('message')}
+            aria-invalid={errors.message ? 'true' : undefined}
+            aria-describedby={errors.message ? 'mh error-message' : 'mh'}
+          />
+          <p className="help" id="mh">
+            {type === 'hire'
+              ? 'Access, ground conditions, wet or dry hire preference.'
+              : 'Size, what’s there now, and what you want at the end.'}
           </p>
+          {errors.message && (
+            <span className="err" id="error-message">
+              {errors.message}
+            </span>
+          )}
+        </div>
 
-          {officeHours && (
-            <p className="text-body-xs text-[var(--ink-600)] mb-[0.8rem]">{officeHours}</p>
-          )}
-          {responseTimeStatement && (
-            <p className="text-body-xs text-[var(--ink-600)]">{responseTimeStatement}</p>
-          )}
+        <div className="fw" data-t="project consultation other" hidden={isHire}>
+          <label htmlFor="field-files">Attach drawings, BoQ or photos (optional)</label>
+          <input
+            id="field-files"
+            name="files"
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+          />
+          <p className="help">Up to 3 files, 10 MB each. PDF, JPG, PNG or WEBP.</p>
+        </div>
 
-          {showOfficesInAside && publishedLocations.length > 0 && (
-            <div className="mt-[2.4rem] pt-[2.4rem] border-t border-[var(--grey-300)]">
-              <h4 className="text-h4 text-[var(--ink-900)] mb-[1.6rem]">Offices</h4>
-              <div className="space-y-[1.6rem]">
-                {publishedLocations.map((loc) => (
-                  <div key={loc.slug}>
-                    <p className="text-label text-[var(--ink-900)]">{loc.town}</p>
-                    <p className="text-body-sm text-[var(--ink-600)] mb-[0.4rem]">{loc.address}</p>
-                    <a
-                      href={loc.directionsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-[0.4rem] text-label text-[var(--ink-900)] no-underline u-draw"
-                    >
-                      <span>Get directions</span>
-                      <Icon name="external-link" size={16} />
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div>
+          <div className="chk">
+            <input
+              type="checkbox"
+              id="field-consent"
+              name="consent"
+              className="rounded-none"
+              checked={consent}
+              onChange={(e) => {
+                setConsent(e.target.checked)
+                if (e.target.checked) {
+                  setErrors((prev) => {
+                    const next = { ...prev }
+                    delete next.consent
+                    return next
+                  })
+                }
+              }}
+              aria-invalid={errors.consent ? 'true' : undefined}
+              aria-describedby={errors.consent ? 'error-consent' : undefined}
+            />
+            <label htmlFor="field-consent">
+              I agree that Shena Works may use these details to respond to my enquiry, as described
+              in the <Link href="/privacy">privacy notice</Link>. *
+            </label>
+          </div>
+          {errors.consent && (
+            <span className="err" id="error-consent">
+              {errors.consent}
+            </span>
           )}
-        </aside>
-      </div>
-    </section>
+        </div>
+
+        <noscript>
+          <p className="help" style={{ border: '2px solid var(--g300)', padding: '12px 16px' }}>
+            This form needs JavaScript to check you are not a robot. You can still call or WhatsApp{' '}
+            {phoneDisplay} or email {contactEmail}.
+          </p>
+        </noscript>
+
+        {siteKey && <div ref={turnstileContainerRef} />}
+
+        <div>
+          <button className="btn pri" type="submit" id="sb" aria-busy={submitting || undefined}>
+            {submitting ? 'Sending...' : 'Send enquiry'}
+          </button>
+        </div>
+      </form>
+
+      <aside className="cside" aria-labelledby="pt-h">
+        <h2 className="h4" id="pt-h">
+          Prefer to talk?
+        </h2>
+        <a
+          className="btn sec"
+          href={`tel:${phoneE164}`}
+          onClick={() => trackEvent('call_click', { location: 'contact_aside' })}
+        >
+          Call {phoneDisplay}
+        </a>
+        <a
+          className="btn outl"
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent('whatsapp_click', { location: 'contact_aside' })}
+        >
+          WhatsApp us
+        </a>
+        <a className="em" href={`mailto:${contactEmail}`}>
+          {contactEmail}
+        </a>
+        <hr />
+        <h2 className="h4">Offices</h2>
+        {publishedLocations.length > 0 ? (
+          publishedLocations.map((loc) => (
+            <React.Fragment key={loc.slug}>
+              <span className="lbl">{loc.town}</span>
+              <p className="sm" style={{ marginBottom: '12px' }}>
+                {loc.address || 'Headquarters and plant yard'}
+              </p>
+            </React.Fragment>
+          ))
+        ) : (
+          <>
+            <span className="lbl">Meru</span>
+            <p className="sm">Headquarters and plant yard</p>
+          </>
+        )}
+      </aside>
+    </div>
   )
 }

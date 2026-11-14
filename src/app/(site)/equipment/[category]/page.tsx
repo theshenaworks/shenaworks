@@ -14,6 +14,7 @@ import { buildWhatsAppUrl } from '@/lib/whatsapp'
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import type { KeyFactItem } from '@/types/content'
+import { InlineEnquiryForm } from '@/components/blocks/InlineEnquiryForm'
 
 export async function generateStaticParams() {
   const categories = await getPublishedEquipmentCategories().catch(() => [])
@@ -83,7 +84,7 @@ export default async function EquipmentCategoryPage({
 
   const heroImg =
     cat.heroImage?.url ||
-    'https://images.pexels.com/photos/25559747/pexels-photo-25559747.jpeg?auto=compress&cs=tinysrgb&w=1600'
+    '/media/equip-excavator.jpg'
   const heroAlt = cat.heroImage?.alt || `${cat.name} on site`
 
   return (
@@ -171,7 +172,7 @@ export default async function EquipmentCategoryPage({
                   <Image
                     src={
                       m.heroImage?.url ||
-                      'https://images.pexels.com/photos/13931828/pexels-photo-13931828.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                      '/media/equip-grader.jpg'
                     }
                     alt={m.heroImage?.alt || m.name}
                     fill
@@ -241,7 +242,7 @@ export default async function EquipmentCategoryPage({
                       <Image
                         src={
                           p.heroImage?.url ||
-                          'https://images.pexels.com/photos/16120138/pexels-photo-16120138.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                          '/media/hero-roads.jpg'
                         }
                         alt={p.heroImage?.alt || p.title}
                         fill
@@ -294,115 +295,19 @@ export default async function EquipmentCategoryPage({
           <p className="lead" style={{ fontSize: '18px', lineHeight: '26px', maxWidth: '34em' }}>
             Tell us the machine, dates and site. We’ll confirm availability and price.
           </p>
-          <form className="form f" id="hf" method="post" action="/api/enquiry" noValidate>
-            <div className="sum" id="sum" role="alert" tabIndex={-1} hidden>
-              <h3>Please fix these before sending</h3>
-              <ul id="sl"></ul>
-            </div>
-            <p className="help" style={{ margin: 0 }}>
-              * required
-            </p>
-            <input type="hidden" name="type" value="hire" />
-            <input type="hidden" name="sourcePage" value={`/equipment/${cat.slug}`} />
-            <div className="hp" aria-hidden="true">
-              <label>
-                Company website
-                <input type="text" name="company_website" tabIndex={-1} autoComplete="off" />
-              </label>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="name">Your name *</label>
-                <input id="name" name="name" type="text" autoComplete="name" required />
-              </div>
-              <div>
-                <label htmlFor="phone">Phone number *</label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  required
-                  aria-describedby="ph-h"
-                />
-                <p className="help" id="phh">
-                  We’ll call or WhatsApp you on this number.
-                </p>
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="email">Email (optional)</label>
-                <input id="email" name="email" type="email" autoComplete="email" />
-              </div>
-              <div>
-                <label htmlFor="org">Company or organisation (optional)</label>
-                <input id="org" name="organisation" type="text" autoComplete="organization" />
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="equipment">Machine *</label>
-                <select id="equipment" name="equipment" required defaultValue={`Any ${cat.name.replace(/s$/, '').toLowerCase()}`}>
-                  <option value="">Choose a machine or type</option>
-                  <option>{`Any ${cat.name.replace(/s$/, '').toLowerCase()}`}</option>
-                  {machines.map((m) => (
-                    <option key={m.slug} value={m.name}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="location">Site location *</label>
-                <input
-                  id="location"
-                  name="location"
-                  type="text"
-                  autoComplete="address-level2"
-                  required
-                  aria-describedby="lc-h"
-                />
-                <p className="help" id="lc-h">
-                  Town, area or road, e.g. Makutano, Meru.
-                </p>
-              </div>
-            </div>
-            <div className="row2">
-              <div>
-                <label htmlFor="start">Start date *</label>
-                <input id="start" name="hireStart" type="date" required />
-              </div>
-              <div>
-                <label htmlFor="dur">How long do you need it? *</label>
-                <select id="dur" name="hireDuration" required>
-                  <option value="">Choose a duration</option>
-                  <option>1 day</option>
-                  <option>2–6 days</option>
-                  <option>1–2 weeks</option>
-                  <option>2–4 weeks</option>
-                  <option>More than a month</option>
-                  <option>Not sure</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label htmlFor="msg">Anything we should know about the site or work? (optional)</label>
-              <textarea id="msg" name="message" maxLength={3000}></textarea>
-            </div>
-            <div className="chk">
-              <input type="checkbox" id="consent" name="consent" required />
-              <label htmlFor="consent">
-                I agree that Shena Works may use these details to respond to my enquiry, as described in the{' '}
-                <Link href="/privacy">privacy notice</Link>. *
-              </label>
-            </div>
-            <div>
-              <button className="btn pri" type="submit">
-                Request hire
-              </button>
-            </div>
-          </form>
+          <InlineEnquiryForm
+            mode="hire"
+            sourcePage={`/equipment/${cat.slug}`}
+            defaultEquipment={`Any ${cat.name.replace(/s$/, '').toLowerCase()}`}
+            equipmentOptions={[
+              {
+                value: `Any ${cat.name.replace(/s$/, '').toLowerCase()}`,
+                label: `Any ${cat.name.replace(/s$/, '').toLowerCase()}`,
+              },
+              ...machines.map((m) => ({ value: m.name, label: m.name })),
+            ]}
+            submitLabel="Request hire"
+          />
         </div>
       </section>
     </>

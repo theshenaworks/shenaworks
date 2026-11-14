@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-accent-500: #c14a12;
-  --color-accent-600: #963a12;
-  --color-accent-700: #7a3214;
-  --color-accent-on-dark: #ff8f50;
+  --color-accent-500: #022460;
+  --color-accent-600: #011b4a;
+  --color-accent-700: #011336;
+  --color-accent-on-dark: #7eb0ff;
   --color-ink-975: #1a1713;
   --color-ink-950: #221f1b;
   --color-ink-900: #2e2a25;
@@ -102,15 +102,15 @@ html {
 @property --underline {
   syntax: "<color>";
   inherits: true;
-  initial-value: #c14a12;
+  initial-value: #022460;
 }
 
 :root {
   /* Color primitives */
-  --accent-500: #c14a12;
-  --accent-600: #963a12;
-  --accent-700: #7a3214;
-  --accent-on-dark: #ff8f50;
+  --accent-500: #022460;
+  --accent-600: #011b4a;
+  --accent-700: #011336;
+  --accent-on-dark: #7eb0ff;
   --ink-975: #1a1713;
   --ink-950: #221f1b;
   --ink-900: #2e2a25;
@@ -337,7 +337,7 @@ body {
   outline: none;
 }
 :focus-visible {
-  outline: 2px solid var(--ring, #c14a12);
+  outline: 2px solid var(--ring, #022460);
   outline-offset: 2px;
 }
 
@@ -706,9 +706,9 @@ html[data-lock="page"]:not([data-lock-below="lg"]) body {
   text-align: center;
 }
 .button--primary {
-  --surface: #c14a12;
-  --hover: #963a12;
-  --pressed: #7a3214;
+  --surface: #022460;
+  --hover: #011b4a;
+  --pressed: #011336;
   --hover-text: #ffffff;
   color: #ffffff;
 }
@@ -986,7 +986,7 @@ html[data-js] .hero-media[data-reveal="hidden"] {
 .field-input:focus-visible,
 .field-textarea:focus-visible {
   border-color: var(--ink-800);
-  outline: 2px solid var(--ring, #c14a12);
+  outline: 2px solid var(--ring, #022460);
   outline-offset: 2px;
 }
 .field-input[aria-invalid="true"],

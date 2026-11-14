@@ -137,10 +137,16 @@ export default buildConfig({
   },
   db: postgresAdapter({
     pool: {
-      connectionString:
-        process.env.PAYLOAD_MIGRATING === 'true'
-          ? process.env.DIRECT_DATABASE_URI || process.env.DATABASE_URI
-          : process.env.DATABASE_URI,
+      connectionString: (() => {
+        const uri =
+          process.env.PAYLOAD_MIGRATING === 'true'
+            ? process.env.DIRECT_DATABASE_URI || process.env.DATABASE_URI
+            : process.env.DATABASE_URI
+        // Explicitly enforce sslmode=verify-full to preserve full SSL verification without pg v9 deprecation warnings
+        return uri
+          ? uri.replace(/([?&])sslmode=(?:require|prefer|verify-ca)(?=&|$)/gi, '$1sslmode=verify-full')
+          : uri
+      })(),
       max: 10,
       idleTimeoutMillis: 30000,
     },

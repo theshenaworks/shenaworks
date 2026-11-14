@@ -258,7 +258,7 @@ export const siteSettingsSeed = {
     companyProfile: null as { url: string; sizeMb: string } | null,
   },
   ctaImage: {
-    url: '/media/cta-site-work.svg',
+    url: '/media/cta-site.jpg',
     alt: 'Shena Works road grading crew and motor grader on site in Meru County',
     caption: 'Road formation grading and drainage works in Meru County.',
   },
@@ -292,7 +292,7 @@ export const homePageSeed = {
   heroLead:
     'We grade, drain and pave roads, and we build homes, lounges and commercial premises across Meru, Nairobi and the rest of Kenya, from site clearing to handover.',
   heroImage: {
-    url: '/media/hero-home-road-grading.svg',
+    url: '/media/hero-roads.jpg',
     alt: 'Shena Works motor grader and vibratory roller preparing a murram road in Meru County',
     caption: 'Grading and compacting an access road in Meru County',
   },
@@ -300,7 +300,7 @@ export const homePageSeed = {
     overline: 'Why Shena Works',
     heading: 'We own the plant and we run the site',
     image: {
-      url: '/media/about-site-supervision.svg',
+      url: '/media/why-crew.jpg',
       alt: 'Shena Works site team and excavator during earthworks and drainage construction',
       caption: 'On-site supervision and earthmoving plant operation in Meru County.',
     },
@@ -347,7 +347,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'We clear, grade, drain and surface access roads, estate roads, commercial compounds and feeder roads in Meru County, Nairobi and across Kenya, using our own earthmoving and compaction plant.',
     heroImage: {
-      url: '/media/service-road-construction.svg',
+      url: '/media/service-roads.jpg',
       alt: 'Motor grader and vibratory roller shaping a murram road formation with side drains',
       caption: 'Formation grading and culvert drainage installation in Meru County.',
     },
@@ -485,7 +485,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'Cabro only stays level when the ground underneath it is properly excavated, drained and compacted. We prepare the sub-base with our own rollers and lay 60 mm and 80 mm interlocking blocks across Meru and Nairobi.',
     heroImage: {
-      url: '/media/service-cabro-paving.svg',
+      url: '/media/service-cabro.jpg',
       alt: 'Herringbone interlocking cabro paving with concrete road kerbs and drainage channel',
       caption: 'Heavy-duty herringbone cabro paving at The Pin Hideout, Meru County.',
     },
@@ -610,7 +610,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'We build lounges, cottages, villas, commercial buildings and family homes in Meru and Nairobi — handling the groundworks, structural frame, masonry, roofing, services and finishes under one contract.',
     heroImage: {
-      url: '/media/service-general-construction.svg',
+      url: '/media/service-building.jpg',
       alt: 'Reinforced concrete frame and natural stone masonry building construction in Meru',
       caption: 'Commercial and hospitality building construction in Meru County.',
     },
@@ -742,7 +742,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'We plan layouts, choose durable materials, design lighting and build custom joinery and finishes for lounges, restaurants, cottages, offices and homes in Meru and Nairobi.',
     heroImage: {
-      url: '/media/service-interior-design.svg',
+      url: '/media/service-interior.jpg',
       alt: 'Hospitality lounge interior with custom lighting, joinery and flooring in Meru',
       caption: 'Interior fit-out and architectural lighting at The Black Perch Lounge, Meru.',
     },
@@ -867,7 +867,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'For developers and property owners who want experienced eyes on site every day — managing the programme, checking materials and workmanship, controlling variations and reporting clearly.',
     heroImage: {
-      url: '/media/service-project-management.svg',
+      url: '/media/service-pm.jpg',
       alt: 'Site supervisor reviewing construction drawings and progress on site in Meru',
       caption: 'On-site quality inspection and trade coordination in Meru County.',
     },
@@ -994,7 +994,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'Practical architectural design and working drawings coordinated with structural engineering and real construction costs from the start.',
     heroImage: {
-      url: '/media/service-project-management.svg',
+      url: '/media/service-pm.jpg',
       alt: 'Architectural working drawings and site layout plans',
       caption: 'Architectural working drawings coordinated with construction planning.',
     },
@@ -1067,7 +1067,7 @@ export const servicesSeed: ServiceRecord[] = [
     heroLead:
       'Know what your road or building will cost before work starts on site — itemised quantities of materials, plant and labour that let you budget accurately and compare quotes fairly.',
     heroImage: {
-      url: '/media/service-project-management.svg',
+      url: '/media/service-pm.jpg',
       alt: 'Construction cost estimating and Bill of Quantities preparation',
       caption: 'Quantity takeoffs and construction estimating.',
     },
@@ -1122,7 +1122,7 @@ export const projectsSeed: ProjectRecord[] = [
     metaDescription:
       'Construction, interior fit-out, wellness facilities, carwash bays and cabro parking for The Black Perch Lounge in Meru County by Shena Works.',
     heroImage: {
-      url: '/media/project-black-perch-lounge.svg',
+      url: '/media/project-black-perch.jpg',
       alt: 'Exterior view of The Black Perch Lounge pavilions and cabro forecourt in Meru',
       caption: 'Lounge pavilions, wellness suites and cabro forecourt at The Black Perch Lounge, Meru.',
     },
@@ -1140,17 +1140,17 @@ export const projectsSeed: ProjectRecord[] = [
       'The Black Perch Lounge opened as a complete day-to-night venue where guests can use the carwash, wellness rooms, restaurant and lounges without congestion or drainage issues during heavy Meru rains.',
     gallery: [
       {
-        url: '/media/project-black-perch-lounge.svg',
+        url: '/media/project-black-perch.jpg',
         alt: 'Wide exterior view of the lounge pavilions and cabro forecourt at The Black Perch Lounge',
         caption: 'Exterior view of the lounge pavilions and cabro forecourt at dusk.',
       },
       {
-        url: '/media/service-interior-design.svg',
+        url: '/media/service-interior.jpg',
         alt: 'Lounge interior showing custom grass-tile flooring, seating and ambient ceiling lighting',
         caption: 'Lounge interior showing custom grass-tile flooring, seating and ambient lighting.',
       },
       {
-        url: '/media/service-cabro-paving.svg',
+        url: '/media/service-cabro.jpg',
         alt: 'Cabro-paved parking and drive-through circulation showing kerbs and surface drainage',
         caption: 'Cabro-paved parking and drive-through circulation with concrete kerbs and drainage.',
       },
@@ -1177,7 +1177,7 @@ export const projectsSeed: ProjectRecord[] = [
     metaDescription:
       'Site grading, storm-water drainage, access road works and heavy-duty cabro paving for The Pin Hideout commercial complex by Shena Works.',
     heroImage: {
-      url: '/media/project-pin-hideout.svg',
+      url: '/media/project-pin-hideout.jpg',
       alt: 'Completed cabro-paved compound and entrance road at The Pin Hideout in Meru County',
       caption: 'Heavy-duty herringbone cabro compound and storm drainage at The Pin Hideout.',
     },
@@ -1195,17 +1195,17 @@ export const projectsSeed: ProjectRecord[] = [
       'The finished access road and compound drain cleanly during downpours and have stayed level under daily commercial traffic, giving visitors a clean approach from the main road to the entrance.',
     gallery: [
       {
-        url: '/media/project-pin-hideout.svg',
+        url: '/media/project-pin-hideout.jpg',
         alt: 'Completed cabro-paved compound and entrance at The Pin Hideout',
         caption: 'Completed cabro-paved compound and entrance at The Pin Hideout.',
       },
       {
-        url: '/media/service-cabro-paving.svg',
+        url: '/media/service-cabro.jpg',
         alt: 'Close-up of herringbone cabro joints and kerb haunching',
         caption: 'Close-up of herringbone cabro paving and concrete kerb haunching.',
       },
       {
-        url: '/media/equipment-vibratory-roller.svg',
+        url: '/media/equip-roller.jpg',
         alt: 'Vibratory roller compacting the murram sub-base prior to cabro laying',
         caption: 'Compaction stage: vibratory roller locking the murram sub-base.',
       },
@@ -1232,7 +1232,7 @@ export const projectsSeed: ProjectRecord[] = [
     metaDescription:
       'Site project management for the Dukes Cottages, Restaurant & Garden hospitality complex in Meru County, supervised by Newton Muthee for Dukes Limited.',
     heroImage: {
-      url: '/media/project-dukes-cottages.svg',
+      url: '/media/project-dukes.jpg',
       alt: 'Guest cottages, dining restaurant and landscaped gardens at Dukes Cottages in Meru',
       caption: 'Guest cottages, central restaurant and landscaped pathways in Meru County.',
     },
@@ -1254,17 +1254,17 @@ export const projectsSeed: ProjectRecord[] = [
       'The cottages, restaurant and grounds were completed to specification and handed over ready for guests — establishing the hands-on hospitality site management approach we now bring to Shena Works projects across Meru.',
     gallery: [
       {
-        url: '/media/project-dukes-cottages.svg',
+        url: '/media/project-dukes.jpg',
         alt: 'Completed guest cottages and landscaped garden path at Dukes Cottages',
         caption: 'Completed guest cottages and landscaped garden pathways.',
       },
       {
-        url: '/media/service-general-construction.svg',
+        url: '/media/service-building.jpg',
         alt: 'Cottage roofing, stonework and veranda detail',
         caption: 'Cottage roofing, natural stonework and veranda construction detail.',
       },
       {
-        url: '/media/service-project-management.svg',
+        url: '/media/service-pm.jpg',
         alt: 'Site supervision and trade coordination during construction',
         caption: 'Daily site supervision and trade sequence management.',
       },
@@ -1291,7 +1291,7 @@ export const projectsSeed: ProjectRecord[] = [
     metaDescription:
       'Natural stone masonry, structural works and contemporary interior finishes for Stone Lounge & Villas by Shena Works.',
     heroImage: {
-      url: '/media/project-stone-lounge-villas.svg',
+      url: '/media/project-stone-lounge.jpg',
       alt: 'Dressed natural stone facade and roof lines at Stone Lounge & Villas',
       caption: 'Architectural natural stone masonry and contemporary interiors at Stone Lounge & Villas.',
     },
@@ -1309,17 +1309,17 @@ export const projectsSeed: ProjectRecord[] = [
       'The finished villas and lounge combine heavy natural stone character with clean modern interiors, delivered on a well-drained, accessible compound.',
     gallery: [
       {
-        url: '/media/project-stone-lounge-villas.svg',
+        url: '/media/project-stone-lounge.jpg',
         alt: 'Exterior elevation showing natural stone facade and roof lines',
         caption: 'Exterior elevation showing dressed natural stone masonry and roof lines.',
       },
       {
-        url: '/media/service-interior-design.svg',
+        url: '/media/service-interior.jpg',
         alt: 'Lounge interior showing stone feature wall, lighting and flooring',
         caption: 'Lounge interior with natural stone feature walls and warm lighting.',
       },
       {
-        url: '/media/service-general-construction.svg',
+        url: '/media/service-building.jpg',
         alt: 'Structural frame and stone masonry construction detail',
         caption: 'Natural stone masonry and structural framing workmanship.',
       },
@@ -1346,7 +1346,7 @@ export const projectsSeed: ProjectRecord[] = [
     metaDescription:
       'Precision road grading, murram gravelling, culvert installation and storm-water drainage in Meru County by Shena Works.',
     heroImage: {
-      url: '/media/project-meru-access-road.svg',
+      url: '/media/hero-roads.jpg',
       alt: 'Graded and compacted murram access road with trapezoidal side drains in Meru County',
       caption: 'Graded murram road profile with side drains and concrete pipe culverts in Meru County.',
     },
@@ -1364,17 +1364,17 @@ export const projectsSeed: ProjectRecord[] = [
       'Storm water now discharges through the side drains and culverts instead of running down the wheel tracks, keeping the road open year-round for residents and deliveries.',
     gallery: [
       {
-        url: '/media/project-meru-access-road.svg',
+        url: '/media/hero-roads.jpg',
         alt: 'Finished graded and compacted road showing camber and clean side drains',
         caption: 'Finished graded and compacted murram road showing camber and side drains.',
       },
       {
-        url: '/media/equipment-crawler-excavator.svg',
+        url: '/media/equip-excavator.jpg',
         alt: 'Excavator trenching and lowering precast concrete culvert rings',
         caption: 'Excavator trenching and installing precast concrete culvert rings.',
       },
       {
-        url: '/media/equipment-motor-grader.svg',
+        url: '/media/equip-grader.jpg',
         alt: 'Motor grader shaping the formation and cutting side drains',
         caption: 'Motor grader shaping the formation camber and cutting V-drains.',
       },
@@ -1397,7 +1397,7 @@ export const equipmentCategoriesSeed: EquipmentCategoryRecord[] = [
     heroLead:
       'Crawler and wheeled excavators with experienced operators for bulk excavation, foundation trenching, culvert installation, quarry loading, dam desilting and demolition.',
     heroImage: {
-      url: '/media/equipment-crawler-excavator.svg',
+      url: '/media/equip-excavator.jpg',
       alt: 'Shena Works 20-tonne class crawler excavator on site in Meru County',
       caption: 'Crawler excavator with operator during bulk excavation and trenching.',
     },
@@ -1456,7 +1456,7 @@ export const equipmentCategoriesSeed: EquipmentCategoryRecord[] = [
     heroLead:
       'Precision motor graders with skilled operators for access road formation, camber shaping, murram spreading, side-drain cutting and bank sloping.',
     heroImage: {
-      url: '/media/equipment-motor-grader.svg',
+      url: '/media/equip-grader.jpg',
       alt: 'Shena Works motor grader shaping road camber and side drains in Meru',
       caption: 'Motor grader shaping road cross-fall and cutting trapezoidal side drains.',
     },
@@ -1513,7 +1513,7 @@ export const equipmentCategoriesSeed: EquipmentCategoryRecord[] = [
     heroLead:
       'Single-drum and double-drum vibratory rollers with operators for soil, murram sub-base, hardcore and asphalt compaction.',
     heroImage: {
-      url: '/media/equipment-vibratory-roller.svg',
+      url: '/media/equip-roller.jpg',
       alt: 'Single-drum vibratory roller compacting a murram sub-base in Meru',
       caption: 'Single-drum vibratory roller compacting road sub-base in Meru County.',
     },
@@ -1560,7 +1560,7 @@ export const equipmentCategoriesSeed: EquipmentCategoryRecord[] = [
     heroLead:
       'Heavy crawler dozers with operators for bush clearing, ripping, cut-and-fill earthworks and dam construction across Kenya.',
     heroImage: {
-      url: '/media/equipment-bulldozer.svg',
+      url: '/media/equip-bulldozer.jpg',
       alt: 'Heavy crawler bulldozer with blade and ripper clearing land',
       caption: 'Crawler bulldozer performing bush clearing and bulk cut-and-fill earthworks.',
     },
@@ -1621,13 +1621,13 @@ export const machinesSeed: MachineRecord[] = [
     featured: true,
     _status: 'draft',
     heroImage: {
-      url: '/media/equipment-crawler-excavator.svg',
+      url: '/media/equip-excavator.jpg',
       alt: 'Crawler excavator for hire in Meru County',
       caption: 'Crawler excavator available for hire with operator.',
     },
     gallery: [
       {
-        url: '/media/equipment-crawler-excavator.svg',
+        url: '/media/equip-excavator.jpg',
         alt: 'Crawler excavator excavating trenches',
         caption: 'Crawler excavator performing trenching and bulk earthworks.',
       },
@@ -1662,13 +1662,13 @@ export const machinesSeed: MachineRecord[] = [
     featured: true,
     _status: 'draft',
     heroImage: {
-      url: '/media/equipment-motor-grader.svg',
+      url: '/media/equip-grader.jpg',
       alt: 'Motor grader shaping road camber',
       caption: 'Motor grader with 3.7 m moldboard blade and operator.',
     },
     gallery: [
       {
-        url: '/media/equipment-motor-grader.svg',
+        url: '/media/equip-grader.jpg',
         alt: 'Motor grader shaping road formation and side drains',
         caption: 'Motor grader cutting road camber and V-drains in Meru County.',
       },
@@ -1703,13 +1703,13 @@ export const machinesSeed: MachineRecord[] = [
     featured: true,
     _status: 'draft',
     heroImage: {
-      url: '/media/equipment-vibratory-roller.svg',
+      url: '/media/equip-roller.jpg',
       alt: 'Single-drum vibratory roller compacting murram road base',
       caption: 'Single-drum vibratory roller with operator.',
     },
     gallery: [
       {
-        url: '/media/equipment-vibratory-roller.svg',
+        url: '/media/equip-roller.jpg',
         alt: 'Single-drum vibratory roller on cabro sub-base',
         caption: 'Vibratory roller compacting road and compound sub-base layers.',
       },
@@ -1744,13 +1744,13 @@ export const machinesSeed: MachineRecord[] = [
     featured: false,
     _status: 'draft',
     heroImage: {
-      url: '/media/equipment-bulldozer.svg',
+      url: '/media/equip-bulldozer.jpg',
       alt: 'Crawler bulldozer with semi-U blade and rear ripper',
       caption: 'Crawler bulldozer for bush clearing, ripping and bulk earthworks.',
     },
     gallery: [
       {
-        url: '/media/equipment-bulldozer.svg',
+        url: '/media/equip-bulldozer.jpg',
         alt: 'Crawler bulldozer clearing land and pushing earthworks',
         caption: 'Crawler bulldozer clearing land and performing cut-and-fill earthworks.',
       },
@@ -1836,7 +1836,7 @@ export const teamSeed: TeamRecord = {
   summary:
     "Newton leads Shena Works Limited's road, building and equipment operations from Meru and Nairobi, combining public-sector road inspection experience with hands-on hospitality and commercial site management.",
   portrait: {
-    url: '/media/portrait-newton-muthee.svg',
+    url: '/media/newton-portrait.jpg',
     alt: 'Newton M. Muthee, Managing Director of Shena Works Limited',
     caption: 'Newton M. Muthee, Managing Director, Shena Works Limited.',
   },
@@ -1968,7 +1968,7 @@ export const locationsSeed: LocationRecord[] = [
     heroLead:
       'Meru is our home base and plant yard. We grade and pave roads, build hospitality, commercial and residential projects, and hire out excavators, graders and rollers across Meru County and Mount Kenya East.',
     heroImage: {
-      url: '/media/location-meru.svg',
+      url: '/media/cta-site.jpg',
       alt: 'Shena Works plant yard and road construction operations in Meru County',
       caption: 'Shena Works headquarters and heavy equipment yard in Meru County.',
     },
@@ -2013,7 +2013,7 @@ export const locationsSeed: LocationRecord[] = [
     heroLead:
       'From our Nairobi office we handle residential and commercial building construction, cabro compounds, interior fit-outs, road works and project management across Nairobi, Kiambu, Machakos and Kajiado.',
     heroImage: {
-      url: '/media/location-nairobi.svg',
+      url: '/media/cta-site.jpg',
       alt: 'Shena Works building and civil engineering operations in Nairobi',
       caption: 'Commercial and residential construction across Nairobi and surrounding counties.',
     },
@@ -2059,19 +2059,55 @@ export const postsSeed: PostRecord[] = [
     readingTimeMinutes: 5,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/post-cabro-cost.svg',
+      url: '/media/service-cabro.jpg',
       alt: 'Cabro paving blocks being laid over compacted sub-base and quarry dust',
-      caption: 'Screeding quarry dust and laying 80 mm herringbone cabro blocks.',
+      caption: 'Screeding quarry dust and laying 80 mm herringbone cabro blocks over compacted sub-base.',
     },
     sections: [
       {
-        heading: 'Why two per m² cabro quotes can differ by 40%',
+        heading: 'Why two "per m²" cabro quotes can differ by 40%',
         paragraphs: [
-          'When comparing cabro paving quotes, the block itself is only one part of the cost. The difference between a driveway or compound that stays flat for ten years and one that ruts in the first rains lies underground in the excavation depth, sub-base thickness and edge restraint.',
+          'When comparing cabro paving quotes, the concrete block itself is only one part of the bill. The difference between a driveway or compound that stays flat for years and one that ruts in the first heavy rains lies underground in the excavation depth, sub-base thickness and edge restraint.',
+          'A low per-square-metre rate almost always leaves something out: shallow scraping instead of removing weak topsoil, uncompacted hardcore, thin quarry dust bedding, or missing kerbs and channels.',
+        ],
+      },
+      {
+        heading: 'Ground excavation and black cotton replacement',
+        paragraphs: [
+          'On firm red volcanic soils common around upper Meru, formation excavation is straightforward once topsoil and vegetation are cleared. On dark clay or black cotton soil pockets, shallow skimming does not work because the clay swells when wet and shrinks in dry months.',
+          'Where weak clay exists, we cut down to firm ground or backfill with imported murram or crushed rock fill before placing the sub-base. Skipping that step turns the paving wavy within a single wet season.',
+        ],
+      },
+      {
+        heading: 'Sub-base thickness and roller compaction',
+        paragraphs: [
+          'Hardcore, graded crushed stone (crusher run) or good murram sub-base needs controlled watering and vibration compaction in layers rather than tipping a thick heap and rolling the surface once. Compaction with a vibrating roller locks the stone matrix together before any bedding sand or quarry dust goes down.',
+          'Quarry dust should only be a tight 25 mm to 40 mm levelling screed under the blocks. Using thick layers of quarry dust to compensate for an uneven sub-base leads to wheel depressions where vehicles brake or turn.',
+        ],
+      },
+      {
+        heading: '60 mm vs 80 mm blocks, colours and patterns',
+        paragraphs: [
+          'Use 60 mm interlocking concrete blocks for domestic driveways, residential courtyards, walkways and light car parking. Specify 80 mm heavy-duty blocks where delivery lorries, water bowsers, coaches or fuel tankers will travel and steer.',
+          'Uniform grey blocks usually cost less per square metre than full-body pigmented red or charcoal mixes, while herringbone laying patterns lock more firmly under turning wheels than running-bond courses.',
+        ],
+      },
+      {
+        heading: 'Kerbs, channels and storm drainage',
+        paragraphs: [
+          'Cabro relies on lateral restraint to stay tight. Concrete road kerbs or flush concrete haunching hold the perimeter blocks from creeping outward when vehicles pass near the edge.',
+          'Storm water must also be directed along falls to catchpits, concrete channels or roadside drains so surface runoff does not undermine the bedding layer.',
+        ],
+      },
+      {
+        heading: 'Checklist before you accept a cabro quote',
+        paragraphs: [
+          'Ask every contractor to state the assumed excavation depth, whether spoil cart-away is included, sub-base material and compacted thickness, block strength and thickness (60 mm or 80 mm), linear metres of kerbs included, and how storm water leaves the yard.',
+          'Send us your approximate compound area and what vehicles will use it. We will inspect the soil on site and put every layer clearly in writing.',
         ],
       },
     ],
-    _status: 'draft',
+    _status: 'published',
   },
   {
     slug: 'murram-gravel-cabro-or-tarmac-access-road',
@@ -2081,15 +2117,48 @@ export const postsSeed: PostRecord[] = [
     excerpt:
       'Matching road surfacing to slope, traffic and rainfall across Meru and central Kenya, and why drainage matters more than the top layer.',
     publishedAt: '2026-10-20',
-    readingTimeMinutes: 6,
+    readingTimeMinutes: 4,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/post-road-surfaces.svg',
+      url: '/media/service-roads.jpg',
       alt: 'Comparison of graded murram, cabro and tarmac access roads',
-      caption: 'Selecting the right access road surface for gradient and traffic load.',
+      caption: 'Selecting between graded murram, cabro blocks and tarmac for slope and traffic.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: 'Match the surface to the slope, the traffic and the rain',
+        paragraphs: [
+          'Choosing between murram, cabro and tarmac depends on gradient, traffic and budget. There is no single right answer, which is why we inspect the site first and, if you want to compare, price more than one option.',
+        ],
+      },
+      {
+        heading: 'When graded murram is enough',
+        paragraphs: [
+          'Well-compacted murram with proper side drains and culverts works well for farm and rural access roads on moderate slopes. The words that matter are compacted and drained: murram that is only spread, not compacted, will not hold up under rain and traffic.',
+        ],
+      },
+      {
+        heading: 'Where cabro beats murram',
+        paragraphs: [
+          'Steep sections, commercial yards, lounges and estate roads carry less maintenance over time when they are paved with 60 mm or 80 mm cabro blocks, or with tarmac.',
+          'Use 60 mm blocks for domestic driveways, footpaths and car parking. Use 80 mm heavy-duty interlocking blocks over a compacted crusher-run or stabilised sub-base where delivery trucks, tankers or buses will turn and park.',
+        ],
+      },
+      {
+        heading: 'When tarmac or surface dressing pays back',
+        paragraphs: [
+          'Tarmac suits urban and feeder roads: a prime coat, a tack coat and an asphalt concrete wearing course, or surface dressing with chippings and bitumen. A good surface needs a layer build-up beneath it that matches the traffic it will carry.',
+        ],
+      },
+      {
+        heading: 'Drainage matters more than the top layer',
+        paragraphs: [
+          'Water is what destroys roads in Meru and central Kenya. Without side drains, mitre drains and culverts sized for heavy rain, runoff cuts channels through murram and washes out the bedding under cabro or tarmac. Whichever surface you choose, check where storm water enters and leaves the road before you check anything else.',
+          'If you are comparing options for your own access road, send us the location, the approximate length and what the road needs to carry. We will tell you what we would build and why.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
   {
     slug: 'hiring-an-excavator-in-meru-what-to-ask',
@@ -2102,12 +2171,49 @@ export const postsSeed: PostRecord[] = [
     readingTimeMinutes: 5,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/post-excavator-hire.svg',
+      url: '/media/equip-excavator.jpg',
       alt: 'Crawler excavator loading tipper truck on a Meru construction site',
-      caption: 'Checking bucket capacity, transport access and wet vs dry hire terms.',
+      caption: 'Confirming machine weight, low-loader access and hire terms before mobilisation.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: '1. Match machine tonnage and bucket width to the work',
+        paragraphs: [
+          'A 20-tonne excavator moves bulk earth and loads tippers far faster than a compact unit, but on a narrow residential plot with masonry boundary walls it can have no room to slew safely. Before booking, confirm both the trench or foundation width and the turning clearance on site.',
+        ],
+      },
+      {
+        heading: '2. Clarify wet rate vs dry rate before quoting compares',
+        paragraphs: [
+          'A dry rate covers only the machine (and sometimes the operator), leaving diesel, daily greasing and mobilisation to the hirer. A wet rate normally bundles machine, operator and fuel for an agreed number of hours per shift. Make sure every quote states clearly who supplies diesel and at what daily hour minimum.',
+        ],
+      },
+      {
+        heading: '3. Check low-loader transport and site gate access',
+        paragraphs: [
+          'Tracked excavators cannot walk long distances on paved roads and always require a low-loader trailer to mobilise and demobilise. Check bridge weight limits, overhanging trees, power drops and gate widths along the final few hundred metres to your plot before dispatching the trailer.',
+        ],
+      },
+      {
+        heading: '4. Ask what operator experience fits your task',
+        paragraphs: [
+          'Bulk excavation into waiting tippers requires speed and tidy benching, while foundation trenches, septic pits and drainage channels require neat vertical walls at design depth without over-digging concrete volume. Let the yard know what work comes first so the right operator and bucket arrive.',
+        ],
+      },
+      {
+        heading: '5. Agree how daily machine hours and stand-by time are logged',
+        paragraphs: [
+          'Every shift should be signed off daily by the site supervisor against the machine hour meter or shift sheet, noting active digging hours separately from weather delays or waiting-for-fuel stoppages. Clear sign-offs prevent end-of-job disputes.',
+        ],
+      },
+      {
+        heading: '6 & 7. Confirm attachment needs and breakdown cover',
+        paragraphs: [
+          'If your site sits on hard volcanic rock or murram pan, a standard digging bucket alone will burn hours and wear teeth; check whether a hydraulic rock breaker attachment is available if rock is struck. Finally, confirm who pays stand-down charges if a hydraulic hose bursts and how quickly a field mechanic can reach the site.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
   {
     slug: 'what-a-motor-grader-does-on-a-road-job',
@@ -2120,12 +2226,44 @@ export const postsSeed: PostRecord[] = [
     readingTimeMinutes: 5,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/equipment-motor-grader.svg',
+      url: '/media/equip-grader.jpg',
       alt: 'Motor grader blade cutting road camber and side drain',
-      caption: 'Blade articulation and wheelbase geometry on a road grading job.',
+      caption: 'Long wheelbase frame and articulated moldboard shaping true road cross-fall.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: 'Wheelbase length, blade articulation and true levels',
+        paragraphs: [
+          'An agricultural tractor towing a rear grader blade bounces up and down with every bump its rear tyres roll over, copying old corrugations back into the road. A motor grader carries its moldboard suspended midway along a long rigid frame between front steering axles and rear tandem drive axles.',
+          'Because the blade sits in the middle of that long wheelbase, high spots are shaved down and hollows fill naturally instead of being mirrored.',
+        ],
+      },
+      {
+        heading: 'Cutting the road formation and cross-fall (camber)',
+        paragraphs: [
+          'A gravel or murram road should never be flat across its width. Flat sections hold puddles that soften the subgrade under every passing axle. The grader tilts its moldboard accurately to cut a 3% to 4% crown from the centreline toward each shoulder so rainwater runs sideways off the carriageway immediately.',
+        ],
+      },
+      {
+        heading: 'Shaping V-drains and mitre drains',
+        paragraphs: [
+          'By rotating the circle and extending the moldboard outward beyond the rear wheels, a grader tilts the blade sharply to cut clean V-shaped roadside drains and turnout mitre drains without driving the heavy tyres into the ditch bottom.',
+        ],
+      },
+      {
+        heading: 'Spreading murram in even lifts for the roller',
+        paragraphs: [
+          'Tipped murram arrives in heaps. A motor grader windrows, mixes moisture through the borrow material and lays uniform 150 mm loose lifts so the vibrating drum roller achieves consistent compaction from edge to edge.',
+        ],
+      },
+      {
+        heading: 'Planning daily production realistically',
+        paragraphs: [
+          'Output on a road job depends on whether the grader is lightly re-profiling existing gravel or performing heavy reshaping, ditch cutting and murram spreading ahead of a roller and water bowser. Matching grader passes to bowser and roller speed keeps the compacted road uniform rather than rushing uncompacted loose dirt ahead.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
   {
     slug: 'how-to-read-a-bill-of-quantities-kenya',
@@ -2138,12 +2276,44 @@ export const postsSeed: PostRecord[] = [
     readingTimeMinutes: 6,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/service-project-management.svg',
+      url: '/media/service-pm.jpg',
       alt: 'Construction drawings and Bill of Quantities review on site',
-      caption: 'Reviewing measured works and provisional sums before signing a contract.',
+      caption: 'Checking measured quantities, preliminaries and provisional sums before signing.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: 'What a BoQ is and why lump-sum quotes hide risk',
+        paragraphs: [
+          'A lump-sum total gives no breakdown of what concrete grade, steel tonnage, block thickness or sanitary fittings are actually priced. If two contractors submit totals 20% apart, only an itemised Bill of Quantities (BoQ) reveals whether one price is genuinely leaner or simply left out foundation depth, external drainage or finishes.',
+        ],
+      },
+      {
+        heading: 'Preliminaries and preambles explained',
+        paragraphs: [
+          'Preliminaries cover site setup that does not turn into bricks and mortar: temporary site office, water and power connections, hoarding, site supervision, scaffolding, insurance and statutory compliance. Review this section carefully so you know which running costs rest with the contractor and which belong to the employer.',
+        ],
+      },
+      {
+        heading: 'Measured works: checking quantities against your drawings',
+        paragraphs: [
+          'Measured trade sections break substructures, superstructures, roofing, finishes and MEP into clear units — cubic metres of concrete, kilograms of reinforcement, square metres of walling and tiling. Check major items against the approved architectural and structural drawings before awarding.',
+        ],
+      },
+      {
+        heading: 'Provisional sums and Prime Cost (PC) sums — where budgets blow up',
+        paragraphs: [
+          'A Provisional Sum is a placeholder allowance for work whose full scope is not yet finalised (such as uncertain rock excavation, borehole power tie-in or external landscaping). A Prime Cost (PC) sum sets an allowance for owner-selected items like kitchen cabinetry, specialist tiles or imported light fittings.',
+          'If those allowances are plugged in unrealistically low to make the tender look cheap, real costs climb sharply once you pick actual materials on site.',
+        ],
+      },
+      {
+        heading: 'Using the BoQ to value stage payments on site',
+        paragraphs: [
+          'During construction, an itemised BoQ provides an objective measure for interim valuations: payments match percentages of completed, inspected work rather than vague calendar milestones.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
   {
     slug: 'what-nca-categories-mean-when-choosing-a-contractor',
@@ -2156,12 +2326,39 @@ export const postsSeed: PostRecord[] = [
     readingTimeMinutes: 5,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/service-general-construction.svg',
+      url: '/media/statement-keys.jpg',
       alt: 'NCA compliance and site safety board on a Kenyan building project',
-      caption: 'Understanding NCA classes and annual contractor practising licences.',
+      caption: 'Verifying NCA work classes and active annual practising licences before contract award.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: 'Building works vs road works vs specialist classes',
+        paragraphs: [
+          'Under the National Construction Authority (NCA), contractors are registered separately by class of work. Building Works covers residential, commercial and institutional structures; Civil / Road Works covers highways, access roads, drainage, bridges and earthworks; Specialist classes cover electrical, mechanical and plumbing trades.',
+          'A contractor registered only for Building Works is not automatically registered for Civil / Road Works, so check that the certificate matches the primary scope of your project.',
+        ],
+      },
+      {
+        heading: 'Categories NCA 1 to NCA 8 and contract value limits',
+        paragraphs: [
+          'Within each class, NCA assigns a category from NCA 1 down to NCA 8 based on a contractor’s financial standing, audited accounts, plant and technical capacity. NCA 1 carries an unlimited contract value ceiling, whereas NCA 2 through NCA 8 step down progressively in maximum single-contract value.',
+          'Confirming the category ensures the contractor is legally permitted to sign and insure a contract of your project size.',
+        ],
+      },
+      {
+        heading: "Checking a contractor's current Annual Practising Licence",
+        paragraphs: [
+          'A registration certificate proves past admission, while the Annual Practising Licence confirms the contractor is active and in good standing for the current calendar year. Always ask to inspect the active licence rather than an expired certificate.',
+        ],
+      },
+      {
+        heading: 'Why project registration with NCA protects the owner',
+        paragraphs: [
+          'Beyond contractor registration, qualifying construction projects must be registered with NCA prior to commencement alongside county building approvals and NEMA clearance where applicable. Proper project registration reinforces site safety compliance, quality audits and clean documentation through to occupation.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
   {
     slug: 'why-roads-fail-without-drainage',
@@ -2174,12 +2371,45 @@ export const postsSeed: PostRecord[] = [
     readingTimeMinutes: 6,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/project-meru-access-road.svg',
+      url: '/media/statement-machines.jpg',
       alt: 'Precast concrete culvert headwall and trapezoidal side drain on a Meru road',
-      caption: 'Cross-drainage culverts and side drains protecting an access road.',
+      caption: 'Road camber, lined side drains, mitre drains and concrete pipe culverts working together.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: 'How water weakens subgrade and washes out murram',
+        paragraphs: [
+          'Most access roads do not fail because vehicles are too heavy for the top layer — they fail because rainwater saturates the soil underneath. Once clay or red volcanic subgrade softens with trapped moisture, tyre loads punch down into ruts and potholes within weeks.',
+          'On sloped approaches around Meru, fast surface water flowing down wheel tracks strips out uncompacted murram gravel faster than traffic wears it away.',
+        ],
+      },
+      {
+        heading: 'Camber (cross-fall): getting water off the running surface',
+        paragraphs: [
+          'Every graded gravel or paved road needs a deliberate cross-fall away from its crown (or a single cross-slope into an inside drain on hillside cuts). Getting runoff sideways off the road within a couple of metres keeps longitudinal gullies from forming down the middle of the track.',
+        ],
+      },
+      {
+        heading: 'Side drains, mitre drains and scour checks on Meru slopes',
+        paragraphs: [
+          'Side drains collect water shed by the road shoulders and uphill verges, while mitre (turnout) drains cut into the adjacent bush or stormwater swales every few dozen metres empty that ditch before volume builds up.',
+          'On steeper gradients, stone or concrete scour checks stepped down the invert slow water speed so earth ditches do not erode into deep ravines.',
+        ],
+      },
+      {
+        heading: 'Sizing pipe culverts (600 mm vs 900 mm) and headwalls',
+        paragraphs: [
+          'Where natural watercourses or full roadside ditches must cross beneath the carriage, concrete pipe culverts (commonly 600 mm or 900 mm internal diameter, bedded and surrounded cleanly with concrete) carry storm flows safely underground. Reinforced masonry or concrete headwalls and wingwalls at both inlet and outlet prevent water from bypassing around the pipe barrel.',
+        ],
+      },
+      {
+        heading: 'Simple maintenance after the rains',
+        paragraphs: [
+          'Before and immediately after the long and short rains, clearing silt, leaves and farm debris from culvert inlets and mitre drain outlets keeps drainage open for years at a fraction of the cost of rebuilding washed-out roadbed.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
   {
     slug: 'planning-a-hospitality-build-from-drawings-to-handover',
@@ -2187,17 +2417,48 @@ export const postsSeed: PostRecord[] = [
     categorySlug: 'building',
     relatedServiceSlug: 'general-construction',
     excerpt:
-      'Site zoning, underground drainage, acoustic and lighting coordination, and external cabro sequencing from our hospitality builds in Meru.',
+      'Site zoning, underground drainage, acoustic and lighting coordination, and external cabro sequencing from hospitality builds in Meru.',
     publishedAt: '2026-11-09',
     readingTimeMinutes: 7,
     authorSlug: 'newton-muthee',
     coverImage: {
-      url: '/media/project-black-perch-lounge.svg',
-      alt: 'Hospitality lounge pavilions and cabro forecourt at The Black Perch Lounge',
-      caption: 'Sequencing civil works, building structure and interior fit-out.',
+      url: '/media/project-black-perch.jpg',
+      alt: 'Hospitality lounge pavilions and cabro forecourt layout',
+      caption: 'Coordinating site zoning, underground services, building works and external paving.',
     },
-    sections: [],
-    _status: 'draft',
+    sections: [
+      {
+        heading: 'Site zoning: separating guest arrival, service deliveries and parking',
+        paragraphs: [
+          'A hospitality plot works smoothly when cars, kitchen deliveries, waste collection and seated guest areas do not fight for the same narrow lane. Before pouring strip foundations, peg out guest parking bays, turning circles, delivery access to stores and quiet outdoor terraces together on the ground.',
+        ],
+      },
+      {
+        heading: 'Getting drainage, power, water storage and waste right underground first',
+        paragraphs: [
+          'Kitchens, washrooms and paved courtyards demand far higher water storage, grease-trap sizing, storm runoff capacity and three-phase power ducting than a typical home. Laying sewer lines, stormwater drains, water tank bases and electrical sleeves in the right sequence prevents breaking freshly laid concrete or cabro later.',
+        ],
+      },
+      {
+        heading: 'Coordinating building structure with interior lighting and acoustics',
+        paragraphs: [
+          'In lounges and dining spaces, ambiance comes from first-fix discipline: concealing conduit runs for layered warm lighting, planning bar back-wall plumbing, and controlling reverberation across tiled floors and roofed gazebos before painting and joinery start.',
+        ],
+      },
+      {
+        heading: 'Sequencing external cabro and landscaping',
+        paragraphs: [
+          'Heavy material tippers and scaffolding tear up finished drives if external paving goes down too early. Leave final quarry-dust screeding and cabro laying until heavy structural masonry, plastering and roof works are out of the way, right after kerbs and storm catchpits are cured.',
+        ],
+      },
+      {
+        heading: 'Lessons from The Black Perch Lounge and Dukes Cottages',
+        paragraphs: [
+          'Across hospitality sites we have built — including The Black Perch Lounge in Meru (site clearance, cabro forecourt, open-air pavilions and perimeter lighting delivered by Shena Works) and earlier work at Dukes Cottages (delivered by Dukes Limited with Newton Muthee serving as Site Project Manager in 2020–2021) — clear setting-out of outdoor seating, parking circulation and drainage proved just as decisive for opening week as interior finishes.',
+        ],
+      },
+    ],
+    _status: 'published',
   },
 ]
 

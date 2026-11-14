@@ -21,8 +21,8 @@ export function HomeHero({ hero, ..._props }: HomeHeroProps = {}) {
     (typeof _props.heroImage === 'string'
       ? _props.heroImage
       : _props.heroImage?.url) ||
-    (hero?.heroImage?.url?.startsWith('http') ? hero.heroImage.url : null) ||
-    'https://images.pexels.com/photos/37333412/pexels-photo-37333412.jpeg?auto=compress&cs=tinysrgb&w=1600'
+    (hero?.heroImage?.url ? hero.heroImage.url : null) ||
+    '/media/hero-roads.jpg'
 
   const imgAlt =
     (typeof _props.heroImage === 'object' && _props.heroImage?.alt) ||

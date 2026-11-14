@@ -77,7 +77,7 @@ export default async function AboutPage() {
       <section className="hero page" style={{ padding: 0 }} data-surface="photo">
         <div className="ph">
           <Image
-            src="https://images.pexels.com/photos/5298215/pexels-photo-5298215.jpeg?auto=compress&cs=tinysrgb&w=1600"
+            src="/media/why-crew.jpg"
             alt="Crew members in safety gear working on a Shena site"
             fill
             priority
@@ -127,7 +127,7 @@ export default async function AboutPage() {
         <div className="split">
           <div className="ph">
             <Image
-              src="https://images.pexels.com/photos/12267902/pexels-photo-12267902.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              src="/media/service-roads.jpg"
               alt="A grader levelling a murram road"
               fill
               sizes="(min-width: 1024px) 56vw, 100vw"
@@ -149,7 +149,7 @@ export default async function AboutPage() {
         <div className="split r">
           <div className="ph warm">
             <Image
-              src="https://images.pexels.com/photos/33719014/pexels-photo-33719014.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              src="/media/service-building.jpg"
               alt="A building under construction with scaffolding"
               fill
               sizes="(min-width: 1024px) 56vw, 100vw"
@@ -171,7 +171,7 @@ export default async function AboutPage() {
         <div className="split">
           <div className="ph">
             <Image
-              src="https://images.pexels.com/photos/40736607/pexels-photo-40736607.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              src="/media/cta-site.jpg"
               alt="People and machines on a Shena road site"
               fill
               sizes="(min-width: 1024px) 56vw, 100vw"
@@ -233,7 +233,7 @@ export default async function AboutPage() {
         <div className="split r q">
           <div className="ph sq grey">
             <Image
-              src={team.portrait?.url || 'https://images.pexels.com/photos/17746097/pexels-photo-17746097.jpeg?auto=compress&cs=tinysrgb&w=1200'}
+              src={team.portrait?.url || '/media/newton-portrait.jpg'}
               alt={team.portrait?.alt || 'Portrait of the managing director in a suit'}
               fill
               sizes="(min-width: 1024px) 44vw, 100vw"

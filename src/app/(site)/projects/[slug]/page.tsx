@@ -187,25 +187,67 @@ export default async function ProjectCaseStudyPage({
               </div>
             </div>
 
-            <aside className="mside">
-              <div className="office" style={{ padding: '32px', background: '#fff' }}>
-                <h3 className="h4" style={{ marginBottom: '16px' }}>Need similar work?</h3>
-                <p className="sm" style={{ marginBottom: '24px' }}>
-                  Tell us about your site and what you want built.
-                </p>
-                <Link className="btn pri" href={`/contact?type=project&project=${project.slug}`} style={{ width: '100%', marginBottom: '12px' }}>
-                  Request a quote
-                </Link>
-                <a
-                  className="btn outl"
-                  href={`https://wa.me/254718971896?text=${encodeURIComponent(`Hello Shena Works, I saw the ${project.title} project and would like to discuss a similar project.`)}`}
-                  target="_blank"
-                  rel="noopener"
-                  style={{ width: '100%' }}
+            <aside
+              className="mside"
+              style={{ background: '#fff', border: '1px solid var(--g300)' }}
+            >
+              <h3 className="h4" style={{ marginBottom: '12px' }}>
+                Need similar work?
+              </h3>
+              <p className="sm" style={{ color: 'var(--ink-600)', marginBottom: '20px' }}>
+                Tell us about your site and what you want built.
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  marginBottom: '20px',
+                  paddingBottom: '16px',
+                  borderBottom: '1px solid var(--g300)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    flexShrink: 0,
+                    overflow: 'hidden',
+                    background: 'var(--g100)',
+                  }}
                 >
-                  WhatsApp us
-                </a>
+                  <img
+                    src="/media/newton-portrait.jpg"
+                    alt="Newton Muthee"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                </div>
+                <div>
+                  <p className="sm" style={{ fontWeight: 700, color: 'var(--ink-900)' }}>
+                    Newton Muthee
+                  </p>
+                  <p className="xs" style={{ color: 'var(--ink-600)' }}>
+                    Managing Director
+                  </p>
+                </div>
               </div>
+              <Link
+                className="btn pri"
+                href={`/contact?type=project&project=${project.slug}`}
+              >
+                Request a quote
+              </Link>
+              <a
+                className="btn outl"
+                style={{ marginBottom: 0 }}
+                href={`https://wa.me/254718971896?text=${encodeURIComponent(
+                  `Hello Shena Works, I saw the ${project.title} project on your website and I'd like something similar.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                WhatsApp us
+              </a>
             </aside>
           </div>
         </div>
@@ -323,7 +365,7 @@ export default async function ProjectCaseStudyPage({
                     <Image
                       src={
                         p.heroImage?.url ||
-                        'https://images.pexels.com/photos/16120138/pexels-photo-16120138.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                        '/media/project-black-perch.jpg'
                       }
                       alt={p.heroImage?.alt || p.title}
                       fill

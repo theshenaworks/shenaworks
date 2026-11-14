@@ -377,7 +377,7 @@ async function runSeed() {
     })
   }
 
-  // 10. Post Categories & Posts (stored as draft until reviewed)
+  // 10. Post Categories & Posts
   const postCatIdBySlug = new Map<string, number | string>()
   for (const pc of postCategoriesSeed) {
     const id = await upsertBySlug(payload, 'post-categories', pc.slug, {

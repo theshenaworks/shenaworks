@@ -1,13 +1,18 @@
 import React from 'react'
 import Link from 'next/link'
-import { getSiteSettings } from '@/lib/payload'
+import { SHENA_LOGO_VIEWBOX } from '@/lib/brand'
+import { getPublishedPosts, getSiteSettings } from '@/lib/payload'
 
 /**
  * Footer (AGENTS.md Section 0 & Section 5 Phase A & D)
  * Server Component emitting reference DOM with dynamic Payload data and reference fallbacks.
  */
 export async function Footer() {
-  const settings = await getSiteSettings().catch(() => null)
+  const [settings, posts] = await Promise.all([
+    getSiteSettings().catch(() => null),
+    getPublishedPosts().catch(() => []),
+  ])
+  const hasInsights = posts.length > 0
 
   const phoneDisplay = settings?.contact?.phoneDisplay || '+254 718 971 896'
   const phoneE164 = settings?.contact?.phoneE164 || '+254718971896'
@@ -20,7 +25,7 @@ export async function Footer() {
       <div className="f-top">
         <div className="f-left">
           <Link className="logo" href="/" aria-label="Shena Works home">
-            <svg viewBox="0 0 2172 724" aria-hidden="true" focusable="false">
+            <svg viewBox={SHENA_LOGO_VIEWBOX} aria-hidden="true" focusable="false">
               <use href="#shena-logo" />
             </svg>
           </Link>
@@ -39,6 +44,11 @@ export async function Footer() {
               <li>
                 <Link href="/about">About</Link>
               </li>
+              {hasInsights && (
+                <li>
+                  <Link href="/insights">Insights</Link>
+                </li>
+              )}
               <li>
                 <Link href="/contact">Contact</Link>
               </li>
