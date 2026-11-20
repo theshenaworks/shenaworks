@@ -16,8 +16,6 @@ const PUBLISHED_ROUTES = [
   '/projects/the-pin-hideout',
   '/projects/dukes-cottages-restaurant-and-garden',
   '/equipment',
-  '/equipment/excavators',
-  '/equipment/excavators/crawler-excavator',
   '/locations/meru',
   '/insights',
   '/insights/category/roads-and-paving',
@@ -30,6 +28,8 @@ const PUBLISHED_ROUTES = [
 const GATED_ROUTES = [
   '/services/architecture-and-consultancy',
   '/services/bills-of-quantities-and-estimating',
+  '/equipment/excavators',
+  '/equipment/excavators/crawler-excavator',
   '/locations/nairobi',
   '/about/credentials-and-safety',
 ]
@@ -63,7 +63,7 @@ test.describe('WCAG 2.2 AA Accessibility (axe-core)', () => {
     '/',
     '/services/road-construction-and-earthworks',
     '/projects/the-black-perch-lounge',
-    '/equipment/excavators/crawler-excavator',
+    '/equipment',
     '/insights',
     '/insights/murram-gravel-cabro-or-tarmac-access-road',
     '/contact',

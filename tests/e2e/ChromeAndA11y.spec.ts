@@ -78,7 +78,7 @@ test.describe('Global Chrome & Accessibility', () => {
     { name: 'Home', path: '/' },
     { name: 'Service', path: '/services/road-construction-and-earthworks' },
     { name: 'Project', path: '/projects/the-black-perch-lounge' },
-    { name: 'Equipment', path: '/equipment/excavators/crawler-excavator' },
+    { name: 'Equipment', path: '/equipment' },
     { name: 'Contact', path: '/contact' },
   ]
 
