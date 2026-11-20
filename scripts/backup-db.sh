@@ -7,6 +7,11 @@ if [[ -z "${DIRECT_DATABASE_URI:-}" ]]; then
   exit 1
 fi
 
+# Ensure libpq can verify Neon TLS certificates when sslmode=verify-full is used
+if [[ -z "${PGSSLROOTCERT:-}" && -f /etc/ssl/certs/ca-certificates.crt ]]; then
+  export PGSSLROOTCERT=/etc/ssl/certs/ca-certificates.crt
+fi
+
 TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 BACKUP_FILE="/tmp/shena-db-${TIMESTAMP}.dump"
 

@@ -19,11 +19,12 @@ jobs:
       - name: Install PostgreSQL client & AWS CLI
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends postgresql-client awscli
+          sudo apt-get install -y --no-install-recommends ca-certificates postgresql-client awscli
 
       - name: Run backup script
         env:
           DIRECT_DATABASE_URI: ${{ secrets.DIRECT_DATABASE_URI }}
+          PGSSLROOTCERT: /etc/ssl/certs/ca-certificates.crt
           R2_BACKUP_BUCKET: ${{ secrets.R2_BACKUP_BUCKET }}
           R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}

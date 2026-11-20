@@ -33,7 +33,7 @@ test.describe('Reduced Motion Compliance', () => {
 
   test('Timeline and Carousel items are visible without motion glitches', async ({ page }) => {
     await page.goto('/services/road-construction-and-earthworks')
-    const timelineHeadings = page.locator('h4')
+    const timelineHeadings = page.locator('ol.steps h3')
     await expect(timelineHeadings.first()).toBeVisible()
   })
 })

@@ -19,10 +19,19 @@ export const metadata: Metadata = buildPageMetadata({
   path: '/projects',
 })
 
+function normalizeQueryParam(value?: string | string[]): string {
+  if (Array.isArray(value)) return value[0] || ''
+  return value || ''
+}
+
 export default async function ProjectsIndexPage({
   searchParams,
 }: {
-  searchParams: Promise<{ service?: string; location?: string; year?: string }>
+  searchParams: Promise<{
+    service?: string | string[]
+    location?: string | string[]
+    year?: string | string[]
+  }>
 }) {
   const params = await searchParams
   const [projects, services, settings] = await Promise.all([
@@ -84,9 +93,9 @@ export default async function ProjectsIndexPage({
       <ProjectsCatalogClient
         projects={projects}
         services={services}
-        initialService={params.service || ''}
-        initialLocation={params.location || ''}
-        initialYear={params.year || ''}
+        initialService={normalizeQueryParam(params.service)}
+        initialLocation={normalizeQueryParam(params.location)}
+        initialYear={normalizeQueryParam(params.year)}
       />
 
       <CtaBand settings={settings} />

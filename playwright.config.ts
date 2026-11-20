@@ -18,9 +18,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
-          executablePath:
-            process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ||
-            (process.env.HOME ? `${process.env.HOME}/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome` : undefined),
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
         },
       },
     },

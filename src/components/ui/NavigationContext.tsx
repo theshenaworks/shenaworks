@@ -48,18 +48,22 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
     setOpenPanel(null)
   }, [pathname])
 
-  // Handle body scroll locking when mobile drawer is open
+  // Handle body scroll locking and background inert state when mobile drawer is open
   useEffect(() => {
+    const mainEl = document.getElementById('main')
     if (isDrawerOpen) {
       document.body.classList.add('lock')
       document.body.style.overflow = 'hidden'
+      mainEl?.setAttribute('inert', '')
     } else {
       document.body.classList.remove('lock')
       document.body.style.overflow = ''
+      mainEl?.removeAttribute('inert')
     }
     return () => {
       document.body.classList.remove('lock')
       document.body.style.overflow = ''
+      mainEl?.removeAttribute('inert')
     }
   }, [isDrawerOpen])
 
