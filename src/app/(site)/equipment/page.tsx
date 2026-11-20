@@ -105,13 +105,13 @@ export default async function EquipmentIndexPage() {
       {/* 3. Category chips */}
       <section style={{ padding: '0 0 48px' }}>
         <div className="wrap">
-          <div className="chips" aria-label="Equipment categories" style={{ margin: 0 }}>
+          <nav className="chips" aria-label="Equipment categories" style={{ margin: 0 }}>
             {categories.map((c) => (
               <a key={c.slug} className="chip" href={`#${c.slug}`}>
                 {c.name}
               </a>
             ))}
-          </div>
+          </nav>
         </div>
       </section>
 
