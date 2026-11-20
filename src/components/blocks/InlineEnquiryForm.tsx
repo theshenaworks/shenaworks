@@ -90,11 +90,13 @@ export function InlineEnquiryForm({
 
   const summaryRef = useRef<HTMLDivElement>(null)
   const startedAtRef = useRef<number>(Date.now())
+  const submittingRef = useRef(false)
   const todayIso = new Date().toISOString().slice(0, 10)
   const enquiryType: EnquiryType = mode
 
   const validateAndSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (submittingRef.current) return
     setServerError(null)
 
     const payload = {
@@ -157,6 +159,7 @@ export function InlineEnquiryForm({
     }
 
     setErrors({})
+    submittingRef.current = true
     setSubmitting(true)
 
     try {
@@ -182,6 +185,7 @@ export function InlineEnquiryForm({
           data?.error ||
             `Your enquiry didn't send. Your details are still in the form — please try again, or call ${phoneDisplay}.`,
         )
+        submittingRef.current = false
         setSubmitting(false)
         setTimeout(() => summaryRef.current?.focus(), 20)
         return
@@ -199,6 +203,7 @@ export function InlineEnquiryForm({
       setServerError(
         `Your enquiry didn't send. Your details are still in the form — please try again, or call ${phoneDisplay}.`,
       )
+      submittingRef.current = false
       setSubmitting(false)
       setTimeout(() => summaryRef.current?.focus(), 20)
     }
@@ -554,7 +559,13 @@ export function InlineEnquiryForm({
       </div>
 
       <div>
-        <button className="btn pri" type="submit" id="sb" aria-busy={submitting || undefined}>
+        <button
+          className="btn pri"
+          type="submit"
+          id="sb"
+          disabled={submitting}
+          aria-busy={submitting || undefined}
+        >
           {submitting ? 'Sending...' : submitLabel}
         </button>
       </div>

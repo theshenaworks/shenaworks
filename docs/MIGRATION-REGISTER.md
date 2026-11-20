@@ -21,11 +21,11 @@ This register tracks every component, layout, and primitive being refactored fro
 
 | Component | File Path | Target Architecture | Visual Parity Diff | A11y / Tests | Status |
 | :--- | :--- | :--- | :---: | :---: | :---: |
-| **Header** | `src/components/ui/Header.tsx` | Next.js Server/Client + `NavigationContext` | < 0.01 | PASS | COMPLETED |
+| **Header** | `src/components/ui/Header.tsx` | Next.js Server/Client + `NavigationContext` | Unverified (diff > 0.01: `Insights` link & wordmark SVG) | PASS | In Progress |
 | **MegaPanel** | `src/components/ui/HeaderClient.tsx` | React State hover/keyboard intent | < 0.01 | PASS | COMPLETED |
-| **MobileDrawer** | `src/components/ui/MobileDrawerClient.tsx` | Accessible Dialog (`role="dialog"`, `aria-modal`) | < 0.01 | PASS | COMPLETED |
-| **MobileActionBar**| `src/components/ui/MobileActionBar.tsx`| Semantic quick actions | < 0.01 | PASS | COMPLETED |
-| **Footer** | `src/components/ui/Footer.tsx` | Responsive footer layout | < 0.01 | PASS | COMPLETED |
+| **MobileDrawer** | `src/components/ui/MobileDrawerClient.tsx` | Accessible Dialog (`role="dialog"`, `aria-modal`, focus trap) | < 0.01 | PASS | COMPLETED |
+| **MobileActionBar**| `src/components/ui/MobileActionBar.tsx`| Semantic quick actions | Unverified (diff > 0.01: `768px` fixed offset) | PASS | In Progress |
+| **Footer** | `src/components/ui/Footer.tsx` | Responsive footer layout | Unverified (diff > 0.01: `Insights` footer link) | PASS | In Progress |
 | **CookieBanner** | `src/components/ui/CookieBanner.tsx` | Consent-gated client banner | < 0.01 | PASS | COMPLETED |
 
 ---

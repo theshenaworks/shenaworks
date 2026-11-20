@@ -104,7 +104,7 @@ export default async function MachineDetailPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
 
       {/* 1. Header & Gallery */}
@@ -139,13 +139,6 @@ export default async function MachineDetailPage({
               </a>
               <a className="btn outl" href={whatsappUrl} rel="noopener noreferrer" target="_blank">
                 WhatsApp us
-              </a>
-              <a
-                className="btn sec"
-                href={`/downloads/specs/${machine.slug}.pdf`}
-                download
-              >
-                Specification sheet (PDF)
               </a>
             </div>
           </div>

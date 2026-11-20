@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useNavigation } from './NavigationContext'
 
@@ -32,15 +32,78 @@ export function MobileDrawerClient({
   hasInsights,
 }: MobileDrawerClientProps) {
   const { isDrawerOpen, closeDrawer } = useNavigation()
+  const drawerRef = useRef<HTMLDivElement | null>(null)
+  const wasOpenRef = useRef(false)
+
+  useEffect(() => {
+    const drawer = drawerRef.current
+
+    const getFocusableElements = (): HTMLElement[] => {
+      if (!drawer) return []
+      const candidates = Array.from(
+        drawer.querySelectorAll<HTMLElement>(
+          'summary, button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      )
+      return candidates.filter((el) => {
+        // Exclude elements inside a closed <details> except its own direct <summary>
+        const parentDetails = el.closest('details')
+        if (parentDetails && !parentDetails.open) {
+          return el.tagName === 'SUMMARY' && el.parentElement === parentDetails
+        }
+        return el.offsetParent !== null
+      })
+    }
+
+    if (isDrawerOpen) {
+      wasOpenRef.current = true
+      const focusables = getFocusableElements()
+      if (focusables.length > 0) {
+        focusables[0].focus()
+      } else {
+        drawer?.focus()
+      }
+
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key !== 'Tab') return
+        const nodes = getFocusableElements()
+        if (nodes.length === 0) return
+        const first = nodes[0]
+        const last = nodes[nodes.length - 1]
+        if (e.shiftKey) {
+          if (document.activeElement === first || !drawer?.contains(document.activeElement)) {
+            e.preventDefault()
+            last.focus()
+          }
+        } else {
+          if (document.activeElement === last || !drawer?.contains(document.activeElement)) {
+            e.preventDefault()
+            first.focus()
+          }
+        }
+      }
+
+      document.addEventListener('keydown', handleKeyDown)
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown)
+      }
+    } else if (wasOpenRef.current) {
+      wasOpenRef.current = false
+      const opener = document.getElementById('mb')
+      opener?.focus()
+    }
+  }, [isDrawerOpen])
 
   return (
     <div
+      ref={drawerRef}
       className={`drawer ${isDrawerOpen ? 'open' : ''}`}
       id="dr"
       role="dialog"
       aria-label="Site navigation"
       aria-modal="true"
       aria-hidden={!isDrawerOpen}
+      tabIndex={-1}
     >
       <details>
         <summary>

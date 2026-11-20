@@ -130,6 +130,7 @@ export function EnquiryForm({
 
   const summaryRef = useRef<HTMLDivElement>(null)
   const startedAtRef = useRef<number>(Date.now())
+  const submittingRef = useRef(false)
   const turnstileContainerRef = useRef<HTMLDivElement>(null)
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
@@ -237,6 +238,7 @@ export function EnquiryForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (submittingRef.current) return
     setServerError(null)
 
     const payload = getFormPayload()
@@ -282,6 +284,7 @@ export function EnquiryForm({
     }
 
     setErrors({})
+    submittingRef.current = true
     setSubmitting(true)
 
     try {
@@ -311,6 +314,7 @@ export function EnquiryForm({
           data?.error ||
             `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${phoneDisplay}.`,
         )
+        submittingRef.current = false
         setSubmitting(false)
         setTimeout(() => summaryRef.current?.focus(), 20)
         return
@@ -328,6 +332,7 @@ export function EnquiryForm({
       setServerError(
         `Your enquiry didn't send because of a problem on our side. Your details are still in the form. Please try again, or call ${phoneDisplay}.`,
       )
+      submittingRef.current = false
       setSubmitting(false)
       setTimeout(() => summaryRef.current?.focus(), 20)
     }
@@ -417,6 +422,17 @@ export function EnquiryForm({
               </label>
             ))}
           </div>
+          <noscript>
+            <p className="help" style={{ marginTop: '8px' }}>
+              Without JavaScript, switch enquiry type to show its fields:{' '}
+              {TYPE_OPTIONS.map((opt, idx) => (
+                <React.Fragment key={opt.value}>
+                  {idx > 0 && ' · '}
+                  <a href={`/contact?type=${opt.value}#${id}`}>{opt.label}</a>
+                </React.Fragment>
+              ))}
+            </p>
+          </noscript>
         </fieldset>
 
         <div className="hp" aria-hidden="true">
@@ -768,7 +784,13 @@ export function EnquiryForm({
         {siteKey && <div ref={turnstileContainerRef} />}
 
         <div>
-          <button className="btn pri" type="submit" id="sb" aria-busy={submitting || undefined}>
+          <button
+            className="btn pri"
+            type="submit"
+            id="sb"
+            disabled={submitting}
+            aria-busy={submitting || undefined}
+          >
             {submitting ? 'Sending...' : 'Send enquiry'}
           </button>
         </div>

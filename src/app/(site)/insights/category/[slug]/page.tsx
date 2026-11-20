@@ -29,11 +29,11 @@ export default async function InsightsCategoryPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>
-  searchParams?: Promise<{ q?: string }>
+  searchParams?: Promise<{ q?: string | string[] }>
 }) {
   const [{ slug }, queryParams] = await Promise.all([
     params,
-    searchParams || Promise.resolve({} as { q?: string }),
+    searchParams || Promise.resolve({} as { q?: string | string[] }),
   ])
   const [categories, allPosts, settings] = await Promise.all([
     getPublishedPostCategories(),
@@ -70,7 +70,7 @@ export default async function InsightsCategoryPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
 
       <div className="ph-head">
@@ -95,7 +95,7 @@ export default async function InsightsCategoryPage({
         posts={allPosts}
         categories={categories}
         initialCategory={activeCat.slug}
-        initialQuery={(queryParams?.q || '').trim()}
+        initialQuery={(Array.isArray(queryParams?.q) ? queryParams.q[0] : queryParams?.q || '').trim()}
         basePath={path}
       />
 

@@ -2,7 +2,13 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-const OUT_DIR = path.resolve(process.cwd(), 'public/media')
+// Stock reference photos must NEVER ship to production (AGENTS.md Rule 3).
+// Default output stays outside public/media so stock assets cannot accidentally enter production builds.
+const allowPublicStaging = process.argv.includes('--allow-public-staging')
+const OUT_DIR = path.resolve(
+  process.cwd(),
+  allowPublicStaging ? 'public/media' : 'docs/reference/media-staging',
+)
 const force = process.argv.includes('--force')
 
 const REFERENCE_MEDIA = [
