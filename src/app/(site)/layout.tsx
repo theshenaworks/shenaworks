@@ -88,6 +88,12 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <NavigationProvider>
+          <a
+            href="#main"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:bg-white focus:text-[var(--ink-900)] focus:px-4 focus:py-3 focus:font-bold focus:outline-2 focus:outline-[var(--accent-500)]"
+          >
+            Skip to main content
+          </a>
           <LogoSprite />
           <Scrim />
           <Header />

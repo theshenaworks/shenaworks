@@ -9,7 +9,7 @@ test.describe('Global Chrome & Accessibility', () => {
       const active = document.activeElement as HTMLAnchorElement | null
       return active ? active.getAttribute('href') : null
     })
-    expect(activeHref).toBe('#main-content')
+    expect(activeHref).toBe('#main')
   })
 
   test('Desktop mega panel opens on hover/focus and closes on Escape', async ({ page }) => {
@@ -17,14 +17,14 @@ test.describe('Global Chrome & Accessibility', () => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/')
 
-    const servicesTrigger = page.locator('nav[aria-label="Primary"] a[href="/services"]').locator('..')
-    const toggleBtn = page.locator('button[aria-label="Toggle Services menu"]')
-    await expect(toggleBtn).toBeVisible()
+    const servicesTrigger = page.locator('header#hd nav.nav .has:has(a[href="/services"])')
+    const servicesLink = servicesTrigger.locator('> a[href="/services"]')
+    await expect(servicesLink).toBeVisible()
 
-    // Test hover intent (200ms)
+    // Test hover opens mega panel
     await servicesTrigger.hover()
     await page.waitForTimeout(300)
-    const megaPanel = page.locator('#mega-panel-services')
+    const megaPanel = page.locator('#p-sv')
     await expect(megaPanel).toBeVisible()
 
     // Test Escape key closes panel
@@ -32,7 +32,7 @@ test.describe('Global Chrome & Accessibility', () => {
     await expect(megaPanel).toBeHidden()
 
     // Test ArrowDown key opens panel
-    await toggleBtn.focus()
+    await servicesLink.focus()
     await page.keyboard.press('ArrowDown')
     await expect(megaPanel).toBeVisible()
     await page.keyboard.press('Escape')
@@ -44,7 +44,7 @@ test.describe('Global Chrome & Accessibility', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    const menuToggle = page.locator('button[aria-label="Open navigation menu"]')
+    const menuToggle = page.locator('button#mb')
     await expect(menuToggle).toBeVisible()
     await menuToggle.click()
 
@@ -52,16 +52,15 @@ test.describe('Global Chrome & Accessibility', () => {
     await expect(drawer).toBeVisible()
 
     // Check main content is inert when drawer is open
-    const mainContent = page.locator('#main-content')
+    const mainContent = page.locator('#main')
     await expect(mainContent).toHaveAttribute('inert', '')
 
-    // Verify focus trap wraps on both boundaries
-    const focusables = drawer.locator('a[href], button:not([disabled])')
-    const firstControl = focusables.first()
-    const lastControl = focusables.last()
+    // Verify focus trap wraps on both boundaries (first visible summary <-> last visible link)
+    const firstControl = drawer.locator('summary').first()
+    const lastControl = drawer.locator('.meta a[href]').last()
 
-    // 1. Focus first control and press Shift+Tab -> focus moves to last control
-    await firstControl.focus()
+    // 1. First focusable element receives focus on open; Shift+Tab wraps to last control
+    await expect(firstControl).toBeFocused()
     await page.keyboard.press('Shift+Tab')
     await expect(lastControl).toBeFocused()
 
@@ -69,9 +68,10 @@ test.describe('Global Chrome & Accessibility', () => {
     await page.keyboard.press('Tab')
     await expect(firstControl).toBeFocused()
 
-    // Press Escape to close
+    // Press Escape to close and restore focus to menu toggle
     await page.keyboard.press('Escape')
     await expect(drawer).toBeHidden()
+    await expect(menuToggle).toBeFocused()
   })
 
   const A11Y_PAGES = [
